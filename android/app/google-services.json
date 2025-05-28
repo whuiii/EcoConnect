@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "828443061933",
+    "project_id": "ecoconnect-e524f",
+    "storage_bucket": "ecoconnect-e524f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828443061933:android:facfc709232339aafa6024",
+        "android_client_info": {
+          "package_name": "com.EcoConnect.navigate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd9k1XdC2qMU_m__cB1PFs2rVXtX0A0ys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
