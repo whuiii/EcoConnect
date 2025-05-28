@@ -9,15 +9,10 @@ class Forgotpassword2 extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text("Verification"),
+        title: Text("Veri"),
       ),
+
 
     );
   }
-}
-
-_textFieldOTP({bool first, last}){
-  return Container(
-
-  )
 }
