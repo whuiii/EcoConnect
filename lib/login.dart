@@ -7,19 +7,19 @@ import 'package:navigate/register.dart';
 import 'forgotPassword2.dart';
 import 'navigate.dart'; // this is only for testing
 
-class Login extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginPageState extends State<LoginPage> {
   int activateIndex = 0;
   bool securePassword = true;
 
   final List<String> _images = [
-    'Assests/1.gif',
-    'Assests/2.gif',
-    'Assests/3.gif',
+    'assets/images/1.gif',
+    'assets/images/2.gif',
+    'assets/images/3.gif',
   ];
 
   @override
@@ -39,7 +39,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -67,67 +66,79 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              SizedBox(height: 5,),
+              SizedBox(
+                height: 5,
+              ),
               FadeInUp(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Welcome Back", style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black,
-                    ),),
+                    Text(
+                      "Welcome Back",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              SizedBox(height: 5,),
-              FadeInUp(child: Row(
+              SizedBox(
+                height: 5,
+              ),
+              FadeInUp(
+                  child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Sign in to continue",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),),
+                  Text(
+                    "Sign in to continue",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ],
               )),
-              SizedBox(height: 30,),
+              SizedBox(
+                height: 30,
+              ),
               FadeInUp(
-                delay: Duration(milliseconds: 800),
+                  delay: Duration(milliseconds: 800),
                   duration: Duration(milliseconds: 1500),
                   child: TextField(
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
-                      labelText: "Email",
-                      hintText: "Username or email",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-
-                      ),
-                      labelStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400
-                      ),
-                      prefixIcon: Icon(Iconsax.user, color: Colors.black, size: 18,),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
-                        borderRadius: BorderRadius.circular(10)
-                      ),
-                      floatingLabelStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
-                        borderRadius: BorderRadius.circular(10)
-                      )
-                    ),
-                  )
+                        labelText: "Email",
+                        hintText: "Username or email",
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        labelStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400),
+                        prefixIcon: Icon(
+                          Iconsax.user,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade200, width: 2),
+                            borderRadius: BorderRadius.circular(10)),
+                        floatingLabelStyle:
+                            TextStyle(color: Colors.black, fontSize: 18),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                            borderRadius: BorderRadius.circular(10))),
+                  )),
+              SizedBox(
+                height: 20,
               ),
-              SizedBox(height: 20,),
               FadeInUp(
                   delay: Duration(milliseconds: 800),
                   duration: Duration(milliseconds: 1500),
@@ -144,49 +155,55 @@ class _LoginState extends State<Login> {
                         labelStyle: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
-                            fontWeight: FontWeight.w400
-                        ),
+                            fontWeight: FontWeight.w400),
                         suffixIcon: togglePassword(),
-                        prefixIcon: Icon(Iconsax.key, color: Colors.black, size: 18,),
+                        prefixIcon: Icon(
+                          Iconsax.key,
+                          color: Colors.black,
+                          size: 18,
+                        ),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)
-                        ),
-                        floatingLabelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18
-                        ),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade200, width: 2),
+                            borderRadius: BorderRadius.circular(10)),
+                        floatingLabelStyle:
+                            TextStyle(color: Colors.black, fontSize: 18),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10)
-                        )
-                    ),
-                  )
-              ),
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                            borderRadius: BorderRadius.circular(10))),
+                  )),
               FadeInUp(
-                duration: Duration(milliseconds: 1300),
+                  duration: Duration(milliseconds: 1300),
                   delay: Duration(milliseconds: 800),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end ,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> Forgotpassword2()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Forgotpassword2()));
                           },
-                          child: Text("Forgot Password?", style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400
-                          ),))
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                          ))
                     ],
-              )),
-              SizedBox(height: 15,),
+                  )),
+              SizedBox(
+                height: 15,
+              ),
               FadeInUp(
-                duration: Duration(milliseconds: 1300),
+                  duration: Duration(milliseconds: 1300),
                   delay: Duration(milliseconds: 800),
                   child: MaterialButton(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Navigate())); // link to the home page
+                      Navigator.of(context).pushNamed('/3');
                     },
                     height: 45,
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
@@ -194,27 +211,40 @@ class _LoginState extends State<Login> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     color: Colors.black,
-                    child: Text("Login", style: TextStyle(
-                      color: Colors.white,
-                    ),),
+                    child: Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   )),
-              SizedBox(height: 8,),
+              SizedBox(
+                height: 8,
+              ),
               FadeInUp(
                 delay: Duration(milliseconds: 800),
                 duration: Duration(milliseconds: 1500),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don\'t have an account?", style: TextStyle(color: Colors.grey.shade600,
-                        fontSize: 15, fontWeight: FontWeight.w400),
+                    Text(
+                      "Don\'t have an account?",
+                      style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400),
                     ),
-                    TextButton(onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Register()));
-                    },
-                        child: Text("Register", style: TextStyle(color: Colors.blue,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400),))
-
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/2');
+                        },
+                        child: Text(
+                          "Register",
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400),
+                        ))
                   ],
                 ),
               ),
@@ -224,13 +254,17 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-  Widget togglePassword(){
-    return IconButton(onPressed: (){
-      setState(() {
-        securePassword = !securePassword;
-      });
-    },
-        icon: securePassword ? Icon(Icons.visibility): Icon(Icons.visibility_off),
-    color: Colors.grey,);
+
+  Widget togglePassword() {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          securePassword = !securePassword;
+        });
+      },
+      icon:
+          securePassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
+      color: Colors.grey,
+    );
   }
 }

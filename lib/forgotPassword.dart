@@ -5,7 +5,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:navigate/register.dart';
 //import 'package:firebase_core/firebase_core.dart';
 
-
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
 
@@ -27,11 +26,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   //modify on here to update a service id of the Email js
   void sendOTP() async {
-    print("Sending OTP to: ${_emailController.text.trim()}");  // Debug print
+    print("Sending OTP to: ${_emailController.text.trim()}"); // Debug print
     bool result = await emailAuth.sendOtp(
       recipientMail: _emailController.text.trim(),
       otpLength: 5,
-
     );
 
     print("OTP send result: $result");
@@ -113,13 +111,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         "Send OTP",
                         style: TextStyle(color: Colors.blue),
                       ),
-                      onPressed: (){
+                      onPressed: () {
                         sendOTP();
                       },
                     ),
                     prefixIcon: Icon(Iconsax.user, color: Colors.black),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+                      borderSide:
+                          BorderSide(color: Colors.grey.shade200, width: 2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -141,7 +140,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     hintText: "Enter 5-digit OTP",
                     prefixIcon: Icon(Iconsax.key, color: Colors.black),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+                      borderSide:
+                          BorderSide(color: Colors.grey.shade200, width: 2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     focusedBorder: OutlineInputBorder(
