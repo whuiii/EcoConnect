@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:navigate/delivery/page_delivery.dart';
 import 'package:navigate/forgotPassword2.dart';
 import 'package:navigate/home.dart';
 import 'package:navigate/login.dart';
@@ -17,7 +18,7 @@ class ProviderPage extends StatefulWidget {
 class _ProviderPageState extends State<ProviderPage> {
   final List<Widget> pages = [
     HomePage(),
-    LoginPage(),
+    DeliveryForm(),
     RegisterPage(),
     Forgotpassword2(),
   ];
