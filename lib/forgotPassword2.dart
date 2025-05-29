@@ -15,9 +15,3 @@ class Forgotpassword2 extends StatelessWidget {
     );
   }
 }
-
-_textFieldOTP({bool first, last}){
-  return Container(
-
-  )
-}

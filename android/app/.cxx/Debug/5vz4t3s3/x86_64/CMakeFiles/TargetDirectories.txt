@@ -1,0 +1,2 @@
+C:/Users/yihon/Desktop/Degree/2year3sem/TTP/EcoConnect/android/app/.cxx/Debug/5vz4t3s3/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/yihon/Desktop/Degree/2year3sem/TTP/EcoConnect/android/app/.cxx/Debug/5vz4t3s3/x86_64/CMakeFiles/rebuild_cache.dir
