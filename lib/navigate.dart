@@ -33,7 +33,7 @@ class _NavigateState extends State<Navigate> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: page[index], // go to the accroding page
+      //body: page[index], // go to the accroding page
       bottomNavigationBar:Theme(data: Theme.of(context).copyWith(
         iconTheme: IconThemeData(color: Colors.black), // icon color
       ), child: CurvedNavigationBar(

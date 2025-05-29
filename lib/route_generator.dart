@@ -3,6 +3,7 @@ import 'package:navigate/home.dart';
 import 'package:navigate/mainpage.dart';
 import 'package:navigate/login.dart';
 import 'package:navigate/main.dart';
+import 'package:navigate/navigate.dart';
 import 'package:navigate/register.dart';
 
 class RouteGenerator {
@@ -14,11 +15,13 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => MainPage());
       case '/1':
         return MaterialPageRoute(builder: (_) => LoginPage());
-       case '/2':
+      case '/2':
         return MaterialPageRoute(builder: (_) => RegisterPage());
-        case '/3':
+      case '/3':
         return MaterialPageRoute(builder: (_) => HomePage());
-    
+      case '/4':
+        return MaterialPageRoute(builder: (_) => Navigate());
+
       default:
         return MaterialPageRoute(builder: (_) => MainPage());
     }
