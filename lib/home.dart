@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:navigate/login.dart';
 import 'package:navigate/ranking.dart/provider_ranking.dart';
 
 enum RankingCategory { point, weight, frequency }
@@ -18,8 +19,8 @@ class _HomePageState extends State<HomePage> {
   int userPoints = 120;
   RankingCategory _selectedTab = RankingCategory.point;
   final page = [
-    //Home(),
-    // Weight(),
+    HomePage(),
+    LoginPage(),
     // Frequency(),
     // Point(),
   ];
@@ -139,23 +140,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-            iconTheme: IconThemeData(color: Colors.black), // icon color
-          ),
-          child: CurvedNavigationBar(
-            //key: navigationKey,
-            color: Colors.green.shade200, // navigation bar color
-            buttonBackgroundColor: Colors.green, // backgrond of icon color
-            backgroundColor: Colors.transparent,
-            height: 60,
-            animationCurve: Curves.easeInOut,
-            animationDuration:
-                Duration(milliseconds: 300), // make the animation more faster
-            index: index,
-            items: items,
-            onTap: (index) => setState(() => this.index = index),
-          ),
-        ));
+        );
   }
 }
