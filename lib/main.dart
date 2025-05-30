@@ -4,8 +4,10 @@ import 'package:navigate/route_generator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  print("Main function is running");
   //await Firebase.initializeApp();
   runApp(MaterialApp(
+
     initialRoute: '/',
     debugShowCheckedModeBanner: false,
     onGenerateRoute: RouteGenerator.generateRoute,

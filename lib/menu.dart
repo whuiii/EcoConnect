@@ -1,7 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/delivery/page_delivery.dart';
-import 'package:navigate/forgotPassword2.dart';
+import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/home.dart';
 import 'package:navigate/login.dart';
 import 'package:navigate/register.dart';
@@ -20,7 +20,7 @@ class _ProviderPageState extends State<ProviderPage> {
     HomePage(),
     DeliveryForm(),
     RegisterPage(),
-    Forgotpassword2(),
+    ForgotPassword(),
   ];
   int currentPage = 0;
   int index = 0;
