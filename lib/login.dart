@@ -3,8 +3,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/register.dart';
-import 'package:navigate/verify.dart';
 
+import 'forgotPassword2.dart';
 import 'navigate.dart'; // this is only for testing
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +22,19 @@ class _LoginPageState extends State<LoginPage> {
     'assets/images/3.gif',
   ];
 
-
+  @override
+  void initState() {
+    super.initState();
+    // Automatically cycle through images every 3 seconds
+    Future.doWhile(() async {
+      await Future.delayed(Duration(seconds: 3));
+      if (!mounted) return false;
+      setState(() {
+        activateIndex = (activateIndex + 1) % _images.length;
+      });
+      return true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ForgotPassword()));
+                                    builder: (context) => Forgotpassword2()));
                           },
                           child: Text(
                             "Forgot Password?",
