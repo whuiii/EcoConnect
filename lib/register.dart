@@ -12,6 +12,26 @@ class _RegisterPageState extends State<RegisterPage> {
   int activateIndex = 0;
   bool securePassword = true;
 
+  // condition of Password
+  bool _isPasswordEightCharacters = false;
+  bool _hasPasswordOneNumber = false;
+
+  onPasswordChanged(String password) {
+    final numericRegex = RegExp(r'[0-9]');
+    setState(() {
+      _isPasswordEightCharacters = false;
+      _hasPasswordOneNumber = false;
+      if(password.length >= 8){
+        _isPasswordEightCharacters = true;
+      }
+
+      if(numericRegex.hasMatch(password)){
+        _hasPasswordOneNumber = true;
+      }
+    });
+
+  }
+
   final List<String> _images = [
     'assets/images/1.gif',
     'assets/images/2.gif',
@@ -209,6 +229,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   delay: Duration(milliseconds: 800),
                   duration: Duration(milliseconds: 1500),
                   child: TextField(
+                    onChanged: (password) => onPasswordChanged(password),
                     obscureText: securePassword,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
@@ -239,6 +260,46 @@ class _RegisterPageState extends State<RegisterPage> {
                                 BorderSide(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(10))),
                   )),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: [
+                  AnimatedContainer(duration: Duration(milliseconds: 500),
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: _isPasswordEightCharacters ? Colors.green : Colors.transparent,
+                    border: _isPasswordEightCharacters ? Border.all(color: Colors.transparent) :
+                    Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                    child: Center(child: Icon(Icons.check, color: Colors.white, size: 15,),),
+                  ),
+                  SizedBox(width: 10,),
+                  Text("Contains at least 8 characters")
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  AnimatedContainer(duration: Duration(milliseconds: 500),
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: _hasPasswordOneNumber ? Colors.green : Colors.transparent,
+                      border: _hasPasswordOneNumber ? Border.all(color: Colors.transparent) :
+                      Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Center(child: Icon(Icons.check, color: Colors.white, size: 15,),),
+                  ),
+                  SizedBox(width: 10,),
+                  Text("Contains at least 1 number")
+                ],
+              ),
               SizedBox(
                 height: 20,
               ),

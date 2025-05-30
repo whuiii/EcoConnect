@@ -1,9 +1,8 @@
-import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:animate_do/animate_do.dart';
-import 'package:navigate/register.dart';
-//import 'package:firebase_core/firebase_core.dart';
+import 'package:navigate/resetPassword.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -13,164 +12,196 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _otpController = TextEditingController();
-  bool submitValid = false;
-  late EmailAuth emailAuth;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    emailAuth = EmailAuth(sessionName: "Forgot Password Session");
-  }
-
-  //modify on here to update a service id of the Email js
-  void sendOTP() async {
-    print("Sending OTP to: ${_emailController.text.trim()}"); // Debug print
-    bool result = await emailAuth.sendOtp(
-      recipientMail: _emailController.text.trim(),
-      otpLength: 5,
-    );
-
-    print("OTP send result: $result");
-
-    if (result) {
-      setState(() {
-        submitValid = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("OTP sent successfully")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to send OTP")),
-      );
-    }
-  }
-
-  void verifyOTP() async {
-    bool isValid = emailAuth.validateOtp(
-      recipientMail: _emailController.text.trim(),
-      userOtp: _otpController.text.trim(),
-    );
-
-    if (isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("OTP is valid. Proceed to reset password.")),
-      );
-      Navigator.pushReplacementNamed(context, '/home'); // Simulate reset flow
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid OTP")),
-      );
-    }
+  void dispose() {
+    emailController.dispose();
+    otpController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 40),
-              FadeInUp(
-                child: Text(
-                  "Forgot Password",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              SizedBox(height: 5),
-              FadeInUp(
-                child: Text(
-                  "OTP Verification to reset your Password",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-              FadeInUp(
-                delay: Duration(milliseconds: 800),
-                duration: Duration(milliseconds: 1500),
-                child: TextField(
-                  controller: _emailController,
-                  cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "Enter your email",
-                    suffixIcon: TextButton(
-                      child: Text(
-                        "Send OTP",
-                        style: TextStyle(color: Colors.blue),
+              topContainer(),
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(
+                        "https://img.freepik.com/free-vector/emails-concept-illustration_114360-1355.jpg?w=1380&t=st=1673699432~exp=1673700032~hmac=d65454eb5c72e8310209bf8ae770f849ea388f318dc6b9b1300b24b03e8886ca",
+                        height: 250,
                       ),
-                      onPressed: () {
-                        sendOTP();
-                      },
                     ),
-                    prefixIcon: Icon(Iconsax.user, color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.grey.shade200, width: 2),
-                      borderRadius: BorderRadius.circular(10),
+                    Container(
+                      padding: EdgeInsetsDirectional.fromSTEB(16, 30, 16, 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Please enter your email address. You will receive an OTP for verification.",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 13.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 30, bottom: 25),
+                            child: TextField(
+                              controller: emailController,
+                              cursorColor: Colors.black,
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                                hintText: "Email",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.mail,
+                                  color: Colors.black,
+                                  size: 18,
+                                ),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("OTP sent successfully")),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.send_rounded,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade200,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                floatingLabelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          pinCodeTextField(context, otpController),
+                          ElevatedButton(
+                            onPressed: () {
+                              print("Email: ${emailController.text}");
+                              print("OTP: ${otpController.text}");
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> ResetPassword()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 40, vertical: 15),
+                            ),
+                            child: Text(
+                              "Verify",
+                              style: TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeInUp(
-                delay: Duration(milliseconds: 800),
-                duration: Duration(milliseconds: 1500),
-                child: TextField(
-                  controller: _otpController,
-                  cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    labelText: "OTP",
-                    hintText: "Enter 5-digit OTP",
-                    prefixIcon: Icon(Iconsax.key, color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.grey.shade200, width: 2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeInUp(
-                duration: Duration(milliseconds: 1300),
-                delay: Duration(milliseconds: 800),
-                child: MaterialButton(
-                  onPressed: verifyOTP,
-                  height: 45,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  color: Colors.black,
-                  child: Text(
-                    "Verify",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // customize appbar
+  Widget topContainer() {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.20,
+      padding: EdgeInsets.only(left: 16, bottom: 15, top: 20),
+      color: Colors.green.shade200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () {
+              Get.back();
+            },
+            child: Icon(Icons.arrow_back),
+          ),
+          Spacer(),
+          Text(
+            "Forgot Password",
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 32,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget pinCodeTextField(BuildContext context, TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      child: PinCodeTextField(
+        controller: controller,
+        appContext: context,
+        length: 4,
+        keyboardType: TextInputType.number,
+        animationType: AnimationType.fade,
+        animationDuration: Duration(milliseconds: 300),
+        enableActiveFill: true,
+        pinTheme: PinTheme(
+          shape: PinCodeFieldShape.box,
+          borderRadius: BorderRadius.circular(10),
+          fieldHeight: 60,
+          fieldWidth: MediaQuery.of(context).size.width * 0.18,
+          inactiveColor: Colors.grey,
+          activeColor: Colors.black,
+          activeFillColor: Colors.white,
+          inactiveFillColor: Colors.grey.shade300,
+          selectedFillColor: Colors.grey.shade300,
         ),
       ),
     );
