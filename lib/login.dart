@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/register.dart';
 
+import 'color.dart';
 import 'forgotPassword2.dart';
 import 'navigate.dart'; // this is only for testing
 
@@ -92,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Sign in to continue",
+                    "Please log in to access your account",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -206,15 +207,17 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.of(context).pushNamed('/3');
                     },
                     height: 45,
+                    minWidth: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    color: Colors.black,
+                    color: button,
                     child: Text(
-                      "Login",
+                      "SIGN IN",
                       style: TextStyle(
                         color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
                   )),

@@ -3,6 +3,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:navigate/login.dart';
 
+import 'color.dart';
+
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -11,6 +13,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   int activateIndex = 0;
   bool securePassword = true;
+  bool? isChecked = false;
 
   // condition of Password
   bool _isPasswordEightCharacters = false;
@@ -337,9 +340,34 @@ class _RegisterPageState extends State<RegisterPage> {
                                 BorderSide(color: Colors.black, width: 1.5),
                             borderRadius: BorderRadius.circular(10))),
                   )),
-              SizedBox(
-                height: 30,
+              SizedBox(height: 10),
+              FadeInUp(
+                duration: Duration(milliseconds: 800),
+                delay: Duration(milliseconds: 1500),
+                child: Row(
+                  //mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Transform.scale(
+                      scale: 0.8, //  Adjust size
+                      child: Checkbox(
+                        value: isChecked,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            isChecked = newValue ?? false;
+                          });
+                        },
+                        activeColor: Colors.grey.shade200,
+                        checkColor: button,
+                      ),
+                    ),
+                    Text(
+                      "I agree to the Terms and Privacy Policy",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
               ),
+
               FadeInUp(
                   duration: Duration(milliseconds: 1300),
                   delay: Duration(milliseconds: 800),
@@ -349,15 +377,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           context, '/home'); // link to the home page
                     },
                     height: 45,
+                    minWidth: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    color: Colors.black,
+                    color: button,
                     child: Text(
-                      "Register",
+                      "SIGN UP",
                       style: TextStyle(
                         color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
                   )),
@@ -386,7 +416,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           style: TextStyle(
                               color: Colors.blue,
                               fontSize: 15,
-                              fontWeight: FontWeight.w400),
+                              fontWeight: FontWeight.w500),
                         ))
                   ],
                 ),

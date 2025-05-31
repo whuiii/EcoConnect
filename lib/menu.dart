@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:navigate/color.dart';
 import 'package:navigate/delivery/page_delivery.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/home.dart';
@@ -38,12 +39,12 @@ class _ProviderPageState extends State<ProviderPage> {
         body: pages[currentPage],
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
-            iconTheme: IconThemeData(color: Colors.black), // icon color
+            iconTheme: IconThemeData(color: Colors.white), // icon color
           ),
           child: CurvedNavigationBar(
             //key: navigationKey,
-            color: Colors.green.shade200, // navigation bar color
-            buttonBackgroundColor: Colors.green, // backgrond of icon color
+            color: button, // navigation bar color
+            buttonBackgroundColor: primaryColor_darkGreen, // backgrond of icon color
             backgroundColor: Colors.transparent,
             height: 60,
             animationCurve: Curves.easeInOut,

@@ -61,7 +61,7 @@ class _MainPageState extends State<MainPage> {
               padding: EdgeInsets.all(10),
               child: Column(
                 children: [
-                  SizedBox(height: 50),
+                  SizedBox(height: 30),
                   FadeInUp(
                     duration: Duration(milliseconds: 800),
                     child: Container(
@@ -126,6 +126,7 @@ Earn rewards for a greener lifestyle.''',
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
+
                               onPressed: () {
                                 Navigator.of(context).pushNamed('/1');
                               },
