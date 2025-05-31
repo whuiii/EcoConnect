@@ -4,6 +4,7 @@ import 'package:navigate/delivery/page_delivery.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/home.dart';
 import 'package:navigate/login.dart';
+import 'package:navigate/profile.dart';
 import 'package:navigate/register.dart';
 
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class _ProviderPageState extends State<ProviderPage> {
     HomePage(),
     DeliveryForm(),
     RegisterPage(),
-    ForgotPassword(),
+    Profile(),
   ];
   int currentPage = 0;
   int index = 0;

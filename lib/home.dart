@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:navigate/login.dart';
+import 'package:navigate/profile.dart';
 import 'package:navigate/ranking.dart/provider_ranking.dart';
 
 enum RankingCategory { point, weight, frequency }
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     HomePage(),
     LoginPage(),
     // Frequency(),
-    // Point(),
+    Profile(),
   ];
 
   Widget _getTabContent() {
