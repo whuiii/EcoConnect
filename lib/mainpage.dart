@@ -161,6 +161,7 @@ Earn rewards for a greener lifestyle.''',
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
+
                               onPressed: () {
                                 Navigator.of(context).pushNamed('/2');
                               },
