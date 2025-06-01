@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/delivery/page_delivery.dart';
+import 'package:navigate/education.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/home.dart';
 import 'package:navigate/login.dart';
@@ -21,7 +22,7 @@ class _ProviderPageState extends State<ProviderPage> {
   final List<Widget> pages = [
     HomePage(),
     DeliveryForm(),
-    RegisterPage(),
+    Education(),
     Profile(),
   ];
   int currentPage = 0;
