@@ -23,7 +23,7 @@ class GlassBin extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
-                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                   children: [
                     Text("Brown Bin",
                       style: TextStyle(fontSize: 30,
