@@ -61,11 +61,11 @@ class _MainPageState extends State<MainPage> {
               padding: EdgeInsets.all(10),
               child: Column(
                 children: [
-                  SizedBox(height: 30),
+                  SizedBox(height: 25),
                   FadeInUp(
                     duration: Duration(milliseconds: 800),
                     child: Container(
-                      height: 400,
+                      height: 380,
                       child: Image.asset('assets/images/EcoConnect_Logo.png'),
                       // child: Stack(
                       //   children: _images.asMap().entries.map((e) {
@@ -118,72 +118,69 @@ Earn rewards for a greener lifestyle.''',
                     height: 40,
                   ),
                   FadeInUp(
-                      delay: Duration(milliseconds: 800),
-                      duration: Duration(milliseconds: 1500),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/1');
-                              },
-                              child: Text(
-                                "LOGIN",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 80),
-                                  backgroundColor: button, // change the color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
+                    delay: Duration(milliseconds: 800),
+                    duration: Duration(milliseconds: 1500),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/1');
+                          },
+                          child: Text(
+                            "LOGIN",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: button,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
+
                   SizedBox(
                     height: 20,
                   ),
                   FadeInUp(
-                      delay: Duration(milliseconds: 800),
-                      duration: Duration(milliseconds: 1500),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/2');
-                              },
-                              child: Text(
-                                "REGISTER",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 60),
-                                  backgroundColor: button, // change the color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
+                    delay: Duration(milliseconds: 800),
+                    duration: Duration(milliseconds: 1500),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/2');
+                          },
+                          child: Text(
+                            "REGISTER",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: button,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

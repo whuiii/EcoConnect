@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quickalert/quickalert.dart';
 
 import '../color.dart';
 import '../mainpage.dart';
@@ -201,6 +202,12 @@ class _EditProfileState extends State<EditProfile> {
                   child: MaterialButton(
                     onPressed: () {
                       // Save profile changes
+                      QuickAlert.show(context: context,
+                          type: QuickAlertType.info,
+                      text: "Are you want to save changes?",
+                      title: "Alert",
+
+                      );
                     },
                     color: button,
                     padding:

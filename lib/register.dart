@@ -266,27 +266,34 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 20,
               ),
-              Row(
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child:Row(
                 children: [
                   AnimatedContainer(duration: Duration(milliseconds: 500),
-                  width: 15,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: _isPasswordEightCharacters ? Colors.green : Colors.transparent,
-                    border: _isPasswordEightCharacters ? Border.all(color: Colors.transparent) :
-                    Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: _isPasswordEightCharacters ? Colors.green : Colors.transparent,
+                      border: _isPasswordEightCharacters ? Border.all(color: Colors.transparent) :
+                      Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
                     child: Center(child: Icon(Icons.check, color: Colors.white, size: 15,),),
                   ),
                   SizedBox(width: 10,),
                   Text("Contains at least 8 characters")
                 ],
-              ),
+              ), ),
+
               SizedBox(
                 height: 10,
               ),
-              Row(
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child:Row(
                 children: [
                   AnimatedContainer(duration: Duration(milliseconds: 500),
                     width: 15,
@@ -302,7 +309,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(width: 10,),
                   Text("Contains at least 1 number")
                 ],
-              ),
+              ), ),
+
               SizedBox(
                 height: 20,
               ),
