@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/color.dart';
-import 'package:navigate/editProfile.dart';
+import 'package:navigate/profile/editProfile.dart';
 import 'package:navigate/mainpage.dart';
 
 class Profile extends StatelessWidget {

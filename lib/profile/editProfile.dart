@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'color.dart';
-import 'mainpage.dart';
-import 'utilis.dart'; // Assuming this contains your pickImage() function
+import '../color.dart';
+import '../mainpage.dart';
+import '../utilis.dart'; // Assuming this contains your pickImage() function
 
 class EditProfile extends StatefulWidget {
   @override

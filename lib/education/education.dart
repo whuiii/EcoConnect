@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:navigate/color.dart'; // Ensure this file defines the 'button' color variable
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:navigate/color.dart';
+import 'package:navigate/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
 
 class Education extends StatefulWidget {
   const Education({super.key});
@@ -62,7 +65,8 @@ class _EducationState extends State<Education> {
                     height: 300,
                     child: MaterialButton(
                       onPressed: () {
-                        print("Sorting education tapped");
+                        //print("Sorting education tapped");
+                        Get.to(WasteSort());
                       },
                       color: button.withOpacity(0.3),
                       shape: RoundedRectangleBorder(

@@ -2,9 +2,9 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:navigate/education.dart';
+import 'package:navigate/education/education.dart';
 import 'package:navigate/login.dart';
-import 'package:navigate/profile.dart';
+import 'package:navigate/profile/profile.dart';
 import 'package:navigate/ranking.dart/provider_ranking.dart';
 
 enum RankingCategory { point, weight, frequency }
