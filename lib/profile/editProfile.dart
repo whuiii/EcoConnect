@@ -203,9 +203,12 @@ class _EditProfileState extends State<EditProfile> {
                     onPressed: () {
                       // Save profile changes
                       QuickAlert.show(context: context,
-                          type: QuickAlertType.info,
+                          type: QuickAlertType.confirm,
                       text: "Are you want to save changes?",
                       title: "Alert",
+                        confirmBtnText: 'Yes',
+                        cancelBtnText: 'No',
+                        confirmBtnColor: Colors.green,
 
                       );
                     },
