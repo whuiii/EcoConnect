@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/education/diy.dart';
 import 'package:navigate/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
 
 class Education extends StatefulWidget {
@@ -36,6 +37,7 @@ class _EducationState extends State<Education> {
       "image": "assets/images/DIY.png",
       "onTap": () {
         print("Tapped on DIY video");
+        Get.to(() => DiyVideo());
       }
     },
   ];
