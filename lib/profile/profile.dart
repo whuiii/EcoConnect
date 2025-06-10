@@ -150,7 +150,7 @@ class ProfileMenuWidget extends StatelessWidget {
         width: 40,height: 40, // size of the circle
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: button, // not sure function
+          color: button,
         ),
         child: Icon(icon, color: Colors.white,size: 30,), //size of the icon
       ),

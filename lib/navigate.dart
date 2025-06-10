@@ -1,6 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
+import 'color.dart';
+
 class Navigate extends StatefulWidget {
   //const Navigate({super.key});
 
@@ -39,7 +41,7 @@ class _NavigateState extends State<Navigate> {
       ), child: CurvedNavigationBar(
         //key: navigationKey,
         color: Colors.green.shade200, // navigation bar color
-        buttonBackgroundColor: Colors.green, // backgrond of icon color
+        buttonBackgroundColor: primary, // backgrond of icon color
         backgroundColor: Colors.transparent,
         height: 60,
         animationCurve: Curves.easeInOut,

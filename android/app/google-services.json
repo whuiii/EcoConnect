@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:828443061933:android:facfc709232339aafa6024",
+        "mobilesdk_app_id": "1:828443061933:android:0a5e4356bc13c9fdfa6024",
         "android_client_info": {
-          "package_name": "com.EcoConnect.navigate"
+          "package_name": "com.example.navigate"
         }
       },
       "oauth_client": [],

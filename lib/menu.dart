@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/delivery/delivery.dart';
 import 'package:navigate/delivery/delivery_form.dart';
 import 'package:navigate/delivery/page_delivery.dart';
 import 'package:navigate/education/education.dart';
@@ -22,7 +23,7 @@ class ProviderPage extends StatefulWidget {
 class _ProviderPageState extends State<ProviderPage> {
   final List<Widget> pages = [
     HomePage(),
-    Delivery(),//DeliveryForm(),
+    DeliveryRequest(),//DeliveryForm(),
     Education(),
     Profile(),
   ];

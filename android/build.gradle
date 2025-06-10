@@ -1,16 +1,26 @@
+
+
 buildscript {
-    ext.kotlin_version = '1.9.10'
+    ext.kotlin_version = '1.9.10' //change from 1.9.10
     repositories {
         google()
         mavenCentral()
     }
 
+
+
+
     dependencies {
-        classpath "com.android.tools.build:gradle:8.3.0"
+        classpath "com.android.tools.build:gradle:8.3.0" //change from 8.3.0
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        //classpath 'com.google.gms:google-services:4.4.2' // add new
+        classpath 'com.google.gms:google-services:4.4.1' // add this
+
     }
 }
+
+//plugins {
+//    id 'com.google.gms.google-services' version '4.4.2' apply false// add new
+//}
 
 allprojects {
     repositories {

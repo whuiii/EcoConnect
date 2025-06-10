@@ -53,15 +53,22 @@ class _EducationState extends State<Education> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor:primary,
+        appBar: AppBar(
+          title: Text("Education"),
+          automaticallyImplyLeading: false, // hide the go back icon button
+          centerTitle: true,
+
+        ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 25),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Top Banner Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: SizedBox(
                     width: double.infinity,
                     height: 300,
