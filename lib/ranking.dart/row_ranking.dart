@@ -33,11 +33,17 @@ class _RankingListState extends State<RankingList> {
           height: 60,
           width: MediaQuery.of(context).size.width * 0.7,
           decoration: BoxDecoration(
-            color: widget.category == 'point'
-                ? Colors.green
-                : widget.category == 'weight'
-                    ? Colors.blue
-                    : Colors.orange,
+            color: widget.index == '1'
+                ? Colors.yellow
+                : widget.index == '2'
+                    ? const Color.fromARGB(255, 246, 235, 235)
+                    : widget.index == '3'
+                        ? Colors.orange
+                        : widget.category == 'point'
+                            ? point_color
+                            : widget.category == 'weight'
+                                ? weight_color
+                                : frequency_color,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
@@ -80,11 +86,17 @@ class _RankingListState extends State<RankingList> {
           height: 60,
           width: MediaQuery.of(context).size.width * 0.23,
           decoration: BoxDecoration(
-            color: widget.category == 'point'
-                ? Colors.green
-                : widget.category == 'weight'
-                    ? Colors.blue
-                    : Colors.orange,
+            color: widget.index == '1'
+                ? Colors.yellow
+                : widget.index == '2'
+                    ? const Color.fromARGB(255, 246, 235, 235)
+                    : widget.index == '3'
+                        ? Colors.orange
+                        : widget.category == 'point'
+                            ? point_color
+                            : widget.category == 'weight'
+                                ? weight_color
+                                : frequency_color,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Center(
