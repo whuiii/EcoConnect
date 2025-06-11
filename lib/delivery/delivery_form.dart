@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:location/location.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/delivery/dateTimePicker.dart';
@@ -17,6 +18,60 @@ class _DeliveryState extends State<Delivery> {
   bool? isPlastic = false;
   bool? isAluminium = false;
   bool? isPaper = false;
+
+  Location location = new Location();
+  bool _serviceEnabled = false;
+  PermissionStatus? _permissionGranted;
+  LocationData? _locationData;
+
+  Future<void> _requestLocationPermission() async {
+    _serviceEnabled = await location.serviceEnabled();
+    if(!_serviceEnabled){
+      _serviceEnabled = await location.requestService();
+      if(!_serviceEnabled){
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if(_permissionGranted == PermissionStatus.denied){
+      _permissionGranted = await location.requestPermission();
+      if(_permissionGranted != PermissionStatus.granted){
+        return;
+      }
+    }
+    //location service is enabled
+    _locationData = await location.getLocation();
+    setState(() {
+
+    });
+  }
+
+  // late String lat;
+  // late String long;
+  // String locationMessage = "Current Location of the User";
+  //
+  // Future<Position> _getCurrentLocation() async{
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if(!serviceEnabled){
+  //     return Future.error("Location services are disabled");
+  //   }
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied){
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied){
+  //       return Future.error("Location permission are denied");
+  //     }
+  //
+  //   }
+  //
+  //   if(permission == LocationPermission.deniedForever){
+  //     return Future.error("Location permissios are permanently denied, we cannot request to access");
+  //
+  //   }
+  //   return await Geolocator.getCurrentPosition();
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -175,6 +230,37 @@ class _DeliveryState extends State<Delivery> {
                   text: "Address",
                   hint: "Your Address",
                   icon: Iconsax.location),
+              SizedBox(height: 2,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(onPressed: (){
+                    _requestLocationPermission();
+                    // _getCurrentLocation().then((value){
+                    //   lat = '${value.latitude}';
+                    //   long = '${value.longitude}';
+                    //   setState(() {
+                    //     locationMessage = "Latitude: $lat, Longtitude: $long";
+                    //   });
+                    // });
+                  },
+                    child:Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.map),
+                        SizedBox(width: 8),
+                        Text("Get current location",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20,),
+              Text("Latitud: ${_locationData?.latitude?? ""}"),
+              Text("Longtitud: ${_locationData?.longitude?? ""}"),
+
               SizedBox(height: 16),
               Container(
                 height: 300,
