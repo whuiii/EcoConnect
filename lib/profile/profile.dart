@@ -12,114 +12,130 @@ class Profile extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
+          child: Column(
+            children: [
+              // Top Container
+              Container(
+                width: double.infinity,
+
+                decoration: BoxDecoration(
+                  color: button,
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30),
+                  ),
+                ),
+                padding: const EdgeInsets.all(30),
+                child: Column(
                   children: [
-                    SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.asset('assets/images/EcoConnect_Logo.png'),
-                      ),
+                    Stack(
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          height: 120,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.asset('assets/images/EcoConnect_Logo.png'),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              color: Colors.grey.shade300,
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child:Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.grey.shade300, // color of the circle
-                      ),
-                      child: Icon(Icons.edit, size: 18, color: Colors.grey.shade800,),
-                    ),),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "EcoConnect",
+                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white),
+                    ),
+                    const Text(
+                      "Bio Data: Recycle, Reuse, Reduce",
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white70),
+                    ),
+                   // const SizedBox(height: 20),
 
                   ],
                 ),
-                SizedBox(height: 10,),
-                Text("EcoConnect",
-                  style: TextStyle(fontSize: 30,fontWeight: FontWeight.w700),),
-                Text("Bio Data: Recycle, Reuse, Reduce",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),),
-                SizedBox(height: 20,),
-                SizedBox(width: 200,
-                  child: MaterialButton(onPressed: (){
-                    // Edit Profile
-                    Get.to(EditProfile());
-                  },
-                    color: button,
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  child: Text("Edit Profile",
-                    style: TextStyle(fontSize: 16, color: Colors.white),),),),
-                SizedBox(height: 30,),
-                const Divider(), // a line of divider
-                SizedBox(height: 10,),
-                ProfileMenuWidget(title: "Settings",icon: Icons.settings,onPress: (){
-                  //Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfile()));
-                },),
-                const Divider(),
-                SizedBox(height: 10,),
-                ProfileMenuWidget(
-                    title: "About Us",
-                    icon: Icons.info,
-                    onPress: (){}),
-                ProfileMenuWidget(
-                    title: "Rating",
-                    icon: Icons.star,
-                    onPress: (){}),
-
-                ProfileMenuWidget(
-                  title: "Logout",
-                  icon: Icons.logout_rounded,
-                  textColor: Colors.red,
-                  endIcon: false, // does not have the right arrow
-                  onPress: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> MainPage()));
-                },),
-                
-              ],
-            ),
               ),
-        )
 
-      ),
-    );
-  }
-
-  //
-  Widget topContainer(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.20,
-      padding: EdgeInsets.only(left: 16, bottom: 15, top: 20),
-      color: Colors.green.shade200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(Icons.arrow_back),
+              // Bottom Container (White)
+              Container(
+                width: double.infinity,
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.to(EditProfile());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: button,
+                          foregroundColor: button,
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Edit Profile",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height:10),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    ProfileMenuWidget(
+                      title: "Settings",
+                      icon: Icons.settings,
+                      onPress: () {},
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    ProfileMenuWidget(
+                      title: "About Us",
+                      icon: Icons.info,
+                      onPress: () {},
+                    ),
+                    ProfileMenuWidget(
+                      title: "Rating",
+                      icon: Icons.star,
+                      onPress: () {},
+                    ),
+                    ProfileMenuWidget(
+                      title: "Logout",
+                      icon: Icons.logout_rounded,
+                      textColor: Colors.red,
+                      endIcon: false,
+                      onPress: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => MainPage()),
+                              (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Spacer(),
-          Text(
-            "Profile",
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 32,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -128,13 +144,12 @@ class Profile extends StatelessWidget {
 class ProfileMenuWidget extends StatelessWidget {
   const ProfileMenuWidget({
     Key? key,
-    //super.key,
     required this.title,
     required this.icon,
     required this.onPress,
     this.endIcon = true,
     this.textColor,
-  }): super(key: key);
+  }) : super(key: key);
 
   final String title;
   final IconData icon;
@@ -147,24 +162,33 @@ class ProfileMenuWidget extends StatelessWidget {
     return ListTile(
       onTap: onPress,
       leading: Container(
-        width: 40,height: 40, // size of the circle
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
           color: button,
         ),
-        child: Icon(icon, color: Colors.white,size: 30,), //size of the icon
+        child: Icon(icon, color: Colors.white, size: 24),
       ),
-      title: Text(title,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500,color: textColor),),
-      trailing: endIcon? Container(
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: textColor ?? Colors.black,
+        ),
+      ),
+      trailing: endIcon
+          ? Container(
         width: 30,
         height: 30,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: Colors.grey.shade300, // color of the circle
+          color: Colors.grey.shade300,
         ),
-        child: Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey.shade800,),
-      ): null,
+        child: Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey.shade800),
+      )
+          : null,
     );
   }
 }

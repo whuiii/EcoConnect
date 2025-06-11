@@ -45,10 +45,11 @@ class _ProviderPageState extends State<ProviderPage> {
             iconTheme: IconThemeData(color: Colors.white), // icon color
           ),
           child: CurvedNavigationBar(
+            backgroundColor: Colors.transparent,
             //key: navigationKey,
             color: button, // navigation bar color
             buttonBackgroundColor: primaryColor_darkGreen, // backgrond of icon color
-            backgroundColor: Colors.transparent,
+
             height: 60,
             animationCurve: Curves.easeInOut,
             animationDuration:
@@ -61,21 +62,6 @@ class _ProviderPageState extends State<ProviderPage> {
             }),
           ),
         )
-
-        // bottomNavigationBar: BottomNavigationBar(
-        //   currentIndex: currentPage,
-        //   onTap: (value) {
-        //     setState(() {
-        //       currentPage = value;
-        //     });
-        //   },
-        //   items: const [
-        //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        //     BottomNavigationBarItem(icon: Icon(Icons.edit), label: "Edit"),
-        //     BottomNavigationBarItem(
-        //         icon: Icon(Icons.calculate), label: "Calculation")
-        //   ],
-        // ),
         );
   }
 }

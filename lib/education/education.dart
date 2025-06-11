@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/education/diy.dart';
+import 'package:navigate/education/paper.dart';
 import 'package:navigate/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
 
 class Education extends StatefulWidget {
@@ -76,6 +77,7 @@ class _EducationState extends State<Education> {
                       onPressed: () {
                         //print("Sorting education tapped");
                         Get.to(WasteSort());
+                        //Get.to(WasteEducationScreen());
                       },
                       color: button.withOpacity(0.3),
                       shape: RoundedRectangleBorder(

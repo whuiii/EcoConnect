@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/education/glass.dart';
+// TODO: Import other bin pages (e.g., paper.dart, waste.dart, plastic.dart)
 
 class WasteSort extends StatelessWidget {
   const WasteSort({super.key});
@@ -8,9 +9,13 @@ class WasteSort extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recycling Bins')),
+      appBar: AppBar(
+        title: const Text('Recycling Bins'),
+        centerTitle: true,
+        backgroundColor: Colors.green.shade700,
+      ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 16, right: 16, left: 16, bottom: 10),
+        padding: const EdgeInsets.all(16.0),
         child: GridView.count(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
@@ -20,22 +25,22 @@ class WasteSort extends StatelessWidget {
             RecyclingBin(
               color: 'brown',
               label: 'Glass',
-              onTap: () => Get.to(() => const GlassBin(),transition: Transition.zoom),
+              onTap: () => Get.to(() => const GlassBin(), transition: Transition.zoom),
             ),
             RecyclingBin(
               color: 'blue',
               label: 'Paper',
-              onTap: () => Get.to(() => const GlassBin()), // Replace with PaperBin()
+              onTap: () => Get.to(() => const GlassBin()), // TODO: Replace with PaperBin()
             ),
             RecyclingBin(
               color: 'black',
               label: 'General Waste',
-              onTap: () => Get.to(() => const GlassBin()), // Replace with WasteBin()
+              onTap: () => Get.to(() => const GlassBin()), // TODO: Replace with WasteBin()
             ),
             RecyclingBin(
               color: 'orange',
               label: 'Plastic & Metal',
-              onTap: () => Get.to(() => const GlassBin()), // Replace with PlasticBin()
+              onTap: () => Get.to(() => const GlassBin()), // TODO: Replace with PlasticBin()
             ),
           ],
         ),
@@ -89,16 +94,16 @@ class RecyclingBin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // ✅ Function is triggered on tap
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Card(
-        elevation: 2,
+        elevation: 3,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: _getBorderColor(color), width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
