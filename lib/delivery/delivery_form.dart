@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart'; // Make sure to add iconsax package in pubspec.yaml
+import 'package:iconsax/iconsax.dart';
+import 'package:navigate/color.dart';
+import 'package:navigate/delivery/bagsize_roundcheck.dart';
+import 'package:navigate/delivery/dateTimePicker.dart';
+import 'package:navigate/delivery/placeholder_delivery.dart'; // Make sure to add iconsax package in pubspec.yaml
 
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
@@ -10,6 +14,9 @@ class Delivery extends StatefulWidget {
 
 class _DeliveryState extends State<Delivery> {
   int currentStep = 0;
+  bool? isPlastic = false;
+  bool? isAluminium = false;
+  bool? isPaper = false;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +24,7 @@ class _DeliveryState extends State<Delivery> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Delivery Form"),
+          backgroundColor: primary,
           centerTitle: true,
         ),
         body: Column(
@@ -27,7 +35,8 @@ class _DeliveryState extends State<Delivery> {
                 currentStep: currentStep,
                 steps: getStep(),
                 controlsBuilder: (context, _) {
-                  return SizedBox.shrink(); // Hides default Continue/Cancel buttons
+                  return SizedBox
+                      .shrink(); // Hides default Continue/Cancel buttons
                 },
               ),
             ),
@@ -52,7 +61,9 @@ class _DeliveryState extends State<Delivery> {
                         setState(() => currentStep += 1);
                       }
                     },
-                    child: Text(currentStep == getStep().length - 1 ? "Finish" : "Continue"),
+                    child: Text(currentStep == getStep().length - 1
+                        ? "Finish"
+                        : "Continue"),
                   ),
                 ],
               ),
@@ -63,168 +74,130 @@ class _DeliveryState extends State<Delivery> {
     );
   }
 
-
   List<Step> getStep() => [
-    Step(
-      isActive: currentStep >= 0,
-      title: Text("Account"),
-      content: Column(
-        children: [
-          TextField(
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              labelText: "Email",
-              hintText: "Email",
-              hintStyle: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
+        Step(
+          isActive: currentStep >= 0,
+          title: Text("Account"),
+          content: Column(
+            children: [
+              FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
+              SizedBox(height: 16),
+              FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
+              SizedBox(height: 16),
+              FillInBlank(
+                  text: "Phone Number",
+                  hint: "Phone Number",
+                  icon: Iconsax.call),
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(top: 10, bottom: 5),
+                child: Text("Recyclable Materials:",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    )),
               ),
-              labelStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+              Column(
+                children: [
+                  Row(children: [
+                    Checkbox(
+                      value: isPlastic,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isPlastic = value;
+                        });
+                      },
+                      activeColor: Colors.orange, // fill color when checked
+                      checkColor: Colors.white, // tick mark color
+                    ),
+                    Text(
+                      "Plastic",
+                      style: TextName,
+                    ),
+                  ]),
+                  Row(children: [
+                    Checkbox(
+                      value: isAluminium,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isAluminium = value;
+                        });
+                      },
+                      activeColor: Colors.brown, // fill color when checked
+                      checkColor: Colors.white, // tick mark color
+                    ),
+                    Text(
+                      "Aluminium",
+                      style: TextName,
+                    ),
+                  ]),
+                  Row(children: [
+                    Checkbox(
+                      value: isPaper,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isPaper = value;
+                        });
+                      },
+                      activeColor: Colors.blue, // fill color when checked
+                      checkColor: Colors.white, // tick mark color
+                    ),
+                    Text(
+                      "Paper",
+                      style: TextName,
+                    ),
+                  ]),
+                ],
               ),
-              prefixIcon: Icon(
-                Iconsax.sms,
-                color: Colors.black,
-                size: 18,
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(top: 10, bottom: 5),
+                child: Text("Estimated Quantity",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    )),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.grey.shade200,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+              BagSizeSelector(),
+            ],
           ),
-          SizedBox(height: 16),
-          TextField(
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              labelText: "Username",
-              hintText: "Username",
-              prefixIcon: Icon(
-                Iconsax.user,
-                color: Colors.black,
-                size: 18,
+        ),
+        Step(
+          isActive: currentStep >= 1,
+          title: Text("Detail"),
+          content: Column(
+            children: [
+              DateTimePickerWidget(),
+              SizedBox(height: 20),
+              FillInBlank(
+                  text: "Address",
+                  hint: "Your Address",
+                  icon: Iconsax.location),
+              SizedBox(height: 16),
+              Container(
+                height: 300,
+                width: 500,
+                color: primary,
+                child: Text("Map"),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.grey.shade200,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
-    ),
-    Step(
-      isActive: currentStep >= 1,
-      title: Text("Detail"),
-      content: Column(
-        children: [
-          TextField(
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              labelText: "Address",
-              hintText: "Your address",
-              prefixIcon: Icon(
-                Iconsax.location,
-                color: Colors.black,
-                size: 18,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.grey.shade200,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+        ),
+        Step(
+          isActive: currentStep >= 2,
+          title: Text("Complete"),
+          content: Column(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 48),
+              SizedBox(height: 10),
+              Text(
+                "All steps completed!",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              )
+            ],
           ),
-          SizedBox(height: 16),
-          TextField(
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              labelText: "Phone Number",
-              hintText: "Phone Number",
-              prefixIcon: Icon(
-                Iconsax.call,
-                color: Colors.black,
-                size: 18,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.grey.shade200,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              floatingLabelStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.black,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-    Step(
-      isActive: currentStep >= 2,
-      title: Text("Complete"),
-      content: Column(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 48),
-          SizedBox(height: 10),
-          Text(
-            "All steps completed!",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          )
-        ],
-      ),
-    ),
-  ];
+        ),
+      ];
 }

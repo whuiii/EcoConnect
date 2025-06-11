@@ -7,10 +7,8 @@ const Color primaryText = Color.fromARGB(255, 112, 64, 18);
 const Color button = Color.fromARGB(255, 107, 140, 33);
 const Color primaryColor_darkGreen = Color.fromARGB(255, 74, 115, 55);
 
-const TextName = TextStyle(
-    fontSize: 17,
-    fontWeight: FontWeight.bold,
-    color: Color.fromARGB(255, 0, 0, 0));
+const TextName =
+    TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w400);
 
 const TextPoint = TextStyle(fontSize: 15, color: Color.fromARGB(255, 0, 0, 0));
 
