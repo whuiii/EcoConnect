@@ -221,32 +221,36 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   )),
-              SizedBox(height: 20,),
-              FadeInUp(delay: Duration(milliseconds: 800),
+              SizedBox(
+                height: 20,
+              ),
+              FadeInUp(
+                  delay: Duration(milliseconds: 800),
                   duration: Duration(milliseconds: 1500),
                   child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Divider(
+                    children: <Widget>[
+                      Expanded(
+                        child: Divider(
 
-                      //color: Colors.grey,
-                      //thickness: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      "or connected with",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  Expanded(child: Divider(
-
+                            //color: Colors.grey,
+                            //thickness: 1,
+                            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          "or connected with",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
                   )),
-                ],
-              )),
-              SizedBox(height: 20,),
-              FadeInUp(delay: Duration(milliseconds: 800),
+              SizedBox(
+                height: 20,
+              ),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
                 duration: Duration(milliseconds: 1500),
                 child: MaterialButton(
                   onPressed: () {
@@ -261,24 +265,25 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.network(
-                        "https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg",
+                      Image.asset(
+                        "assets/images/google.png",
                         height: 25,
                       ),
                       SizedBox(width: 10),
                       Text(
                         "Continue with Google",
-                        style: TextStyle(color: Colors.black,
-                          fontSize: 16,
-                        fontWeight: FontWeight.w400),
-
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
                       )
                     ],
                   ),
                 ),
               ),
-              SizedBox(height:10),
-              FadeInUp(delay: Duration(milliseconds: 800),
+              SizedBox(height: 10),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
                 duration: Duration(milliseconds: 1500),
                 child: MaterialButton(
                   onPressed: () {
@@ -293,17 +298,17 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.network(
-                        "https://www.pocketnews.com.my/wp-content/uploads/2024/11/Apple-Logo.png",
+                      Image.asset(
+                        "assets/images/apple.png",
                         height: 25,
                       ),
                       SizedBox(width: 10),
                       Text(
                         "Continue with Apple",
-                        style: TextStyle(color: Colors.black,
+                        style: TextStyle(
+                            color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.w400),
-
                       )
                     ],
                   ),

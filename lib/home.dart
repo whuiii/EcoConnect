@@ -7,6 +7,7 @@ import 'package:navigate/education/education.dart';
 import 'package:navigate/login.dart';
 import 'package:navigate/profile/profile.dart';
 import 'package:navigate/ranking.dart/provider_ranking.dart';
+import 'package:navigate/ranking.dart/top3_ranking.dart';
 
 enum RankingCategory { point, weight, frequency }
 
@@ -51,98 +52,128 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              //Top Bar
-              Container(
-                color: primary,
-                child: Row(
-                  children: [
-                    //Profile Image
-                    Container(
-                      width: 100,
-                      height: 100,
-                      child: Padding(
-                        padding: EdgeInsets.all(
-                            15), // Adjust Padding to change the image size
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              45), // slightly smaller radius
-                          child: Image.asset(
-                            "assets/images/ava.jpg",
-                            fit: BoxFit.cover,
-                          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            //Top Bar
+            Container(
+              color: primary,
+              child: Row(
+                children: [
+                  //Profile Image
+                  Container(
+                    width: 100,
+                    height: 100,
+                    child: Padding(
+                      padding: EdgeInsets.all(
+                          15), // Adjust Padding to change the image size
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            45), // slightly smaller radius
+                        child: Image.asset(
+                          "assets/images/ava.jpg",
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    //Profile Name
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      child: Text(
-                        "Chong Yi Hong bt Mohammad Ashraf",
-                        style: TextName,
+                  ),
+                  //Profile Name
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: Text(
+                      "Chong Yi Hong bt Mohammad Ashraf",
+                      style: TextName,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  //Points
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Point: $userPoints", style: TextPoint),
+                      Text(
+                        "Click to exchange reward",
+                        style: TextLink,
                       ),
-                    ),
-                    SizedBox(width: 10),
-                    //Points
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Point: $userPoints", style: TextPoint),
-                        Text(
-                          "Click to exchange reward",
-                          style: TextLink,
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                    ],
+                  )
+                ],
               ),
-              Container(
-                color: primary,
-                child:
+            ),
+            Container(
+              color: primary,
+              child:
 
-                    //Rankings
-                    CupertinoSlidingSegmentedControl<RankingCategory>(
-                  backgroundColor: CupertinoColors.systemGrey5,
-                  thumbColor: _selectedTab == RankingCategory.point
-                      ? Colors.green
-                      : _selectedTab == RankingCategory.weight
-                          ? Colors.blue
-                          : Colors.orange,
-                  groupValue: _selectedTab,
-                  onValueChanged: (RankingCategory? value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedTab = value;
-                      });
-                    }
-                  },
+                  //Rankings
+                  Column(
+                children: [
+                  //Image
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      //Image
+                      Top3Ranking(
+                          size: 70,
+                          rank: 2,
+                          imagePath: "assets/images/ava.jpg",
+                          name: "Recycle Monster",
+                          colored: const Color.fromARGB(255, 246, 235, 235)),
 
-                  //TabPage for Ranking Category
-                  children: const <RankingCategory, Widget>{
-                    RankingCategory.point: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25),
-                      child: Text('Point'),
-                    ),
-                    RankingCategory.weight: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25),
-                      child: Text('Weight'),
-                    ),
-                    RankingCategory.frequency: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25),
-                      child: Text('Frequency'),
-                    ),
-                  },
-                ),
+                      Top3Ranking(
+                          size: 100,
+                          rank: 1,
+                          imagePath: "assets/images/ava.jpg",
+                          name: "Yihong",
+                          colored: Colors.yellow),
+                      Top3Ranking(
+                          size: 70,
+                          rank: 3,
+                          imagePath: "assets/images/ava.jpg",
+                          name: "Mega Knight",
+                          colored: Colors.orangeAccent),
+                    ],
+                  ),
+                  CupertinoSlidingSegmentedControl<RankingCategory>(
+                    backgroundColor: CupertinoColors.systemGrey5,
+                    thumbColor: _selectedTab == RankingCategory.point
+                        ? point_color
+                        : _selectedTab == RankingCategory.weight
+                            ? weight_color
+                            : frequency_color,
+                    groupValue: _selectedTab,
+                    onValueChanged: (RankingCategory? value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedTab = value;
+                        });
+                      }
+                    },
+
+                    //TabPage for Ranking Category
+                    children: const <RankingCategory, Widget>{
+                      RankingCategory.point: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 25),
+                        child: Text('Point'),
+                      ),
+                      RankingCategory.weight: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 25),
+                        child: Text('Weight'),
+                      ),
+                      RankingCategory.frequency: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 25),
+                        child: Text('Frequency'),
+                      ),
+                    },
+                  ),
+                ],
               ),
-              Expanded(
-                child: _getTabContent(),
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: _getTabContent(),
+            ),
+          ],
         ),
-        );
+      ),
+    );
   }
 }
