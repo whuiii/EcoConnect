@@ -149,13 +149,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   //     bufferedColor: Colors.purple.shade200,
                   //   ),
                   // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(_formatDuration(_controller.value.position)),
-                      Text(_formatDuration(_controller.value.duration)),
-                    ],
-                  ),
+
                 ],
               ),
             ),
@@ -210,93 +204,102 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Widget _controlView(BuildContext context) {
-    final noMute = (_controller?.value.volume ?? 0) > 0;
     final duration = _duration?.inSeconds ?? 0;
-    final head = _position?.inSeconds ?? 0;
-    final remained = max(0, duration - head);
-    final mins = convertTwo(remained ~/ 60);
-    final secs = convertTwo(remained % 60);
+    final position = _position?.inSeconds ?? 0;
+    final currentFormatted = _formatDuration(Duration(seconds: position));
+    final totalFormatted = _formatDuration(Duration(seconds: duration));
 
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: Colors.red.shade700,
-            inactiveTrackColor: Colors.red.shade100,
-            thumbColor: Colors.redAccent,
-            overlayColor: Colors.red.withAlpha(32),
-            trackShape: const RoundedRectSliderTrackShape(),
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 28),
-            valueIndicatorShape: const PaddleSliderValueIndicatorShape(),
-            valueIndicatorColor: Colors.redAccent,
-            valueIndicatorTextStyle: const TextStyle(color: Colors.white),
-          ),
-          child: Slider(
-            value: _progress * 100,
-            min: 0,
-            max: 100,
-            divisions: 100,
-            label: _position?.toString().split(".")[0],
-            onChanged: (value) {
-              setState(() {
-                final newPosition = Duration(
-                    milliseconds:
-                    (_controller.value.duration.inMilliseconds * (value / 100)).round());
-                _controller.seekTo(newPosition);
-              });
-            },
-            onChangeStart: (_) => _controller?.pause(),
-            onChangeEnd: (value) {
-              final duration = _controller?.value.duration;
-              if (duration != null) {
-                final newValue = max(0, min(value, 99)) * 0.01;
-                final millis = (duration.inMilliseconds * newValue).toInt();
-                _controller?.seekTo(Duration(milliseconds: millis));
-                _controller?.play();
-              }
-            },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Text(
+                currentFormatted,
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 4,
+                    activeTrackColor: Colors.deepPurple,
+                    inactiveTrackColor: Colors.deepPurple.shade100,
+                    thumbColor: Colors.deepPurpleAccent,
+                    overlayColor: Colors.deepPurple.withOpacity(0.1),
+                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                  ),
+                  child: Slider(
+                    value: _progress * 100,
+                    min: 0,
+                    max: 100,
+                    onChanged: (value) {
+                      setState(() {
+                        final newPosition = Duration(
+                          milliseconds: (_controller.value.duration.inMilliseconds * (value / 100)).round(),
+                        );
+                        _controller.seekTo(newPosition);
+                      });
+                    },
+                    onChangeStart: (_) => _controller.pause(),
+                    onChangeEnd: (value) {
+                      final duration = _controller.value.duration;
+                      if (duration != null) {
+                        final newValue = value.clamp(0, 100) * 0.01;
+                        final millis = (duration.inMilliseconds * newValue).toInt();
+                        _controller.seekTo(Duration(milliseconds: millis));
+                        _controller.play();
+                      }
+                    },
+                  ),
+                ),
+              ),
+              Text(
+                totalFormatted,
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            ],
           ),
         ),
-        _buildControlButtons(noMute, mins, secs),
+        const SizedBox(height: 8),
+        _buildControlButtons(),
       ],
     );
   }
 
-  Widget _buildControlButtons(bool noMute, String mins, String secs) {
-    return Container(
-      height: 40,
-      width: double.infinity,
-      color: Colors.transparent,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Volume Icon
-          IconButton(
-            icon: Icon(noMute ? Icons.volume_up : Icons.volume_off, color: Colors.black),
-            onPressed: () {
-              _controller.setVolume(noMute ? 0 : 1.0);
-              setState(() {});
-            },
+  Widget _buildControlButtons() {
+    final noMute = (_controller.value.volume > 0);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: Icon(
+            noMute ? Icons.volume_up : Icons.volume_off,
+            color: Colors.black87,
           ),
-
-          // Play/Pause Icon
-          IconButton(
-            icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              size: 30,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              setState(() => _isPlaying = !_isPlaying);
-              _isPlaying ? _controller.play() : _controller.pause();
-            },
+          onPressed: () {
+            _controller.setVolume(noMute ? 0 : 1.0);
+            setState(() {});
+          },
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: Icon(
+            _isPlaying ? Icons.pause_circle : Icons.play_circle,
+            size: 40,
+            color: Colors.deepPurple,
           ),
-        ],
-      ),
+          onPressed: () {
+            setState(() => _isPlaying = !_isPlaying);
+            _isPlaying ? _controller.play() : _controller.pause();
+          },
+        ),
+      ],
     );
   }
+
 
 
   void _onControllerUpdate() {
