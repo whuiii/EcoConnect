@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:navigate/home.dart';
-import 'package:navigate/mainpage.dart';
+import 'package:navigate/home.dart';import 'package:navigate/mainpage.dart';
 import 'package:navigate/login.dart';
-import 'package:navigate/main.dart';
+
 import 'package:navigate/menu.dart';
 import 'package:navigate/navigate.dart';
 import 'package:navigate/ranking.dart/tester.dart';
-import 'package:navigate/register.dart';
-
-import 'intro_screen/onboarding_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {

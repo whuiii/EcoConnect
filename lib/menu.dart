@@ -14,27 +14,36 @@ import 'package:navigate/register.dart';
 import 'package:provider/provider.dart';
 
 class ProviderPage extends StatefulWidget {
-  const ProviderPage({super.key});
+  final int initialPage;
+  const ProviderPage({super.key, this.initialPage = 0});
 
   @override
   State<ProviderPage> createState() => _ProviderPageState();
 }
 
 class _ProviderPageState extends State<ProviderPage> {
+  late int currentPage;
+  late int index;
+
   final List<Widget> pages = [
     HomePage(),
-    DeliveryRequest(),//DeliveryForm(),
+    DeliveryRequest(),
     Education(),
     Profile(),
   ];
-  int currentPage = 0;
-  int index = 0;
+
   final items = <Widget>[
     Icon(Icons.home, size: 30),
     Icon(Icons.delivery_dining, size: 30),
     Icon(Icons.cast_for_education, size: 30),
     Icon(Icons.person, size: 30),
   ];
+  @override
+  void initState() {
+    super.initState();
+    currentPage = widget.initialPage;
+    index = widget.initialPage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +57,8 @@ class _ProviderPageState extends State<ProviderPage> {
             backgroundColor: Colors.transparent,
             //key: navigationKey,
             color: button, // navigation bar color
-            buttonBackgroundColor: primaryColor_darkGreen, // backgrond of icon color
+            buttonBackgroundColor:
+                primaryColor_darkGreen, // backgrond of icon color
 
             height: 60,
             animationCurve: Curves.easeInOut,
@@ -61,7 +71,6 @@ class _ProviderPageState extends State<ProviderPage> {
               currentPage = index;
             }),
           ),
-        )
-        );
+        ));
   }
 }

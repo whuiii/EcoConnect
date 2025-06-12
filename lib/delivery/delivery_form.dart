@@ -6,7 +6,12 @@ import 'package:geocoding/geocoding.dart' as geo;
 import 'package:navigate/color.dart';
 import 'package:navigate/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/delivery/dateTimePicker.dart';
+import 'package:navigate/delivery/delivery.dart';
 import 'package:navigate/delivery/placeholder_delivery.dart';
+import 'package:navigate/flash_message.dart';
+import 'package:navigate/home.dart';
+import 'package:navigate/label_text.dart';
+import 'package:navigate/menu.dart';
 
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
@@ -193,7 +198,11 @@ class _DeliveryState extends State<Delivery> {
                     onPressed: () {
                       final isLastStep = currentStep == getStep().length - 1;
                       if (isLastStep) {
-                        print("Completed");
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ProviderPage(initialPage: 1)),
+                        );
                       } else {
                         setState(() => currentStep += 1);
                       }
@@ -217,23 +226,24 @@ class _DeliveryState extends State<Delivery> {
           title: Text("Account"),
           content: Column(
             children: [
-              FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
+              FillInBlank(
+                  text: "Email",
+                  isEnabled: true,
+                  hint: "Email",
+                  icon: Iconsax.sms),
               SizedBox(height: 16),
-              FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
+              FillInBlank(
+                  text: "Username",
+                  isEnabled: true,
+                  hint: "Email",
+                  icon: Iconsax.user),
               SizedBox(height: 16),
               FillInBlank(
                   text: "Phone Number",
                   hint: "Phone Number",
+                  isEnabled: true,
                   icon: Iconsax.call),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 10, bottom: 5),
-                child: Text("Recyclable Materials:",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400)),
-              ),
+              LabelText(text: "Recyclable Materials:"),
               Column(
                 children: [
                   Row(children: [
@@ -265,15 +275,7 @@ class _DeliveryState extends State<Delivery> {
                   ]),
                 ],
               ),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 10, bottom: 5),
-                child: Text("Estimated Quantity",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400)),
-              ),
+              LabelText(text: "Estimated Quantity:"),
               BagSizeSelector(),
             ],
           ),
@@ -291,7 +293,7 @@ class _DeliveryState extends State<Delivery> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: currentAddress,
+                  hintText: "Your Address",
                   labelText: currentAddress,
                   prefixIcon: Icon(Iconsax.location), // From iconsax package
                   suffixIcon: IconButton(
@@ -345,8 +347,7 @@ class _DeliveryState extends State<Delivery> {
                 ],
               ),
               SizedBox(height: 10),
-              Text("Current Address: $currentAddress",
-                  style: TextStyle(fontWeight: FontWeight.w500)),
+
               //SizedBox(height: 16),
               // TextField(
               //   controller: _searchController,
@@ -373,10 +374,32 @@ class _DeliveryState extends State<Delivery> {
           title: Text("Complete"),
           content: Column(
             children: [
+              if (currentStep == 2) FlashMessage(),
               Icon(Icons.check_circle, color: Colors.green, size: 48),
               SizedBox(height: 10),
               Text("All steps completed!",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
+              LabelText(text: "Company Name:"),
+              FillInBlank(
+                  text: "Sun Soon Yik Sdn Bhd",
+                  icon: Iconsax.building,
+                  hint: "Company Details",
+                  isEnabled: false),
+              SizedBox(height: 10),
+              LabelText(text: "Driver Name:"),
+              FillInBlank(
+                  text: "Yusuf Taiyoob",
+                  icon: Iconsax.user,
+                  hint: "Driver Name",
+                  isEnabled: false),
+              SizedBox(height: 10),
+              LabelText(text: "Driver Contact No:"),
+              FillInBlank(
+                  text: "0118885555",
+                  icon: Iconsax.call,
+                  hint: "Driver Contact",
+                  isEnabled: false),
             ],
           ),
         ),
