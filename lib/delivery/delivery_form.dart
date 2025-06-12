@@ -8,7 +8,6 @@ import 'package:navigate/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/delivery/dateTimePicker.dart';
 import 'package:navigate/delivery/placeholder_delivery.dart';
 
-
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
 
@@ -35,6 +34,12 @@ class _DeliveryState extends State<Delivery> {
   late GoogleMapController googleMapController;
   Set<Marker> marker = {};
 
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission(); // Request location when widget is initialized
+  }
+
   Future<void> _requestLocationPermission() async {
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
@@ -50,13 +55,34 @@ class _DeliveryState extends State<Delivery> {
 
     _locationData = await location.getLocation();
     if (_locationData != null) {
+      LatLng newLocation = LatLng(
+        _locationData!.latitude ?? 0.0,
+        _locationData!.longitude ?? 0.0,
+      );
+
       setState(() {
-        myCurrentLocation = LatLng(
-          _locationData!.latitude ?? 0.0,
-          _locationData!.longitude ?? 0.0,
-        );
+        myCurrentLocation = newLocation;
       });
-      await _getAddressFromLatLng(myCurrentLocation);
+
+      await _getAddressFromLatLng(newLocation);
+
+      // Move camera to current location
+      if (googleMapController != null) {
+        googleMapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: newLocation, zoom: 16),
+          ),
+        );
+
+        marker.clear();
+        marker.add(
+          Marker(
+            markerId: const MarkerId("currentLocation"),
+            position: newLocation,
+            infoWindow: const InfoWindow(title: "Your Location"),
+          ),
+        );
+      }
     }
   }
 
@@ -70,7 +96,8 @@ class _DeliveryState extends State<Delivery> {
         geo.Placemark place = placemarks.first;
         setState(() {
           currentAddress =
-          "${place.name}, ${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+              "${place.name}, ${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+          _searchController.text = currentAddress; //Update the TextField
         });
       }
     } catch (e) {
@@ -100,7 +127,11 @@ class _DeliveryState extends State<Delivery> {
           );
         });
 
-        googleMapController.animateCamera(
+        // Optional: update address text
+        await _getAddressFromLatLng(searchedLatLng);
+
+        // Move camera
+        await googleMapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: searchedLatLng, zoom: 16),
           ),
@@ -167,7 +198,9 @@ class _DeliveryState extends State<Delivery> {
                         setState(() => currentStep += 1);
                       }
                     },
-                    child: Text(currentStep == getStep().length - 1 ? "Finish" : "Continue"),
+                    child: Text(currentStep == getStep().length - 1
+                        ? "Finish"
+                        : "Continue"),
                   ),
                 ],
               ),
@@ -179,163 +212,175 @@ class _DeliveryState extends State<Delivery> {
   }
 
   List<Step> getStep() => [
-    Step(
-      isActive: currentStep >= 0,
-      title: Text("Account"),
-      content: Column(
-        children: [
-          FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
-          SizedBox(height: 16),
-          FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
-          SizedBox(height: 16),
-          FillInBlank(text: "Phone Number", hint: "Phone Number", icon: Iconsax.call),
-          Container(
-            alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(top: 10, bottom: 5),
-            child: Text("Recyclable Materials:",
-                style:
-                TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
-          ),
-          Column(
+        Step(
+          isActive: currentStep >= 0,
+          title: Text("Account"),
+          content: Column(
             children: [
-              Row(children: [
-                Checkbox(
-                  value: isPlastic,
-                  onChanged: (value) => setState(() => isPlastic = value),
-                  activeColor: Colors.orange,
-                  checkColor: Colors.white,
-                ),
-                Text("Plastic", style: TextName),
-              ]),
-              Row(children: [
-                Checkbox(
-                  value: isAluminium,
-                  onChanged: (value) => setState(() => isAluminium = value),
-                  activeColor: Colors.brown,
-                  checkColor: Colors.white,
-                ),
-                Text("Aluminium", style: TextName),
-              ]),
-              Row(children: [
-                Checkbox(
-                  value: isPaper,
-                  onChanged: (value) => setState(() => isPaper = value),
-                  activeColor: Colors.blue,
-                  checkColor: Colors.white,
-                ),
-                Text("Paper", style: TextName),
-              ]),
+              FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
+              SizedBox(height: 16),
+              FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
+              SizedBox(height: 16),
+              FillInBlank(
+                  text: "Phone Number",
+                  hint: "Phone Number",
+                  icon: Iconsax.call),
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(top: 10, bottom: 5),
+                child: Text("Recyclable Materials:",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400)),
+              ),
+              Column(
+                children: [
+                  Row(children: [
+                    Checkbox(
+                      value: isPlastic,
+                      onChanged: (value) => setState(() => isPlastic = value),
+                      activeColor: Colors.orange,
+                      checkColor: Colors.white,
+                    ),
+                    Text("Plastic", style: TextName),
+                  ]),
+                  Row(children: [
+                    Checkbox(
+                      value: isAluminium,
+                      onChanged: (value) => setState(() => isAluminium = value),
+                      activeColor: Colors.brown,
+                      checkColor: Colors.white,
+                    ),
+                    Text("Aluminium", style: TextName),
+                  ]),
+                  Row(children: [
+                    Checkbox(
+                      value: isPaper,
+                      onChanged: (value) => setState(() => isPaper = value),
+                      activeColor: Colors.blue,
+                      checkColor: Colors.white,
+                    ),
+                    Text("Paper", style: TextName),
+                  ]),
+                ],
+              ),
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(top: 10, bottom: 5),
+                child: Text("Estimated Quantity",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400)),
+              ),
+              BagSizeSelector(),
             ],
           ),
-          Container(
-            alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(top: 10, bottom: 5),
-            child: Text("Estimated Quantity",
-                style:
-                TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
-          ),
-          BagSizeSelector(),
-        ],
-      ),
-    ),
-    Step(
-      isActive: currentStep >= 1,
-      title: Text("Detail"),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DateTimePickerWidget(),
-          SizedBox(height: 20,),
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Your Address',
-              labelText: 'Address',
-              prefixIcon: Icon(Iconsax.location), // From iconsax package
-              suffixIcon: IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () => _searchAndNavigate(_searchController.text),
-              ),
-              filled: true,
-              fillColor: Colors.grey[100], // Light background like a form field
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12), // Rounded corners
-                borderSide: BorderSide.none, // Remove default border
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            ),
-          ),
-          //FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+        ),
+        Step(
+          isActive: currentStep >= 1,
+          title: Text("Detail"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextButton(
-                onPressed: () async {
-                  await _requestLocationPermission();
-                  googleMapController.animateCamera(
-                    CameraUpdate.newCameraPosition(
-                        CameraPosition(target: myCurrentLocation, zoom: 16)),
-                  );
-                  setState(() {
-                    marker.clear();
-                    marker.add(
-                      Marker(
-                        markerId: const MarkerId("currentLocation"),
-                        position: myCurrentLocation,
-                        infoWindow: const InfoWindow(title: "You are here"),
-                      ),
-                    );
-                  });
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.map),
-                    SizedBox(width: 8),
-                    Text("Get current location",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                  ],
+              DateTimePickerWidget(),
+              SizedBox(
+                height: 20,
+              ),
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: currentAddress,
+                  labelText: currentAddress,
+                  prefixIcon: Icon(Iconsax.location), // From iconsax package
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () => _searchAndNavigate(_searchController.text),
+                  ),
+                  filled: true,
+                  fillColor:
+                      Colors.grey[100], // Light background like a form field
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                    borderSide: BorderSide.none, // Remove default border
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
+              ),
+              //FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      await _requestLocationPermission();
+                      googleMapController.animateCamera(
+                        CameraUpdate.newCameraPosition(CameraPosition(
+                            target: myCurrentLocation, zoom: 16)),
+                      );
+                      setState(() {
+                        marker.clear();
+                        marker.add(
+                          Marker(
+                            markerId: const MarkerId("currentLocation"),
+                            position: myCurrentLocation,
+                            infoWindow: const InfoWindow(title: "You are here"),
+                          ),
+                        );
+                      });
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.map),
+                        SizedBox(width: 8),
+                        Text("Get current location",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w400)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Text("Current Address: $currentAddress",
+                  style: TextStyle(fontWeight: FontWeight.w500)),
+              //SizedBox(height: 16),
+              // TextField(
+              //   controller: _searchController,
+              //   decoration: InputDecoration(
+              //     labelText: 'Search Location',
+              //     suffixIcon: IconButton(
+              //       icon: Icon(Icons.search),
+              //       onPressed: () => _searchAndNavigate(_searchController.text),
+              //     ),
+              //   ),
+              // ),
+              SizedBox(height: 10),
+              Container(
+                height: 300,
+                width: double.infinity,
+                color: primary,
+                child: _map(),
               ),
             ],
           ),
-          SizedBox(height: 10),
-          Text("Current Address: $currentAddress",
-              style: TextStyle(fontWeight: FontWeight.w500)),
-          //SizedBox(height: 16),
-          // TextField(
-          //   controller: _searchController,
-          //   decoration: InputDecoration(
-          //     labelText: 'Search Location',
-          //     suffixIcon: IconButton(
-          //       icon: Icon(Icons.search),
-          //       onPressed: () => _searchAndNavigate(_searchController.text),
-          //     ),
-          //   ),
-          // ),
-          SizedBox(height: 10),
-          Container(
-            height: 300,
-            width: double.infinity,
-            color: primary,
-            child: _map(),
+        ),
+        Step(
+          isActive: currentStep >= 2,
+          title: Text("Complete"),
+          content: Column(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 48),
+              SizedBox(height: 10),
+              Text("All steps completed!",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
           ),
-        ],
-      ),
-    ),
-    Step(
-      isActive: currentStep >= 2,
-      title: Text("Complete"),
-      content: Column(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 48),
-          SizedBox(height: 10),
-          Text("All steps completed!",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    ),
-  ];
+        ),
+      ];
 
   Widget _map() {
     return GoogleMap(
@@ -345,8 +390,30 @@ class _DeliveryState extends State<Delivery> {
       scrollGesturesEnabled: true,
       rotateGesturesEnabled: true,
       tiltGesturesEnabled: true,
-      onMapCreated: (GoogleMapController controller) {
+      onMapCreated: (GoogleMapController controller) async {
         googleMapController = controller;
+
+        // Delay slightly to ensure controller is ready
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        // Move camera to current location
+        googleMapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: myCurrentLocation, zoom: 16),
+          ),
+        );
+
+        // Add marker at current location
+        setState(() {
+          marker.clear();
+          marker.add(
+            Marker(
+              markerId: const MarkerId("currentLocation"),
+              position: myCurrentLocation,
+              infoWindow: const InfoWindow(title: "Your Location"),
+            ),
+          );
+        });
       },
       initialCameraPosition: CameraPosition(
         target: myCurrentLocation,

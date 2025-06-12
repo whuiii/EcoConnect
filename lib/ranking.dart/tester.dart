@@ -1,59 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// Flutter code sample for basic [showDatePicker].
-
-void main() => runApp(const DatePickerApp());
-
-class DatePickerApp extends StatelessWidget {
-  const DatePickerApp({super.key});
+class MapPage extends StatelessWidget {
+  const MapPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('showDatePicker Example')),
-        body: const Center(child: DatePickerExample()),
-      ),
-    );
-  }
-}
+    const LatLng _pGooglePlex = LatLng(37.4223, -122.0848);
 
-class DatePickerExample extends StatefulWidget {
-  const DatePickerExample({super.key});
-
-  @override
-  State<DatePickerExample> createState() => _DatePickerExampleState();
-}
-
-class _DatePickerExampleState extends State<DatePickerExample> {
-  DateTime? selectedDate;
-
-  Future<void> _selectDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2021, 7, 25),
-      firstDate: DateTime(2021),
-      lastDate: DateTime(2022),
-    );
-
-    setState(() {
-      selectedDate = pickedDate;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          selectedDate != null
-              ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
-              : 'No date selected',
-        ),
-        OutlinedButton(
-            onPressed: _selectDate, child: const Text('Select Date')),
-      ],
+    return Scaffold(
+      body: GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: _pGooglePlex,
+            zoom: 13,
+          ),
+         ),
     );
   }
 }

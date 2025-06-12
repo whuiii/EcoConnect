@@ -5,6 +5,7 @@ import 'package:navigate/login.dart';
 import 'package:navigate/main.dart';
 import 'package:navigate/menu.dart';
 import 'package:navigate/navigate.dart';
+import 'package:navigate/ranking.dart/tester.dart';
 import 'package:navigate/register.dart';
 
 import 'intro_screen/onboarding_screen.dart';
@@ -15,12 +16,12 @@ class RouteGenerator {
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => OnBoardingScreen());
-        //return MaterialPageRoute(builder: (_) => MainPage());
+        //return MaterialPageRoute(builder: (_) => OnBoardingScreen());
+        return MaterialPageRoute(builder: (_) => LoginPage());
       case '/1':
         return MaterialPageRoute(builder: (_) => LoginPage());
       case '/2':
-        return MaterialPageRoute(builder: (_) => RegisterPage());
+        return MaterialPageRoute(builder: (_) => MapPage());
       case '/3':
         return MaterialPageRoute(builder: (_) => ProviderPage());
       case '/4':
