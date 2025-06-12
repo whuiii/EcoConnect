@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart';
 import 'package:navigate/color.dart';
@@ -18,6 +19,7 @@ class _DeliveryState extends State<Delivery> {
   bool? isPlastic = false;
   bool? isAluminium = false;
   bool? isPaper = false;
+  LatLng myCurrentLocation = LatLng(0, 0);
 
   Location location = new Location();
   bool _serviceEnabled = false;
@@ -42,35 +44,16 @@ class _DeliveryState extends State<Delivery> {
     }
     //location service is enabled
     _locationData = await location.getLocation();
-    setState(() {
-
-    });
+    if(_locationData != null){
+      setState(() {
+        myCurrentLocation = LatLng(
+            _locationData!.latitude ?? 0.0,
+            _locationData!.longitude ?? 0.0,
+        );
+      });
+    }
   }
 
-  // late String lat;
-  // late String long;
-  // String locationMessage = "Current Location of the User";
-  //
-  // Future<Position> _getCurrentLocation() async{
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if(!serviceEnabled){
-  //     return Future.error("Location services are disabled");
-  //   }
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied){
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied){
-  //       return Future.error("Location permission are denied");
-  //     }
-  //
-  //   }
-  //
-  //   if(permission == LocationPermission.deniedForever){
-  //     return Future.error("Location permissios are permanently denied, we cannot request to access");
-  //
-  //   }
-  //   return await Geolocator.getCurrentPosition();
-  // }
 
 
   @override
@@ -236,13 +219,6 @@ class _DeliveryState extends State<Delivery> {
                 children: [
                   TextButton(onPressed: (){
                     _requestLocationPermission();
-                    // _getCurrentLocation().then((value){
-                    //   lat = '${value.latitude}';
-                    //   long = '${value.longitude}';
-                    //   setState(() {
-                    //     locationMessage = "Latitude: $lat, Longtitude: $long";
-                    //   });
-                    // });
                   },
                     child:Row(
                       mainAxisSize: MainAxisSize.min,
@@ -260,13 +236,14 @@ class _DeliveryState extends State<Delivery> {
               SizedBox(height: 20,),
               Text("Latitud: ${_locationData?.latitude?? ""}"),
               Text("Longtitud: ${_locationData?.longitude?? ""}"),
+              Text("Current Location $myCurrentLocation"),
 
               SizedBox(height: 16),
               Container(
                 height: 300,
                 width: 500,
                 color: primary,
-                child: Text("Map"),
+                child: _map(),
               ),
             ],
           ),
@@ -286,4 +263,53 @@ class _DeliveryState extends State<Delivery> {
           ),
         ),
       ];
+
+
+  late GoogleMapController googleMapController;
+  Set<Marker> marker = {};
+  Widget _map(){
+    return Stack(
+      children: [
+        GoogleMap(
+          myLocationButtonEnabled: false,
+          markers: marker,
+          onMapCreated: (GoogleMapController controller) {
+            googleMapController = controller;
+          },
+          initialCameraPosition: CameraPosition(
+            target: myCurrentLocation,
+            zoom: 14,
+          ),
+        ),
+        Positioned(
+          bottom: 10,
+          right: 10,
+          child: FloatingActionButton(
+            backgroundColor: Colors.white,
+            onPressed: () async {
+              await _requestLocationPermission();
+
+              // Move camera
+              googleMapController.animateCamera(
+                CameraUpdate.newLatLng(myCurrentLocation),
+              );
+
+              // Add marker
+              setState(() {
+                marker.clear();
+                marker.add(
+                  Marker(
+                    markerId: MarkerId("currentLocation"),
+                    position: myCurrentLocation,
+                    infoWindow: InfoWindow(title: "You are here"),
+                  ),
+                );
+              });
+            },
+            child: Icon(Icons.my_location, color: Colors.blue),
+          ),
+        ),
+      ],
+    );
+  }
 }

@@ -42,6 +42,9 @@ dependencies:
   quickalert: ^1.1.0
   video_player: ^2.10.0
   location: ^8.0.0
+  google_maps_flutter_ios: ^2.15.3
+  google_maps_flutter_android: ^2.16.1
+  google_maps_flutter: ^2.12.2
   #geolocation: ^14.0.1
 
 
