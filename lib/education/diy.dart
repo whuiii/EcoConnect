@@ -84,21 +84,45 @@ class _DiyVideoState extends State<DiyVideo> {
   Widget _buildInitialHeader() {
     return Container(
       width: double.infinity,
-      height: 250,
-      padding: const EdgeInsets.only(left: 20),
+      height: 300,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+      decoration: const BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            "DIY Video Guide",
+            style: TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: const [
+              Icon(Icons.recycling, size: 28, color: Colors.white),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Learn to create fun and useful items using recyclable materials. "
+                      "Eco-friendly, creative, and easy to do at home!",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 30),
-          const Text("DIY Video", style: TextStyle(fontSize: 25, color: Colors.white)),
-          const SizedBox(height: 5),
-          const Text("Do it Yourself", style: TextStyle(fontSize: 25, color: Colors.white)),
-          const SizedBox(height: 50),
           Row(
             children: [
-              _buildInfoBox("Time"),
+              _buildInfoBox("Avg Time: 5-10 mins"),
               const SizedBox(width: 20),
-              _buildInfoBox("Time", width: 250),
+              _buildInfoBox("Eco-friendly", width: 140),
             ],
           ),
         ],
@@ -106,20 +130,36 @@ class _DiyVideoState extends State<DiyVideo> {
     );
   }
 
-  Widget _buildInfoBox(String text, {double width = 90}) {
+  Widget _buildInfoBox(String text, {double width = 120}) {
     return Container(
       width: width,
-      height: 30,
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.grey,
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            spreadRadius: 1,
+            offset: const Offset(2, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.timer, size: 20, color: Colors.black),
+          const Icon(Icons.timer, size: 18, color: Colors.black87),
           const SizedBox(width: 5),
-          Text(text, style: const TextStyle(fontSize: 16, color: Colors.black)),
+          Flexible(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
+          ),
         ],
       ),
     );
@@ -195,7 +235,7 @@ class _DiyVideoState extends State<DiyVideo> {
             children: [
               Container(
                 width: 80,
-                height: 80,
+                height: 90,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   image: DecorationImage(image: AssetImage(video["thumbnail"]), fit: BoxFit.cover),

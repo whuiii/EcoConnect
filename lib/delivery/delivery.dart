@@ -67,19 +67,46 @@ class DeliveryRequest extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10), // body-level padding
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10, // more blur = softer shadow
+                          spreadRadius: 2,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: const [
+                        RequestContainerWidget(
+                          location: "Seri Iskandar",
+                          description: "5kg Newspaper and 50 cans",
+                          contactNo: "010-310123123",
+                          remarks: "-",
+                        ),
+                        RequestContainerWidget(
+                          location: "Seri Iskandar",
+                          description: "5kg Newspaper and 50 cans",
+                          contactNo: "010-310123123",
+                          remarks: "Please come before 2/5/2034",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
                 // if contain request
                 // may use while true to check the availability of the data
                 // if no request display a no request picture
-                RequestContainerWidget(location: "Seri Iskandar",
-                    description: "5kg Newspaper and 50 cans",
-                    contactNo: "010-310123123",
-                    remarks: "-",
-                ),
-                RequestContainerWidget(location: "Seri Iskandar",
-                  description: "5kg Newspaper and 50 cans",
-                  contactNo: "010-310123123",
-                  remarks: "Please come before 2/5/2034",
-                ),
+
               ],
 
             ),
