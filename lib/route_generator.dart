@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:navigate/home.dart';import 'package:navigate/mainpage.dart';
+import 'package:navigate/home.dart';
+import 'package:navigate/mainpage.dart';
 import 'package:navigate/login.dart';
 
 import 'package:navigate/menu.dart';
@@ -13,7 +14,7 @@ class RouteGenerator {
     switch (settings.name) {
       case '/':
         //return MaterialPageRoute(builder: (_) => OnBoardingScreen());
-        return MaterialPageRoute(builder: (_) => LoginPage());
+        return MaterialPageRoute(builder: (_) => MainPage());
       case '/1':
         return MaterialPageRoute(builder: (_) => LoginPage());
       case '/2':
