@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:location/location.dart';
-import 'package:geocoding/geocoding.dart' hide Location; // <--- Added
+import 'package:location/location.dart' as loc;
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:navigate/color.dart';
 import 'package:navigate/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/delivery/dateTimePicker.dart';
 import 'package:navigate/delivery/placeholder_delivery.dart';
+import 'package:navigate/delivery/searchAddress.dart';
 
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
@@ -16,6 +17,8 @@ class Delivery extends StatefulWidget {
 }
 
 class _DeliveryState extends State<Delivery> {
+  TextEditingController _searchController = TextEditingController();
+
   int currentStep = 0;
   bool? isPlastic = false;
   bool? isAluminium = false;
@@ -24,10 +27,10 @@ class _DeliveryState extends State<Delivery> {
   LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
   String currentAddress = "";
 
-  Location location = Location();
+  loc.Location location = loc.Location();
   bool _serviceEnabled = false;
-  PermissionStatus? _permissionGranted;
-  LocationData? _locationData;
+  loc.PermissionStatus? _permissionGranted;
+  loc.LocationData? _locationData;
 
   late GoogleMapController googleMapController;
   Set<Marker> marker = {};
@@ -40,9 +43,9 @@ class _DeliveryState extends State<Delivery> {
     }
 
     _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
+    if (_permissionGranted == loc.PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) return;
+      if (_permissionGranted != loc.PermissionStatus.granted) return;
     }
 
     _locationData = await location.getLocation();
@@ -59,12 +62,12 @@ class _DeliveryState extends State<Delivery> {
 
   Future<void> _getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<geo.Placemark> placemarks = await geo.placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
       if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
+        geo.Placemark place = placemarks.first;
         setState(() {
           currentAddress =
           "${place.name}, ${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
@@ -75,6 +78,39 @@ class _DeliveryState extends State<Delivery> {
         currentAddress = "Unable to retrieve address.";
       });
       print("Error getting address: $e");
+    }
+  }
+
+  Future<void> _searchAndNavigate(String place) async {
+    try {
+      List<geo.Location> locations = await geo.locationFromAddress(place);
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+        LatLng searchedLatLng = LatLng(loc.latitude, loc.longitude);
+
+        setState(() {
+          myCurrentLocation = searchedLatLng;
+          marker.clear();
+          marker.add(
+            Marker(
+              markerId: const MarkerId("searchedLocation"),
+              position: searchedLatLng,
+              infoWindow: const InfoWindow(title: "Searched Location"),
+            ),
+          );
+        });
+
+        googleMapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: searchedLatLng, zoom: 16),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Search failed: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Location not found")),
+      );
     }
   }
 
@@ -131,8 +167,7 @@ class _DeliveryState extends State<Delivery> {
                         setState(() => currentStep += 1);
                       }
                     },
-                    child: Text(
-                        currentStep == getStep().length - 1 ? "Finish" : "Continue"),
+                    child: Text(currentStep == getStep().length - 1 ? "Finish" : "Continue"),
                   ),
                 ],
               ),
@@ -158,8 +193,8 @@ class _DeliveryState extends State<Delivery> {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(top: 10, bottom: 5),
             child: Text("Recyclable Materials:",
-                style: TextStyle(
-                    color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
+                style:
+                TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
           ),
           Column(
             children: [
@@ -196,8 +231,8 @@ class _DeliveryState extends State<Delivery> {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(top: 10, bottom: 5),
             child: Text("Estimated Quantity",
-                style: TextStyle(
-                    color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
+                style:
+                TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
           ),
           BagSizeSelector(),
         ],
@@ -210,18 +245,36 @@ class _DeliveryState extends State<Delivery> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DateTimePickerWidget(),
-          SizedBox(height: 20),
-          FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
+          SizedBox(height: 20,),
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Your Address',
+              labelText: 'Address',
+              prefixIcon: Icon(Iconsax.location), // From iconsax package
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () => _searchAndNavigate(_searchController.text),
+              ),
+              filled: true,
+              fillColor: Colors.grey[100], // Light background like a form field
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12), // Rounded corners
+                borderSide: BorderSide.none, // Remove default border
+              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
+          ),
+          //FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: () async{
-                  _requestLocationPermission();
+                onPressed: () async {
                   await _requestLocationPermission();
                   googleMapController.animateCamera(
-                    CameraUpdate.newCameraPosition(CameraPosition(
-                        target: myCurrentLocation, zoom: 16)),
+                    CameraUpdate.newCameraPosition(
+                        CameraPosition(target: myCurrentLocation, zoom: 16)),
                   );
                   setState(() {
                     marker.clear();
@@ -247,12 +300,20 @@ class _DeliveryState extends State<Delivery> {
             ],
           ),
           SizedBox(height: 10),
-          Text("Latitude: ${_locationData?.latitude ?? ""}"),
-          Text("Longitude: ${_locationData?.longitude ?? ""}"),
-          SizedBox(height: 5),
           Text("Current Address: $currentAddress",
               style: TextStyle(fontWeight: FontWeight.w500)),
-          SizedBox(height: 16),
+          //SizedBox(height: 16),
+          // TextField(
+          //   controller: _searchController,
+          //   decoration: InputDecoration(
+          //     labelText: 'Search Location',
+          //     suffixIcon: IconButton(
+          //       icon: Icon(Icons.search),
+          //       onPressed: () => _searchAndNavigate(_searchController.text),
+          //     ),
+          //   ),
+          // ),
+          SizedBox(height: 10),
           Container(
             height: 300,
             width: double.infinity,
@@ -277,78 +338,45 @@ class _DeliveryState extends State<Delivery> {
   ];
 
   Widget _map() {
-    return Stack(
-      children: [
-        GoogleMap(
-          myLocationEnabled: true,
-          myLocationButtonEnabled: false,
-          zoomGesturesEnabled: true,
-          scrollGesturesEnabled: true,
-          rotateGesturesEnabled: true,
-          tiltGesturesEnabled: true,
-          onMapCreated: (GoogleMapController controller) {
-            googleMapController = controller;
-          },
-          initialCameraPosition: CameraPosition(
-            target: myCurrentLocation,
-            zoom: 16,
-          ),
-          onCameraMove: (CameraPosition position) {
-            setState(() {
-              myCurrentLocation = position.target;
-            });
-          },
-          onCameraIdle: _handleCameraIdle,
+    return GoogleMap(
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomGesturesEnabled: true,
+      scrollGesturesEnabled: true,
+      rotateGesturesEnabled: true,
+      tiltGesturesEnabled: true,
+      onMapCreated: (GoogleMapController controller) {
+        googleMapController = controller;
+      },
+      initialCameraPosition: CameraPosition(
+        target: myCurrentLocation,
+        zoom: 16,
+      ),
+      onCameraMove: (CameraPosition position) {
+        setState(() {
+          myCurrentLocation = position.target;
+        });
+      },
+      onCameraIdle: _handleCameraIdle,
+      onTap: (LatLng tappedPoint) async {
+        setState(() {
+          myCurrentLocation = tappedPoint;
+        });
 
-          // 🔹 New: Handle map tap
-          onTap: (LatLng tappedPoint) async {
-            setState(() {
-              myCurrentLocation = tappedPoint;
-            });
+        await _getAddressFromLatLng(tappedPoint);
 
-            await _getAddressFromLatLng(tappedPoint);
-
-            setState(() {
-              marker.clear();
-              marker.add(
-                Marker(
-                  markerId: const MarkerId("tappedLocation"),
-                  position: tappedPoint,
-                  infoWindow: const InfoWindow(title: "Selected Location"),
-                ),
-              );
-            });
-          },
-
-          markers: marker,
-        ),
-        // Positioned(
-        //   bottom: 10,
-        //   right: 10,
-        //   child: FloatingActionButton(
-        //     backgroundColor: Colors.white,
-        //     onPressed: () async {
-        //       await _requestLocationPermission();
-        //       googleMapController.animateCamera(
-        //         CameraUpdate.newCameraPosition(CameraPosition(
-        //             target: myCurrentLocation, zoom: 16)),
-        //       );
-        //       setState(() {
-        //         marker.clear();
-        //         marker.add(
-        //           Marker(
-        //             markerId: const MarkerId("currentLocation"),
-        //             position: myCurrentLocation,
-        //             infoWindow: const InfoWindow(title: "You are here"),
-        //           ),
-        //         );
-        //       });
-        //     },
-        //     child: const Icon(Icons.my_location, color: Colors.blue),
-        //   ),
-        // ),
-      ],
+        setState(() {
+          marker.clear();
+          marker.add(
+            Marker(
+              markerId: const MarkerId("tappedLocation"),
+              position: tappedPoint,
+              infoWindow: const InfoWindow(title: "Selected Location"),
+            ),
+          );
+        });
+      },
+      markers: marker,
     );
   }
-
 }
