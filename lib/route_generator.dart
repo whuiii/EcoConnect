@@ -7,13 +7,16 @@ import 'package:navigate/menu.dart';
 import 'package:navigate/navigate.dart';
 import 'package:navigate/register.dart';
 
+import 'intro_screen/onboarding_screen.dart';
+
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => MainPage());
+        return MaterialPageRoute(builder: (_) => OnBoardingScreen());
+        //return MaterialPageRoute(builder: (_) => MainPage());
       case '/1':
         return MaterialPageRoute(builder: (_) => LoginPage());
       case '/2':
