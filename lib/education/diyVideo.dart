@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:video_player/video_player.dart';
+
+import '../color.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -20,6 +24,13 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
+  Duration? _duration;
+  Duration? _position;
+  var _progress = 0.0;
+  var _onUpdateControllerTime;
+  bool _disposed = false;
+  String convertTwo(int value) => value < 10 ? "0$value" : "$value";
+
 
   @override
   void initState() {
@@ -29,11 +40,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         setState(() {});
         _controller.play();
         _isPlaying = true;
+        _controller.addListener(_onControllerUpdate);
       });
   }
 
+
   @override
   void dispose() {
+    _disposed = true;
+    _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     super.dispose();
   }
@@ -124,15 +139,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
-                  VideoProgressIndicator(
-                    _controller,
-                    allowScrubbing: true,
-                    colors: VideoProgressColors(
-                      playedColor: Colors.purple,
-                      backgroundColor: Colors.purple.shade100,
-                      bufferedColor: Colors.purple.shade200,
-                    ),
-                  ),
+                  _controlView(context),
+                  // VideoProgressIndicator(
+                  //   _controller,
+                  //   allowScrubbing: true,
+                  //   colors: VideoProgressColors(
+                  //     playedColor: Colors.purple,
+                  //     backgroundColor: Colors.purple.shade100,
+                  //     bufferedColor: Colors.purple.shade200,
+                  //   ),
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -147,16 +163,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             const Spacer(),
 
             // Bottom Status (optional volume or subtitle buttons)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  Icon(Icons.volume_up_outlined),
-                  Text("11:59"),
-                ],
-              ),
-            )
+            // Padding(
+            //   padding: const EdgeInsets.only(bottom: 24.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: const [
+            //       Icon(Icons.volume_up_outlined),
+            //       Text("11:59"),
+            //     ],
+            //   ),
+            // )
           ],
         ),
       ),
@@ -192,4 +208,114 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     return "$minutes:$seconds";
   }
+
+  Widget _controlView(BuildContext context) {
+    final noMute = (_controller?.value.volume ?? 0) > 0;
+    final duration = _duration?.inSeconds ?? 0;
+    final head = _position?.inSeconds ?? 0;
+    final remained = max(0, duration - head);
+    final mins = convertTwo(remained ~/ 60);
+    final secs = convertTwo(remained % 60);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: Colors.red.shade700,
+            inactiveTrackColor: Colors.red.shade100,
+            thumbColor: Colors.redAccent,
+            overlayColor: Colors.red.withAlpha(32),
+            trackShape: const RoundedRectSliderTrackShape(),
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 28),
+            valueIndicatorShape: const PaddleSliderValueIndicatorShape(),
+            valueIndicatorColor: Colors.redAccent,
+            valueIndicatorTextStyle: const TextStyle(color: Colors.white),
+          ),
+          child: Slider(
+            value: _progress * 100,
+            min: 0,
+            max: 100,
+            divisions: 100,
+            label: _position?.toString().split(".")[0],
+            onChanged: (value) {
+              setState(() {
+                final newPosition = Duration(
+                    milliseconds:
+                    (_controller.value.duration.inMilliseconds * (value / 100)).round());
+                _controller.seekTo(newPosition);
+              });
+            },
+            onChangeStart: (_) => _controller?.pause(),
+            onChangeEnd: (value) {
+              final duration = _controller?.value.duration;
+              if (duration != null) {
+                final newValue = max(0, min(value, 99)) * 0.01;
+                final millis = (duration.inMilliseconds * newValue).toInt();
+                _controller?.seekTo(Duration(milliseconds: millis));
+                _controller?.play();
+              }
+            },
+          ),
+        ),
+        _buildControlButtons(noMute, mins, secs),
+      ],
+    );
+  }
+
+  Widget _buildControlButtons(bool noMute, String mins, String secs) {
+    return Container(
+      height: 40,
+      width: double.infinity,
+      color: Colors.transparent,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Volume Icon
+          IconButton(
+            icon: Icon(noMute ? Icons.volume_up : Icons.volume_off, color: Colors.black),
+            onPressed: () {
+              _controller.setVolume(noMute ? 0 : 1.0);
+              setState(() {});
+            },
+          ),
+
+          // Play/Pause Icon
+          IconButton(
+            icon: Icon(
+              _isPlaying ? Icons.pause : Icons.play_arrow,
+              size: 30,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              setState(() => _isPlaying = !_isPlaying);
+              _isPlaying ? _controller.play() : _controller.pause();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  void _onControllerUpdate() {
+    if (_disposed) return;
+    if (!_controller.value.isInitialized) return;
+
+    final position = _controller.value.position;
+    final duration = _controller.value.duration;
+
+    setState(() {
+      _position = position;
+      _duration = duration;
+      _progress = (duration.inMilliseconds == 0)
+          ? 0
+          : position.inMilliseconds / duration.inMilliseconds;
+      _isPlaying = _controller.value.isPlaying;
+    });
+  }
+
 }
+
+
