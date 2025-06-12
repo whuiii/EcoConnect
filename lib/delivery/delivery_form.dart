@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart' hide Location; // <--- Added
 import 'package:navigate/color.dart';
 import 'package:navigate/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/delivery/dateTimePicker.dart';
-import 'package:navigate/delivery/placeholder_delivery.dart'; // Make sure to add iconsax package in pubspec.yaml
+import 'package:navigate/delivery/placeholder_delivery.dart';
 
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
@@ -19,42 +20,77 @@ class _DeliveryState extends State<Delivery> {
   bool? isPlastic = false;
   bool? isAluminium = false;
   bool? isPaper = false;
-  LatLng myCurrentLocation = LatLng(0, 0);
 
-  Location location = new Location();
+  LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
+  String currentAddress = "";
+
+  Location location = Location();
   bool _serviceEnabled = false;
   PermissionStatus? _permissionGranted;
   LocationData? _locationData;
 
+  late GoogleMapController googleMapController;
+  Set<Marker> marker = {};
+
   Future<void> _requestLocationPermission() async {
     _serviceEnabled = await location.serviceEnabled();
-    if(!_serviceEnabled){
+    if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
-      if(!_serviceEnabled){
-        return;
-      }
+      if (!_serviceEnabled) return;
     }
 
     _permissionGranted = await location.hasPermission();
-    if(_permissionGranted == PermissionStatus.denied){
+    if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
-      if(_permissionGranted != PermissionStatus.granted){
-        return;
-      }
+      if (_permissionGranted != PermissionStatus.granted) return;
     }
-    //location service is enabled
+
     _locationData = await location.getLocation();
-    if(_locationData != null){
+    if (_locationData != null) {
       setState(() {
         myCurrentLocation = LatLng(
-            _locationData!.latitude ?? 0.0,
-            _locationData!.longitude ?? 0.0,
+          _locationData!.latitude ?? 0.0,
+          _locationData!.longitude ?? 0.0,
         );
       });
+      await _getAddressFromLatLng(myCurrentLocation);
     }
   }
 
+  Future<void> _getAddressFromLatLng(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          currentAddress =
+          "${place.name}, ${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        currentAddress = "Unable to retrieve address.";
+      });
+      print("Error getting address: $e");
+    }
+  }
 
+  void _handleCameraIdle() async {
+    await _getAddressFromLatLng(myCurrentLocation);
+    setState(() {
+      marker.clear();
+      marker.add(
+        Marker(
+          markerId: const MarkerId("selectedLocation"),
+          position: myCurrentLocation,
+          infoWindow: const InfoWindow(title: "Selected Location"),
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +108,7 @@ class _DeliveryState extends State<Delivery> {
                 type: StepperType.horizontal,
                 currentStep: currentStep,
                 steps: getStep(),
-                controlsBuilder: (context, _) {
-                  return SizedBox
-                      .shrink(); // Hides default Continue/Cancel buttons
-                },
+                controlsBuilder: (context, _) => SizedBox.shrink(),
               ),
             ),
             Padding(
@@ -94,14 +127,12 @@ class _DeliveryState extends State<Delivery> {
                       final isLastStep = currentStep == getStep().length - 1;
                       if (isLastStep) {
                         print("Completed");
-                        // You can navigate or show dialog here
                       } else {
                         setState(() => currentStep += 1);
                       }
                     },
-                    child: Text(currentStep == getStep().length - 1
-                        ? "Finish"
-                        : "Continue"),
+                    child: Text(
+                        currentStep == getStep().length - 1 ? "Finish" : "Continue"),
                   ),
                 ],
               ),
@@ -113,203 +144,211 @@ class _DeliveryState extends State<Delivery> {
   }
 
   List<Step> getStep() => [
-        Step(
-          isActive: currentStep >= 0,
-          title: Text("Account"),
-          content: Column(
+    Step(
+      isActive: currentStep >= 0,
+      title: Text("Account"),
+      content: Column(
+        children: [
+          FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
+          SizedBox(height: 16),
+          FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
+          SizedBox(height: 16),
+          FillInBlank(text: "Phone Number", hint: "Phone Number", icon: Iconsax.call),
+          Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.only(top: 10, bottom: 5),
+            child: Text("Recyclable Materials:",
+                style: TextStyle(
+                    color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
+          ),
+          Column(
             children: [
-              FillInBlank(text: "Email", hint: "Email", icon: Iconsax.sms),
-              SizedBox(height: 16),
-              FillInBlank(text: "Username", hint: "Email", icon: Iconsax.user),
-              SizedBox(height: 16),
-              FillInBlank(
-                  text: "Phone Number",
-                  hint: "Phone Number",
-                  icon: Iconsax.call),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 10, bottom: 5),
-                child: Text("Recyclable Materials:",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    )),
-              ),
-              Column(
-                children: [
-                  Row(children: [
-                    Checkbox(
-                      value: isPlastic,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isPlastic = value;
-                        });
-                      },
-                      activeColor: Colors.orange, // fill color when checked
-                      checkColor: Colors.white, // tick mark color
-                    ),
-                    Text(
-                      "Plastic",
-                      style: TextName,
-                    ),
-                  ]),
-                  Row(children: [
-                    Checkbox(
-                      value: isAluminium,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isAluminium = value;
-                        });
-                      },
-                      activeColor: Colors.brown, // fill color when checked
-                      checkColor: Colors.white, // tick mark color
-                    ),
-                    Text(
-                      "Aluminium",
-                      style: TextName,
-                    ),
-                  ]),
-                  Row(children: [
-                    Checkbox(
-                      value: isPaper,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isPaper = value;
-                        });
-                      },
-                      activeColor: Colors.blue, // fill color when checked
-                      checkColor: Colors.white, // tick mark color
-                    ),
-                    Text(
-                      "Paper",
-                      style: TextName,
-                    ),
-                  ]),
-                ],
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(top: 10, bottom: 5),
-                child: Text("Estimated Quantity",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    )),
-              ),
-              BagSizeSelector(),
+              Row(children: [
+                Checkbox(
+                  value: isPlastic,
+                  onChanged: (value) => setState(() => isPlastic = value),
+                  activeColor: Colors.orange,
+                  checkColor: Colors.white,
+                ),
+                Text("Plastic", style: TextName),
+              ]),
+              Row(children: [
+                Checkbox(
+                  value: isAluminium,
+                  onChanged: (value) => setState(() => isAluminium = value),
+                  activeColor: Colors.brown,
+                  checkColor: Colors.white,
+                ),
+                Text("Aluminium", style: TextName),
+              ]),
+              Row(children: [
+                Checkbox(
+                  value: isPaper,
+                  onChanged: (value) => setState(() => isPaper = value),
+                  activeColor: Colors.blue,
+                  checkColor: Colors.white,
+                ),
+                Text("Paper", style: TextName),
+              ]),
             ],
           ),
-        ),
-        Step(
-          isActive: currentStep >= 1,
-          title: Text("Detail"),
-          content: Column(
+          Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.only(top: 10, bottom: 5),
+            child: Text("Estimated Quantity",
+                style: TextStyle(
+                    color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
+          ),
+          BagSizeSelector(),
+        ],
+      ),
+    ),
+    Step(
+      isActive: currentStep >= 1,
+      title: Text("Detail"),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DateTimePickerWidget(),
+          SizedBox(height: 20),
+          FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              DateTimePickerWidget(),
-              SizedBox(height: 20),
-              FillInBlank(
-                  text: "Address",
-                  hint: "Your Address",
-                  icon: Iconsax.location),
-              SizedBox(height: 2,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(onPressed: (){
-                    _requestLocationPermission();
-                  },
-                    child:Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.map),
-                        SizedBox(width: 8),
-                        Text("Get current location",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20,),
-              Text("Latitud: ${_locationData?.latitude?? ""}"),
-              Text("Longtitud: ${_locationData?.longitude?? ""}"),
-              Text("Current Location $myCurrentLocation"),
-
-              SizedBox(height: 16),
-              Container(
-                height: 300,
-                width: 500,
-                color: primary,
-                child: _map(),
+              TextButton(
+                onPressed: () async{
+                  _requestLocationPermission();
+                  await _requestLocationPermission();
+                  googleMapController.animateCamera(
+                    CameraUpdate.newCameraPosition(CameraPosition(
+                        target: myCurrentLocation, zoom: 16)),
+                  );
+                  setState(() {
+                    marker.clear();
+                    marker.add(
+                      Marker(
+                        markerId: const MarkerId("currentLocation"),
+                        position: myCurrentLocation,
+                        infoWindow: const InfoWindow(title: "You are here"),
+                      ),
+                    );
+                  });
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.map),
+                    SizedBox(width: 8),
+                    Text("Get current location",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-        Step(
-          isActive: currentStep >= 2,
-          title: Text("Complete"),
-          content: Column(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 48),
-              SizedBox(height: 10),
-              Text(
-                "All steps completed!",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              )
-            ],
+          SizedBox(height: 10),
+          Text("Latitude: ${_locationData?.latitude ?? ""}"),
+          Text("Longitude: ${_locationData?.longitude ?? ""}"),
+          SizedBox(height: 5),
+          Text("Current Address: $currentAddress",
+              style: TextStyle(fontWeight: FontWeight.w500)),
+          SizedBox(height: 16),
+          Container(
+            height: 300,
+            width: double.infinity,
+            color: primary,
+            child: _map(),
           ),
-        ),
-      ];
+        ],
+      ),
+    ),
+    Step(
+      isActive: currentStep >= 2,
+      title: Text("Complete"),
+      content: Column(
+        children: [
+          Icon(Icons.check_circle, color: Colors.green, size: 48),
+          SizedBox(height: 10),
+          Text("All steps completed!",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    ),
+  ];
 
-
-  late GoogleMapController googleMapController;
-  Set<Marker> marker = {};
-  Widget _map(){
+  Widget _map() {
     return Stack(
       children: [
         GoogleMap(
+          myLocationEnabled: true,
           myLocationButtonEnabled: false,
-          markers: marker,
+          zoomGesturesEnabled: true,
+          scrollGesturesEnabled: true,
+          rotateGesturesEnabled: true,
+          tiltGesturesEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             googleMapController = controller;
           },
           initialCameraPosition: CameraPosition(
             target: myCurrentLocation,
-            zoom: 14,
+            zoom: 16,
           ),
-        ),
-        Positioned(
-          bottom: 10,
-          right: 10,
-          child: FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: () async {
-              await _requestLocationPermission();
+          onCameraMove: (CameraPosition position) {
+            setState(() {
+              myCurrentLocation = position.target;
+            });
+          },
+          onCameraIdle: _handleCameraIdle,
 
-              // Move camera
-              googleMapController.animateCamera(
-                CameraUpdate.newLatLng(myCurrentLocation),
+          // 🔹 New: Handle map tap
+          onTap: (LatLng tappedPoint) async {
+            setState(() {
+              myCurrentLocation = tappedPoint;
+            });
+
+            await _getAddressFromLatLng(tappedPoint);
+
+            setState(() {
+              marker.clear();
+              marker.add(
+                Marker(
+                  markerId: const MarkerId("tappedLocation"),
+                  position: tappedPoint,
+                  infoWindow: const InfoWindow(title: "Selected Location"),
+                ),
               );
+            });
+          },
 
-              // Add marker
-              setState(() {
-                marker.clear();
-                marker.add(
-                  Marker(
-                    markerId: MarkerId("currentLocation"),
-                    position: myCurrentLocation,
-                    infoWindow: InfoWindow(title: "You are here"),
-                  ),
-                );
-              });
-            },
-            child: Icon(Icons.my_location, color: Colors.blue),
-          ),
+          markers: marker,
         ),
+        // Positioned(
+        //   bottom: 10,
+        //   right: 10,
+        //   child: FloatingActionButton(
+        //     backgroundColor: Colors.white,
+        //     onPressed: () async {
+        //       await _requestLocationPermission();
+        //       googleMapController.animateCamera(
+        //         CameraUpdate.newCameraPosition(CameraPosition(
+        //             target: myCurrentLocation, zoom: 16)),
+        //       );
+        //       setState(() {
+        //         marker.clear();
+        //         marker.add(
+        //           Marker(
+        //             markerId: const MarkerId("currentLocation"),
+        //             position: myCurrentLocation,
+        //             infoWindow: const InfoWindow(title: "You are here"),
+        //           ),
+        //         );
+        //       });
+        //     },
+        //     child: const Icon(Icons.my_location, color: Colors.blue),
+        //   ),
+        // ),
       ],
     );
   }
+
 }

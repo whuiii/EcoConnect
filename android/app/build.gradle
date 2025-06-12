@@ -26,6 +26,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.navigate"
+    compileSdkVersion 35 // add new
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
