@@ -9,7 +9,7 @@ import 'package:navigate/user/delivery/dateTimePicker.dart';
 import 'package:navigate/user/delivery/delivery.dart';
 import 'package:navigate/user/delivery/placeholder_delivery.dart';
 import 'package:navigate/flash_message.dart';
-import 'package:navigate/user/ranking.dart/home.dart';
+import 'package:navigate/user/ranking.dart/page_ranking.dart';
 import 'package:navigate/label_text.dart';
 import 'package:navigate/menu.dart';
 

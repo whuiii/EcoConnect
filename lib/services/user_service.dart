@@ -59,4 +59,19 @@ class UserService {
       return null;
     }
   }
+
+  //Get All User Data
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+  try {
+    QuerySnapshot snapshot = await _firestore.collection('users').get();
+    return snapshot.docs.map((doc) {
+      return doc.data() as Map<String, dynamic>;
+    }).toList();
+  } catch (e) {
+    print("Error fetching users: $e");
+    return [];
+  }
 }
+
+}
+

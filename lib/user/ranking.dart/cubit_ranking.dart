@@ -1,45 +1,60 @@
-//Cubit
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:navigate/services/user_service.dart';
 
-class RankingCubit extends Cubit<Map<String, List<Map<String, String>>>> {
+class RankingCubit extends Cubit<Map<String, List<Map<String, dynamic>>>> {
   RankingCubit()
       : super({
-          'point': [
-            {'name': 'Yihong', 'value': '1500'},
-            {'name': 'Recycle Monster', 'value': '1300'},
-            {'name': 'Mega Knight', 'value': '1200'},
-            {'name': 'Terralith', 'value': '1200'},
-            {'name': 'Cycloop never die', 'value': '1123'},
-            {'name': 'debate', 'value': '1100'},
-            {'name': 'lalat king', 'value': '1002'},
-            {'name': 'zei bi', 'value': '323'},
-            {'name': 'beimuyu', 'value': '142'},
-            {'name': 'Wen Hui', 'value': '81'},
-          ],
-          'weight': [
-            {'name': 'Yihong', 'value': '90'},
-            {'name': 'Recycle Monster', 'value': '76'},
-            {'name': 'Mega Knight', 'value': '42'},
-            {'name': 'Terralith', 'value': '42'},
-            {'name': 'Cycloop never die', 'value': '41'},
-            {'name': 'debate', 'value': '39'},
-            {'name': 'lalat king', 'value': '35'},
-            {'name': 'zei bi', 'value': '32'},
-            {'name': 'beimuyu', 'value': '10'},
-            {'name': 'Wen Hui', 'value': '8'},
-          ],
-          'frequency': [
-            {'name': 'Yihong', 'value': '9'},
-            {'name': 'Recycle Monster', 'value': '7'},
-            {'name': 'Mega Knight', 'value': '4'},
-            {'name': 'Terralith', 'value': '4'},
-            {'name': 'Cycloop never die', 'value': '4'},
-            {'name': 'debate', 'value': '3'},
-            {'name': 'lalat king', 'value': '3'},
-            {'name': 'zei bi', 'value': '2'},
-            {'name': 'beimuyu', 'value': '1'},
-            {'name': 'Wen Hui', 'value': '1'},
-          ],
+          'point': [],
+          'weight': [],
+          'frequency': [],
         });
+
+  final UserService _userService = UserService();
+
+  Future<void> fetchRankings() async {
+    try {
+      List<Map<String, dynamic>> users = await _userService.getAllUsers();
+
+      // 'point'
+      List<Map<String, dynamic>> pointRanking = users
+          .map((user) => {
+                'name': user['username'] ?? 'Unknown',
+                'value': user['point'] ?? 0,
+              })
+          .toList();
+
+      pointRanking.sort((a, b) =>
+          (b['value'] as num).compareTo(a['value'] as num));
+
+      // 'weight'
+      List<Map<String, dynamic>> weightRanking = users
+          .map((user) => {
+                'name': user['username'] ?? 'Unknown',
+                'value': user['weight'] ?? 0,
+              })
+          .toList();
+
+      weightRanking.sort((a, b) =>
+          (b['value'] as num).compareTo(a['value'] as num));
+
+      // 'frequency'
+      List<Map<String, dynamic>> frequencyRanking = users
+          .map((user) => {
+                'name': user['username'] ?? 'Unknown',
+                'value': user['frequency'] ?? 0,
+              })
+          .toList();
+
+      frequencyRanking.sort((a, b) =>
+          (b['value'] as num).compareTo(a['value'] as num));
+
+      emit({
+        'point': pointRanking,
+        'weight': weightRanking,
+        'frequency': frequencyRanking,
+      });
+    } catch (e) {
+      print("Error fetching rankings: $e");
+    }
+  }
 }

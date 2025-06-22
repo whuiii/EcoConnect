@@ -1,17 +1,12 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/user/delivery/delivery.dart';
-import 'package:navigate/user/delivery/delivery_form.dart';
-import 'package:navigate/user/delivery/page_delivery.dart';
 import 'package:navigate/user/education/education.dart';
-import 'package:navigate/forgotPassword.dart';
-import 'package:navigate/user/ranking.dart/home.dart';
-import 'package:navigate/login.dart';
-import 'package:navigate/user/profile/profile.dart';
-import 'package:navigate/register.dart';
+import 'package:navigate/user/ranking.dart/cubit_ranking.dart';
 import 'package:navigate/user/ranking.dart/page_ranking.dart';
-import 'package:provider/provider.dart';
+import 'package:navigate/user/profile/profile.dart';
 
 class ProviderPage extends StatefulWidget {
   final int initialPage;
@@ -26,7 +21,10 @@ class _ProviderPageState extends State<ProviderPage> {
   late int index;
 
   final List<Widget> pages = [
-    HomePage(),
+    BlocProvider(
+      create: (context) => RankingCubit()..fetchRankings(),
+      child: RankingPage(),
+    ),
     DeliveryRequest(),
     Education(),
     Profile(),
