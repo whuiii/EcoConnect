@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:navigate/color.dart';
+import 'package:navigate/services/delivery_service.dart';
 import 'package:navigate/user/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/user/delivery/dateTimePicker.dart';
 import 'package:navigate/user/delivery/delivery.dart';
@@ -21,23 +22,33 @@ class Delivery extends StatefulWidget {
 }
 
 class _DeliveryState extends State<Delivery> {
+  //Enable GPS Location
+  loc.Location location = loc.Location();
+  bool _serviceEnabled = false;
+  loc.PermissionStatus? _permissionGranted;
+  loc.LocationData? _locationData;
+  late GoogleMapController googleMapController;
+  Set<Marker> marker = {};
+
+  final _formKey = GlobalKey<FormState>();
+
+  //Collect Account (Step 1)
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final phoneController = TextEditingController();
   TextEditingController _searchController = TextEditingController();
 
   int currentStep = 0;
   bool? isPlastic = false;
   bool? isAluminium = false;
   bool? isPaper = false;
+  String selectedBagSize = "Small";
 
-  LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
+  //Collect Detail (Step 2)
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
   String currentAddress = "";
-
-  loc.Location location = loc.Location();
-  bool _serviceEnabled = false;
-  loc.PermissionStatus? _permissionGranted;
-  loc.LocationData? _locationData;
-
-  late GoogleMapController googleMapController;
-  Set<Marker> marker = {};
+  LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
 
   @override
   void initState() {
@@ -164,6 +175,38 @@ class _DeliveryState extends State<Delivery> {
     });
   }
 
+  Future<void> _saveDelivery() async {
+    List<String> materials = [];
+    if (isPlastic == true) materials.add('plastic');
+    if (isAluminium == true) materials.add('aluminium');
+    if (isPaper == true) materials.add('paper');
+
+    try {
+      await DeliveryService().createDelivery(
+        email: emailController.text.trim(),
+        username: usernameController.text.trim(),
+        phoneNumber: phoneController.text.trim(),
+        materials: materials,
+        bagSize: selectedBagSize,
+        date: selectedDate!,
+        time: selectedTime!,
+        address: currentAddress,
+        latitude: myCurrentLocation.latitude,
+        longitude: myCurrentLocation.longitude,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Delivery successfully saved!')));
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to save delivery')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -197,7 +240,71 @@ class _DeliveryState extends State<Delivery> {
                   ElevatedButton(
                     onPressed: () {
                       final isLastStep = currentStep == getStep().length - 1;
+
+                      if (currentStep == 0) {
+                        // Perform validation only on first step
+                        if (emailController.text.isEmpty ||
+                            usernameController.text.isEmpty ||
+                            phoneController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Please fill in your information')),
+                          );
+                          return;
+                        }
+
+                        if (!(isPlastic == true ||
+                            isAluminium == true ||
+                            isPaper == true)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Please select at least one recyclable material')),
+                          );
+                          return;
+                        }
+
+                        if (selectedBagSize == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Please select estimated quantity')),
+                          );
+                          return;
+                        }
+                      }
+
+                      if (currentStep == 1) {
+                        if (selectedDate == null || selectedTime == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Please select date and time')));
+                          return;
+                        }
+
+                        if (myCurrentLocation.latitude == 3.1319 &&
+                            myCurrentLocation.longitude == 101.6841) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Please select your address or update location')),
+                          );
+                          return;
+                        }
+
+                        if (currentAddress.isEmpty ||
+                            currentAddress == "Unable to retrieve address.") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Unable to get address. Please search or select location.')),
+                          );
+                          return;
+                        }
+                      }
                       if (isLastStep) {
+                        // Final submit
+                        _saveDelivery();
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                               builder: (context) =>
@@ -224,60 +331,77 @@ class _DeliveryState extends State<Delivery> {
         Step(
           isActive: currentStep >= 0,
           title: Text("Account"),
-          content: Column(
-            children: [
-              FillInBlank(
+          content: Form(
+            key: _formKey, // wrap whole form
+            child: Column(
+              children: [
+                FillInBlank(
                   text: "Email",
                   isEnabled: true,
                   hint: "Email",
-                  icon: Iconsax.sms),
-              SizedBox(height: 16),
-              FillInBlank(
+                  icon: Iconsax.sms,
+                  controller: emailController,
+                ),
+                SizedBox(height: 16),
+                FillInBlank(
                   text: "Username",
                   isEnabled: true,
-                  hint: "Email",
-                  icon: Iconsax.user),
-              SizedBox(height: 16),
-              FillInBlank(
+                  hint: "Username",
+                  icon: Iconsax.user,
+                  controller: usernameController,
+                ),
+                SizedBox(height: 16),
+                FillInBlank(
                   text: "Phone Number",
                   hint: "Phone Number",
                   isEnabled: true,
-                  icon: Iconsax.call),
-              LabelText(text: "Recyclable Materials:"),
-              Column(
-                children: [
-                  Row(children: [
-                    Checkbox(
-                      value: isPlastic,
-                      onChanged: (value) => setState(() => isPlastic = value),
-                      activeColor: Colors.orange,
-                      checkColor: Colors.white,
-                    ),
-                    Text("Plastic", style: TextName),
-                  ]),
-                  Row(children: [
-                    Checkbox(
-                      value: isAluminium,
-                      onChanged: (value) => setState(() => isAluminium = value),
-                      activeColor: Colors.brown,
-                      checkColor: Colors.white,
-                    ),
-                    Text("Aluminium", style: TextName),
-                  ]),
-                  Row(children: [
-                    Checkbox(
-                      value: isPaper,
-                      onChanged: (value) => setState(() => isPaper = value),
-                      activeColor: Colors.blue,
-                      checkColor: Colors.white,
-                    ),
-                    Text("Paper", style: TextName),
-                  ]),
-                ],
-              ),
-              LabelText(text: "Estimated Quantity:"),
-              BagSizeSelector(),
-            ],
+                  icon: Iconsax.call,
+                  controller: phoneController,
+                ),
+                LabelText(text: "Recyclable Materials:"),
+                Column(
+                  children: [
+                    Row(children: [
+                      Checkbox(
+                        value: isPlastic,
+                        onChanged: (value) => setState(() => isPlastic = value),
+                        activeColor: Colors.orange,
+                        checkColor: Colors.white,
+                      ),
+                      Text("Plastic", style: TextName),
+                    ]),
+                    Row(children: [
+                      Checkbox(
+                        value: isAluminium,
+                        onChanged: (value) =>
+                            setState(() => isAluminium = value),
+                        activeColor: Colors.brown,
+                        checkColor: Colors.white,
+                      ),
+                      Text("Aluminium", style: TextName),
+                    ]),
+                    Row(children: [
+                      Checkbox(
+                        value: isPaper,
+                        onChanged: (value) => setState(() => isPaper = value),
+                        activeColor: Colors.blue,
+                        checkColor: Colors.white,
+                      ),
+                      Text("Paper", style: TextName),
+                    ]),
+                  ],
+                ),
+                LabelText(text: "Estimated Quantity:"),
+                BagSizeSelector(
+                  selectedSize: selectedBagSize,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedBagSize = value;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         Step(
@@ -286,7 +410,19 @@ class _DeliveryState extends State<Delivery> {
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DateTimePickerWidget(),
+              //Get the Date and Time
+              DateTimePickerWidget(
+                onDateSelected: (date) {
+                  setState(() {
+                    selectedDate = date;
+                  });
+                },
+                onTimeSelected: (time) {
+                  setState(() {
+                    selectedTime = time;
+                  });
+                },
+              ),
               SizedBox(
                 height: 20,
               ),
@@ -295,7 +431,7 @@ class _DeliveryState extends State<Delivery> {
                 decoration: InputDecoration(
                   hintText: "Your Address",
                   labelText: currentAddress,
-                  prefixIcon: Icon(Iconsax.location), // From iconsax package
+                  prefixIcon: Icon(Iconsax.location),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.search),
                     onPressed: () => _searchAndNavigate(_searchController.text),
@@ -311,7 +447,7 @@ class _DeliveryState extends State<Delivery> {
                       EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
-              //FillInBlank(text: "Address", hint: "Your Address", icon: Iconsax.location),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -347,18 +483,6 @@ class _DeliveryState extends State<Delivery> {
                 ],
               ),
               SizedBox(height: 10),
-
-              //SizedBox(height: 16),
-              // TextField(
-              //   controller: _searchController,
-              //   decoration: InputDecoration(
-              //     labelText: 'Search Location',
-              //     suffixIcon: IconButton(
-              //       icon: Icon(Icons.search),
-              //       onPressed: () => _searchAndNavigate(_searchController.text),
-              //     ),
-              //   ),
-              // ),
               SizedBox(height: 10),
               Container(
                 height: 300,

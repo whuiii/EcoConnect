@@ -6,18 +6,20 @@ class FillInBlank extends StatelessWidget {
   final String hint;
   final IconData icon;
   final bool isEnabled;
+  final TextEditingController? controller;
   const FillInBlank(
       {super.key,
       required this.text,
       required this.icon,
       required this.hint,
-      required this.isEnabled});
+      required this.isEnabled, this.controller});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       enabled: isEnabled,
       cursorColor: Colors.black,
+      controller: controller,
       decoration: InputDecoration(
         labelText: text,
         hintText: hint,

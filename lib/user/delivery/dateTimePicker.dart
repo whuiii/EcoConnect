@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class DateTimePickerWidget extends StatefulWidget {
-  const DateTimePickerWidget({super.key});
+  final Function(DateTime) onDateSelected;
+  final Function(TimeOfDay) onTimeSelected;
+
+  const DateTimePickerWidget({
+    super.key,
+    required this.onDateSelected,
+    required this.onTimeSelected,
+  });
 
   @override
   State<DateTimePickerWidget> createState() => _DateTimePickerWidgetState();
@@ -15,7 +22,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
 
@@ -23,6 +30,8 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       setState(() {
         selectedDate = picked;
       });
+
+      widget.onDateSelected(picked);
     }
   }
 
@@ -36,6 +45,8 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       setState(() {
         selectedTime = picked;
       });
+
+      widget.onTimeSelected(picked);
     }
   }
 
@@ -47,16 +58,11 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
         ElevatedButton(
           onPressed: () => _selectDate(context),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, // text color
+            foregroundColor: Colors.black,
             backgroundColor: Colors.white,
             elevation: 0,
-            side: BorderSide(
-              color: Colors.grey.shade200,
-              width: 2,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            side: BorderSide(color: Colors.grey.shade200, width: 2),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           child: Row(
@@ -68,29 +74,19 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                 selectedDate != null
                     ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
                     : 'Select Date',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: TextStyle(color: Colors.black, fontSize: 14),
               ),
             ],
           ),
         ),
-        SizedBox(height: 16),
         ElevatedButton(
           onPressed: () => _selectTime(context),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, // text color
+            foregroundColor: Colors.black,
             backgroundColor: Colors.white,
             elevation: 0,
-            side: BorderSide(
-              color: Colors.grey.shade200,
-              width: 2,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            side: BorderSide(color: Colors.grey.shade200, width: 2),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           child: Row(
@@ -99,14 +95,8 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
               Icon(Icons.access_time, size: 18, color: Colors.black),
               SizedBox(width: 8),
               Text(
-                selectedTime != null
-                    ? selectedTime!.format(context)
-                    : 'Select Time',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                selectedTime != null ? selectedTime!.format(context) : 'Select Time',
+                style: TextStyle(color: Colors.black, fontSize: 14),
               ),
             ],
           ),
