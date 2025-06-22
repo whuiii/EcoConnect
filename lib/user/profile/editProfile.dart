@@ -32,9 +32,7 @@ class _EditProfileState extends State<EditProfile> {
         appBar: AppBar(
           title: Text(
             "Edit Profile",
-            style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: button,
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -45,15 +43,15 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     _image != null
                         ? CircleAvatar(
-                      radius: 60,
-                      backgroundImage: MemoryImage(_image!),
-                    )
+                            radius: 60,
+                            backgroundImage: MemoryImage(_image!),
+                          )
                         : CircleAvatar(
-                      radius: 60,
-                      backgroundImage:
-                      AssetImage('assets/images/EcoConnect_Logo.png'),
-                      backgroundColor: Colors.transparent,
-                    ),
+                            radius: 60,
+                            backgroundImage:
+                                AssetImage('assets/images/EcoConnect_Logo.png'),
+                            backgroundColor: Colors.transparent,
+                          ),
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -109,14 +107,13 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: Colors.grey.shade200, width: 2),
+                            BorderSide(color: Colors.grey.shade200, width: 2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       floatingLabelStyle:
-                      TextStyle(color: Colors.black, fontSize: 18),
+                          TextStyle(color: Colors.black, fontSize: 18),
                       focusedBorder: OutlineInputBorder(
-                        borderSide:
-                        BorderSide(color: Colors.black, width: 1.5),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -146,14 +143,13 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: Colors.grey.shade200, width: 2),
+                            BorderSide(color: Colors.grey.shade200, width: 2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       floatingLabelStyle:
-                      TextStyle(color: Colors.black, fontSize: 18),
+                          TextStyle(color: Colors.black, fontSize: 18),
                       focusedBorder: OutlineInputBorder(
-                        borderSide:
-                        BorderSide(color: Colors.black, width: 1.5),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -183,14 +179,13 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: Colors.grey.shade200, width: 2),
+                            BorderSide(color: Colors.grey.shade200, width: 2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       floatingLabelStyle:
-                      TextStyle(color: Colors.black, fontSize: 18),
+                          TextStyle(color: Colors.black, fontSize: 18),
                       focusedBorder: OutlineInputBorder(
-                        borderSide:
-                        BorderSide(color: Colors.black, width: 1.5),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -202,19 +197,18 @@ class _EditProfileState extends State<EditProfile> {
                   child: MaterialButton(
                     onPressed: () {
                       // Save profile changes
-                      QuickAlert.show(context: context,
-                          type: QuickAlertType.confirm,
-                      text: "Are you want to save changes?",
-                      title: "Alert",
+                      QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.confirm,
+                        text: "Are you want to save changes?",
+                        title: "Alert",
                         confirmBtnText: 'Yes',
                         cancelBtnText: 'No',
                         confirmBtnColor: Colors.green,
-
                       );
                     },
                     color: button,
-                    padding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 50),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

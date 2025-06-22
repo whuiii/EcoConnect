@@ -10,7 +10,7 @@ class RankingContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primary,
+      backgroundColor: back1,
       body: Container(
         margin: EdgeInsets.only(top: 20),
         padding: const EdgeInsets.only(top: 8.0),

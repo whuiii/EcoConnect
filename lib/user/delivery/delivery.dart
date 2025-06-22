@@ -16,9 +16,10 @@ class DeliveryRequest extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: primary,
+        backgroundColor: const Color.fromARGB(255, 235, 228, 205),
         appBar: AppBar(
           title: const Text("Recycle Request"),
+          foregroundColor: green1,
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
@@ -78,18 +79,6 @@ class DeliveryRequest extends StatelessWidget {
                       horizontal: 10), // body-level padding
                   child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10, // more blur = softer shadow
-                          spreadRadius: 2,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
                     padding: const EdgeInsets.all(10),
                     child: StreamBuilder(
                       stream: FirebaseFirestore.instance
@@ -118,20 +107,22 @@ class DeliveryRequest extends StatelessWidget {
                             final data = doc.data() as Map<String, dynamic>;
 
                             return RequestContainerWidget(
-  location: data['address'] ?? '-',
-  materials: List<String>.from(data['materials'] ?? []),
-  bagSize: data['bagSize'] ?? '-',
-  status: data['status'] ?? 'Pending',
-  remark: data['remark'] ?? '-',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DeliveryDetailPage(documentId: docId),
-      ),
-    );
-  },
-);
+                              location: data['address'] ?? '-',
+                              materials:
+                                  List<String>.from(data['materials'] ?? []),
+                              bagSize: data['bagSize'] ?? '-',
+                              status: data['status'] ?? 'Pending',
+                              remark: data['remark'] ?? '-',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        DeliveryDetailPage(documentId: docId),
+                                  ),
+                                );
+                              },
+                            );
                           },
                         );
                       },

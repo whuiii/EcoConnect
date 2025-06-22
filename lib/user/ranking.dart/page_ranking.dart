@@ -75,7 +75,7 @@ class _RankingPageState extends State<RankingPage> {
           children: [
             //Top Bar
             Container(
-              color: primary,
+              color: green3,
               child: Row(
                 children: [
                   //Profile Image
@@ -118,8 +118,9 @@ class _RankingPageState extends State<RankingPage> {
                 ],
               ),
             ),
+            SizedBox(height: 20),
             Container(
-              color: primary,
+              color: back1,
               child:
 
                   //Rankings

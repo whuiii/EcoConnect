@@ -54,12 +54,10 @@ class _EducationState extends State<Education> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor:primary,
         appBar: AppBar(
           title: Text("Education"),
           automaticallyImplyLeading: false, // hide the go back icon button
           centerTitle: true,
-
         ),
         body: SingleChildScrollView(
           child: Padding(

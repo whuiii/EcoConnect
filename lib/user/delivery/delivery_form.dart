@@ -232,7 +232,6 @@ class _DeliveryState extends State<Delivery> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Delivery Form"),
-          backgroundColor: primary,
           centerTitle: true,
         ),
         body: Column(
@@ -522,7 +521,6 @@ class _DeliveryState extends State<Delivery> {
               Container(
                 height: 300,
                 width: double.infinity,
-                color: primary,
                 child: _map(),
               ),
             ],
@@ -533,7 +531,6 @@ class _DeliveryState extends State<Delivery> {
           title: Text("Complete"),
           content: Column(
             children: [
-              if (currentStep == 2) FlashMessage(),
               Icon(Icons.check_circle, color: Colors.green, size: 48),
               SizedBox(height: 10),
               Text("All steps completed!",

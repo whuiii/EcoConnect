@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:navigate/color.dart';
 import 'package:navigate/user/delivery/placeholder_delivery.dart';
 
 class DeliveryDetailPage extends StatelessWidget {
@@ -14,7 +15,7 @@ class DeliveryDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Delivery Details"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: green3,
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance

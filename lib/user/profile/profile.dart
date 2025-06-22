@@ -17,10 +17,11 @@ class Profile extends StatelessWidget {
               // Top Container
               Container(
                 width: double.infinity,
-
                 decoration: BoxDecoration(
-                  color: button,
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30),
+                  color: green3,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
                 ),
                 padding: const EdgeInsets.all(30),
@@ -33,7 +34,8 @@ class Profile extends StatelessWidget {
                           height: 120,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(100),
-                            child: Image.asset('assets/images/EcoConnect_Logo.png'),
+                            child: Image.asset(
+                                'assets/images/EcoConnect_Logo.png'),
                           ),
                         ),
                         Positioned(
@@ -58,14 +60,19 @@ class Profile extends StatelessWidget {
                     const SizedBox(height: 10),
                     const Text(
                       "EcoConnect",
-                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white),
                     ),
                     const Text(
                       "Bio Data: Recycle, Reuse, Reduce",
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white70),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white70),
                     ),
-                   // const SizedBox(height: 20),
-
+                    // const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -73,8 +80,9 @@ class Profile extends StatelessWidget {
               // Bottom Container (White)
               Container(
                 width: double.infinity,
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                color: back1,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   children: [
                     SizedBox(
@@ -86,7 +94,8 @@ class Profile extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: button,
                           foregroundColor: button,
-                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -97,7 +106,7 @@ class Profile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height:10),
+                    SizedBox(height: 10),
                     const Divider(),
                     const SizedBox(height: 10),
                     ProfileMenuWidget(
@@ -126,7 +135,7 @@ class Profile extends StatelessWidget {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => MainPage()),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -180,14 +189,15 @@ class ProfileMenuWidget extends StatelessWidget {
       ),
       trailing: endIcon
           ? Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: Colors.grey.shade300,
-        ),
-        child: Icon(Icons.keyboard_arrow_right, size: 18, color: Colors.grey.shade800),
-      )
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                color: Colors.grey.shade300,
+              ),
+              child: Icon(Icons.keyboard_arrow_right,
+                  size: 18, color: Colors.grey.shade800),
+            )
           : null,
     );
   }
