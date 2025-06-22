@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:navigate/delivery/delivery_info.dart';
-import 'package:navigate/delivery/page_delivery.dart';
+import 'package:navigate/user/delivery/delivery_info.dart';
+import 'package:navigate/user/delivery/page_delivery.dart';
 
-import '../color.dart';
+import '../../color.dart';
 import 'delivery_form.dart';
 
 class DeliveryRequest extends StatelessWidget {

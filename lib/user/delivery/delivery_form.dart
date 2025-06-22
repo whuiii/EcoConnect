@@ -4,12 +4,12 @@ import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:navigate/color.dart';
-import 'package:navigate/delivery/bagsize_roundcheck.dart';
-import 'package:navigate/delivery/dateTimePicker.dart';
-import 'package:navigate/delivery/delivery.dart';
-import 'package:navigate/delivery/placeholder_delivery.dart';
+import 'package:navigate/user/delivery/bagsize_roundcheck.dart';
+import 'package:navigate/user/delivery/dateTimePicker.dart';
+import 'package:navigate/user/delivery/delivery.dart';
+import 'package:navigate/user/delivery/placeholder_delivery.dart';
 import 'package:navigate/flash_message.dart';
-import 'package:navigate/home.dart';
+import 'package:navigate/user/ranking.dart/home.dart';
 import 'package:navigate/label_text.dart';
 import 'package:navigate/menu.dart';
 

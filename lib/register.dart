@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:navigate/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:navigate/services/user_service.dart';
 
 import 'color.dart';
 
@@ -15,24 +17,23 @@ class _RegisterPageState extends State<RegisterPage> {
   bool securePassword = true;
   bool? isChecked = false;
 
-  // condition of Password
+  // Controllers to get input values
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  // Password conditionss
   bool _isPasswordEightCharacters = false;
   bool _hasPasswordOneNumber = false;
 
   onPasswordChanged(String password) {
     final numericRegex = RegExp(r'[0-9]');
     setState(() {
-      _isPasswordEightCharacters = false;
-      _hasPasswordOneNumber = false;
-      if(password.length >= 8){
-        _isPasswordEightCharacters = true;
-      }
-
-      if(numericRegex.hasMatch(password)){
-        _hasPasswordOneNumber = true;
-      }
+      _isPasswordEightCharacters = password.length >= 8;
+      _hasPasswordOneNumber = numericRegex.hasMatch(password);
     });
-
   }
 
   final List<String> _images = [
@@ -41,10 +42,11 @@ class _RegisterPageState extends State<RegisterPage> {
     'assets/images/3.gif',
   ];
 
+  
+
   @override
   void initState() {
     super.initState();
-    // Automatically cycle through images every 3 seconds
     Future.doWhile(() async {
       await Future.delayed(Duration(seconds: 3));
       if (!mounted) return false;
@@ -54,6 +56,31 @@ class _RegisterPageState extends State<RegisterPage> {
       return true;
     });
   }
+
+final userService = UserService();
+void handleRegister() async {
+  String? result = await userService.registerUser(
+  email: emailController.text.trim(),
+  password: passwordController.text,
+  confirmPassword: confirmPasswordController.text,
+  username: usernameController.text.trim(),
+  phone: phoneController.text.trim(),
+);
+
+
+  if (result == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Registration successful!"))
+    );
+    Navigator.pushReplacementNamed(context, '/home');
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result))
+    );
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           opacity: activateIndex == e.key ? 1 : 0,
                           child: Image.asset(
                             e.value,
-                            fit: BoxFit.cover, // Auto scales the image
-                            //width: double.infinity,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       );
@@ -85,347 +111,142 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 5,
-              ),
+              SizedBox(height: 5),
               FadeInUp(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Welcome New User",
-                      style: TextStyle(
+                child: Text("Welcome New User",
+                    style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w800,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+                        color: Colors.black)),
+              ),
+              SizedBox(height: 5),
+              FadeInUp(
+                  child: Text("Sign up to create account",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey))),
+              SizedBox(height: 30),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child: TextField(
+                  controller: usernameController,
+                  cursorColor: Colors.black,
+                  decoration: inputDecoration("Username", Iconsax.user),
                 ),
               ),
-              SizedBox(
-                height: 5,
-              ),
+              SizedBox(height: 20),
               FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child: TextField(
+                  controller: emailController,
+                  cursorColor: Colors.black,
+                  decoration: inputDecoration("Email", Iconsax.sms),
+                ),
+              ),
+              SizedBox(height: 20),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child: TextField(
+                  controller: phoneController,
+                  cursorColor: Colors.black,
+                  decoration: inputDecoration("Phone Number", Iconsax.call),
+                ),
+              ),
+              SizedBox(height: 20),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child: TextField(
+                  controller: passwordController,
+                  onChanged: onPasswordChanged,
+                  obscureText: securePassword,
+                  cursorColor: Colors.black,
+                  decoration: inputDecoration("Password", Iconsax.key)
+                      .copyWith(suffixIcon: togglePassword()),
+                ),
+              ),
+              SizedBox(height: 10),
+              FadeInUp(
+                  delay: Duration(milliseconds: 800),
+                  duration: Duration(milliseconds: 1500),
                   child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Sign up to create account",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              )),
-              SizedBox(
-                height: 30,
-              ),
-              FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                        labelText: "Username",
-                        hintText: "Username",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        labelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        prefixIcon: Icon(
-                          Iconsax.user,
-                          color: Colors.black,
-                          size: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)),
-                        floatingLabelStyle:
-                            TextStyle(color: Colors.black, fontSize: 18),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10))),
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                        labelText: "Email",
-                        hintText: "Email",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        labelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        prefixIcon: Icon(
-                          Iconsax.sms,
-                          color: Colors.black,
-                          size: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)),
-                        floatingLabelStyle:
-                            TextStyle(color: Colors.black, fontSize: 18),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10))),
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                        labelText: "Phone Number",
-                        hintText: "Phone Number without -",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        labelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        prefixIcon: Icon(
-                          Iconsax.call,
-                          color: Colors.black,
-                          size: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)),
-                        floatingLabelStyle:
-                            TextStyle(color: Colors.black, fontSize: 18),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10))),
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    onChanged: (password) => onPasswordChanged(password),
-                    obscureText: securePassword,
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                        labelText: "Password",
-                        hintText: "Password",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        suffixIcon: togglePassword(),
-                        labelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        prefixIcon: Icon(
-                          Iconsax.key,
-                          color: Colors.black,
-                          size: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)),
-                        floatingLabelStyle:
-                            TextStyle(color: Colors.black, fontSize: 18),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10))),
-                  )),
-              SizedBox(
-                height: 20,
-              ),
-              FadeInUp(
-                delay: Duration(milliseconds: 800),
-                duration: Duration(milliseconds: 1500),
-                child:Row(
-                children: [
-                  AnimatedContainer(duration: Duration(milliseconds: 500),
-                    width: 15,
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: _isPasswordEightCharacters ? Colors.green : Colors.transparent,
-                      border: _isPasswordEightCharacters ? Border.all(color: Colors.transparent) :
-                      Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Center(child: Icon(Icons.check, color: Colors.white, size: 15,),),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("Contains at least 8 characters")
-                ],
-              ), ),
-
-              SizedBox(
-                height: 10,
-              ),
-              FadeInUp(
-                delay: Duration(milliseconds: 800),
-                duration: Duration(milliseconds: 1500),
-                child:Row(
-                children: [
-                  AnimatedContainer(duration: Duration(milliseconds: 500),
-                    width: 15,
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: _hasPasswordOneNumber ? Colors.green : Colors.transparent,
-                      border: _hasPasswordOneNumber ? Border.all(color: Colors.transparent) :
-                      Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Center(child: Icon(Icons.check, color: Colors.white, size: 15,),),
-                  ),
-                  SizedBox(width: 10,),
-                  Text("Contains at least 1 number")
-                ],
-              ), ),
-
-              SizedBox(
-                height: 20,
-              ),
-              FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    obscureText: securePassword,
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                        labelText: "Confirm Password",
-                        hintText: "Confirm Password",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        suffixIcon: togglePassword(),
-                        labelStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        prefixIcon: Icon(
-                          Iconsax.lock,
-                          color: Colors.black,
-                          size: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade200, width: 2),
-                            borderRadius: BorderRadius.circular(10)),
-                        floatingLabelStyle:
-                            TextStyle(color: Colors.black, fontSize: 18),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                            borderRadius: BorderRadius.circular(10))),
+                    children: [
+                      passwordRequirementCheck(
+                          _isPasswordEightCharacters, "At least 8 characters"),
+                    ],
                   )),
               SizedBox(height: 10),
               FadeInUp(
-                duration: Duration(milliseconds: 800),
-                delay: Duration(milliseconds: 1500),
+                  delay: Duration(milliseconds: 800),
+                  duration: Duration(milliseconds: 1500),
+                  child: Row(
+                    children: [
+                      passwordRequirementCheck(
+                          _hasPasswordOneNumber, "At least 1 number"),
+                    ],
+                  )),
+              SizedBox(height: 20),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
+                child: TextField(
+                  controller: confirmPasswordController,
+                  obscureText: securePassword,
+                  cursorColor: Colors.black,
+                  decoration: inputDecoration("Confirm Password", Iconsax.lock)
+                      .copyWith(suffixIcon: togglePassword()),
+                ),
+              ),
+              SizedBox(height: 20),
+              FadeInUp(
+                delay: Duration(milliseconds: 800),
+                duration: Duration(milliseconds: 1500),
                 child: Row(
-                  //mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Transform.scale(
-                      scale: 0.8, //  Adjust size
-                      child: Checkbox(
+                    Checkbox(
                         value: isChecked,
-                        onChanged: (bool? newValue) {
+                        onChanged: (val) {
                           setState(() {
-                            isChecked = newValue ?? false;
+                            isChecked = val;
                           });
-                        },
-                        activeColor: Colors.grey.shade200,
-                        checkColor: button,
-                      ),
-                    ),
-                    Text(
-                      "I agree to the Terms and Privacy Policy",
-                      style: TextStyle(color: Colors.black),
-                    ),
+                        }),
+                    Text("I agree to the Terms and Privacy Policy")
                   ],
                 ),
               ),
-
               FadeInUp(
-                  duration: Duration(milliseconds: 1300),
-                  delay: Duration(milliseconds: 800),
-                  child: MaterialButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, '/home'); // link to the home page
-                    },
-                    height: 45,
-                    minWidth: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    color: button,
-                    child: Text(
-                      "SIGN UP",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  )),
-              SizedBox(
-                height: 8,
+                duration: Duration(milliseconds: 1300),
+                delay: Duration(milliseconds: 800),
+                child: MaterialButton(
+                  onPressed: handleRegister,
+                  height: 45,
+                  minWidth: double.infinity,
+                  color: button,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Text("SIGN UP",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
               ),
+              SizedBox(height: 10),
               FadeInUp(
                 delay: Duration(milliseconds: 800),
                 duration: Duration(milliseconds: 1500),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Already have an account?",
-                      style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400),
-                    ),
+                    Text("Already have an account?",
+                        style: TextStyle(color: Colors.grey)),
                     TextButton(
                         onPressed: () {
                           Navigator.of(context).pushNamed('/1');
                         },
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500),
-                        ))
+                        child: Text("Login",
+                            style: TextStyle(color: Colors.blue))),
                   ],
                 ),
               ),
@@ -436,6 +257,47 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  InputDecoration inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      hintText: label,
+      hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+      labelStyle: TextStyle(
+          color: Colors.black, fontSize: 14, fontWeight: FontWeight.w400),
+      prefixIcon: Icon(icon, color: Colors.black, size: 18),
+      enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+          borderRadius: BorderRadius.circular(10)),
+      floatingLabelStyle: TextStyle(color: Colors.black, fontSize: 18),
+      focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black, width: 1.5),
+          borderRadius: BorderRadius.circular(10)),
+    );
+  }
+
+  Widget passwordRequirementCheck(bool condition, String text) {
+    return Row(
+      children: [
+        AnimatedContainer(
+          duration: Duration(milliseconds: 500),
+          width: 15,
+          height: 15,
+          decoration: BoxDecoration(
+            color: condition ? Colors.green : Colors.transparent,
+            border: Border.all(
+                color: condition ? Colors.transparent : Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: condition
+              ? Icon(Icons.check, color: Colors.white, size: 15)
+              : SizedBox(),
+        ),
+        SizedBox(width: 10),
+        Text(text),
+      ],
+    );
+  }
+
   Widget togglePassword() {
     return IconButton(
       onPressed: () {
@@ -443,9 +305,8 @@ class _RegisterPageState extends State<RegisterPage> {
           securePassword = !securePassword;
         });
       },
-      icon:
-          securePassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-      color: Colors.grey,
+      icon: Icon(securePassword ? Icons.visibility : Icons.visibility_off,
+          color: Colors.grey),
     );
   }
 }

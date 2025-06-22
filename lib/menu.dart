@@ -1,16 +1,16 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart';
-import 'package:navigate/delivery/delivery.dart';
-import 'package:navigate/delivery/delivery_form.dart';
-import 'package:navigate/delivery/page_delivery.dart';
-import 'package:navigate/education/education.dart';
+import 'package:navigate/user/delivery/delivery.dart';
+import 'package:navigate/user/delivery/delivery_form.dart';
+import 'package:navigate/user/delivery/page_delivery.dart';
+import 'package:navigate/user/education/education.dart';
 import 'package:navigate/forgotPassword.dart';
-import 'package:navigate/home.dart';
+import 'package:navigate/user/ranking.dart/home.dart';
 import 'package:navigate/login.dart';
-import 'package:navigate/profile/profile.dart';
+import 'package:navigate/user/profile/profile.dart';
 import 'package:navigate/register.dart';
-
+import 'package:navigate/user/ranking.dart/page_ranking.dart';
 import 'package:provider/provider.dart';
 
 class ProviderPage extends StatefulWidget {

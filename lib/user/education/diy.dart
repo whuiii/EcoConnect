@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
-import '../color.dart';
+import '../../color.dart';
 import 'diyVideo.dart';
 //import 'video_player_screen.dart'; // New file for full-screen video
 

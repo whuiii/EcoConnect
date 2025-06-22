@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/color.dart';
-import 'package:navigate/ranking.dart/cubit_ranking.dart';
+import 'package:navigate/user/ranking.dart/cubit_ranking.dart';
 
 class RankingList extends StatefulWidget {
   final String index;

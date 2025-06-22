@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:navigate/auth.dart';
+import 'package:navigate/services/auth.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/register.dart';
 

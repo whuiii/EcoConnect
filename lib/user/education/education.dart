@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:navigate/color.dart';
-import 'package:navigate/education/diy.dart';
-import 'package:navigate/education/paper.dart';
-import 'package:navigate/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
+import 'package:navigate/user/education/diy.dart';
+import 'package:navigate/user/education/paper.dart';
+import 'package:navigate/user/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
 
 class Education extends StatefulWidget {
   const Education({super.key});

@@ -1,13 +1,17 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/color.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:navigate/delivery/delivery_form.dart';
-import 'package:navigate/education/education.dart';
-import 'package:navigate/login.dart';
-import 'package:navigate/profile/profile.dart';
-import 'package:navigate/ranking.dart/provider_ranking.dart';
-import 'package:navigate/ranking.dart/top3_ranking.dart';
+import 'package:navigate/services/user_service.dart';
+import 'package:navigate/user/delivery/delivery_form.dart';
+import 'package:navigate/user/education/education.dart';
+
+import 'package:navigate/user/profile/profile.dart';
+
+import 'package:navigate/user/ranking.dart/provider_ranking.dart';
+import 'package:navigate/user/ranking.dart/top3_ranking.dart';
 
 enum RankingCategory { point, weight, frequency }
 
@@ -19,6 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String username = 'Loading...';
   int index = 0;
   int userPoints = 120;
   RankingCategory _selectedTab = RankingCategory.point;
@@ -48,6 +53,24 @@ class _HomePageState extends State<HomePage> {
     Icon(Icons.cast_for_education, size: 30),
     Icon(Icons.person, size: 30),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  void loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String uid = user.uid;
+      final userService = UserService();
+      Map<String, dynamic>? userData = await userService.getUserProfile(uid);
+      setState(() {
+        username = userData?['username'] ?? 'No Name';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: Text(
-                      "Chong Yi Hong bt Mohammad Ashraf",
+                      username,
                       style: TextName,
                     ),
                   ),

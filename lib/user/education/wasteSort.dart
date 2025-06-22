@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:navigate/education/glass.dart';
+import 'package:navigate/user/education/glass.dart';
 // TODO: Import other bin pages (e.g., paper.dart, waste.dart, plastic.dart)
 
 class WasteSort extends StatelessWidget {

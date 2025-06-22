@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:video_player/video_player.dart';
 
-import '../color.dart';
+import '../../color.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
