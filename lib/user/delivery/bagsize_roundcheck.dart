@@ -39,19 +39,19 @@ class _BagSizeSelectorState extends State<BagSizeSelector> {
       children: [
         RadioListTile<String>(
           title: Text('Small Bag (1-2 bags)', style: TextName),
-          value: 's',
+          value: 'Small (1-2 bags)',
           groupValue: _currentSize,
           onChanged: _handleSelection,
         ),
         RadioListTile<String>(
           title: Text('Medium Bag (3-5 bags)', style: TextName),
-          value: 'm',
+          value: 'Medium (3-5 bags)',
           groupValue: _currentSize,
           onChanged: _handleSelection,
         ),
         RadioListTile<String>(
           title: Text('Large Bag (>5 bags)', style: TextName),
-          value: 'l',
+          value: 'Large (>5 bags)',
           groupValue: _currentSize,
           onChanged: _handleSelection,
         ),

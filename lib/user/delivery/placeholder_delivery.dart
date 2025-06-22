@@ -12,7 +12,8 @@ class FillInBlank extends StatelessWidget {
       required this.text,
       required this.icon,
       required this.hint,
-      required this.isEnabled, this.controller});
+      required this.isEnabled,
+      this.controller});
 
   @override
   Widget build(BuildContext context) {

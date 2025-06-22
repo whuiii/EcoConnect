@@ -36,7 +36,7 @@ class _DeliveryState extends State<Delivery> {
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final phoneController = TextEditingController();
-  TextEditingController _searchController = TextEditingController();
+  final _searchController = TextEditingController();
 
   int currentStep = 0;
   bool? isPlastic = false;
@@ -49,11 +49,23 @@ class _DeliveryState extends State<Delivery> {
   TimeOfDay? selectedTime;
   String currentAddress = "";
   LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
+  final remarkController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _requestLocationPermission(); // Request location when widget is initialized
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    usernameController.dispose();
+    phoneController.dispose();
+    _searchController.dispose();
+    remarkController.dispose();
+    googleMapController.dispose();
+    super.dispose();
   }
 
   Future<void> _requestLocationPermission() async {
@@ -76,6 +88,7 @@ class _DeliveryState extends State<Delivery> {
         _locationData!.longitude ?? 0.0,
       );
 
+      if (!mounted) return;
       setState(() {
         myCurrentLocation = newLocation;
       });
@@ -84,7 +97,7 @@ class _DeliveryState extends State<Delivery> {
 
       // Move camera to current location
       if (googleMapController != null) {
-        googleMapController.animateCamera(
+        googleMapController!.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: newLocation, zoom: 16),
           ),
@@ -108,6 +121,7 @@ class _DeliveryState extends State<Delivery> {
         latLng.latitude,
         latLng.longitude,
       );
+      if (!mounted) return;
       if (placemarks.isNotEmpty) {
         geo.Placemark place = placemarks.first;
         setState(() {
@@ -117,6 +131,7 @@ class _DeliveryState extends State<Delivery> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         currentAddress = "Unable to retrieve address.";
       });
@@ -131,6 +146,7 @@ class _DeliveryState extends State<Delivery> {
         final loc = locations.first;
         LatLng searchedLatLng = LatLng(loc.latitude, loc.longitude);
 
+        if (!mounted) return;
         setState(() {
           myCurrentLocation = searchedLatLng;
           marker.clear();
@@ -154,6 +170,7 @@ class _DeliveryState extends State<Delivery> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       print("Search failed: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Location not found")),
@@ -177,9 +194,9 @@ class _DeliveryState extends State<Delivery> {
 
   Future<void> _saveDelivery() async {
     List<String> materials = [];
-    if (isPlastic == true) materials.add('plastic');
-    if (isAluminium == true) materials.add('aluminium');
-    if (isPaper == true) materials.add('paper');
+    if (isPlastic == true) materials.add('Plastic');
+    if (isAluminium == true) materials.add('Aluminium');
+    if (isPaper == true) materials.add('Paper');
 
     try {
       await DeliveryService().createDelivery(
@@ -193,6 +210,8 @@ class _DeliveryState extends State<Delivery> {
         address: currentAddress,
         latitude: myCurrentLocation.latitude,
         longitude: myCurrentLocation.longitude,
+        remark: remarkController.text,
+        status: "Your order has been placed! Waiting for company to confirm",
       );
 
       if (!mounted) return;
@@ -437,16 +456,32 @@ class _DeliveryState extends State<Delivery> {
                     onPressed: () => _searchAndNavigate(_searchController.text),
                   ),
                   filled: true,
-                  fillColor:
-                      Colors.grey[100], // Light background like a form field
+                  fillColor: Colors.white, // Light background like a form field
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
-                    borderSide: BorderSide.none, // Remove default border
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  disabledBorder: OutlineInputBorder(
+                    // 👈 Match enabled border
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade200, width: 2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
+              SizedBox(height: 10),
+              FillInBlank(
+                  text: "Remarks",
+                  controller: remarkController,
+                  icon: Iconsax.edit,
+                  hint: "Remarks",
+                  isEnabled: true),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

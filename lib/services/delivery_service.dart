@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DeliveryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,18 +15,25 @@ Future<void> createDelivery({
   required String address,
   required double latitude,
   required double longitude,
+  required String remark,
+  required String status
 }) async {
+  // Format date to dd/MM/yyyy
+    String formattedDate = DateFormat('dd/MM/yyyy').format(date);
+
   await FirebaseFirestore.instance.collection('deliveries').add({
     'email': email,
     'username': username,
     'phoneNumber': phoneNumber,
     'materials': materials,
     'bagSize': bagSize,
-    'date': date.toIso8601String(),  // Save date
+    'date': formattedDate,  // Save date
     'time': '${time.hour}:${time.minute}',  // Save time as string
     'address': address,
     'latitude': latitude,
     'longitude': longitude,
+    'remark': remark,
+    'status': status,
     'createdAt': FieldValue.serverTimestamp(),
   });
 

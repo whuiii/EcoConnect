@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:navigate/user/delivery/delivery_container.dart';
+import 'package:navigate/user/delivery/delivery_container_detail.dart';
 import 'package:navigate/user/delivery/delivery_info.dart';
 import 'package:navigate/user/delivery/page_delivery.dart';
 
@@ -57,18 +60,22 @@ class DeliveryRequest extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(width: 10), // spacing between icon and text
+                      const SizedBox(
+                          width: 10), // spacing between icon and text
                       const Text(
                         "Info",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 20,),
+                SizedBox(
+                  height: 20,
+                ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10), // body-level padding
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10), // body-level padding
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -84,21 +91,50 @@ class DeliveryRequest extends StatelessWidget {
                       ],
                     ),
                     padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: const [
-                        RequestContainerWidget(
-                          location: "Seri Iskandar",
-                          description: "5kg Newspaper and 50 cans",
-                          contactNo: "010-310123123",
-                          remarks: "-",
-                        ),
-                        RequestContainerWidget(
-                          location: "Seri Iskandar",
-                          description: "5kg Newspaper and 50 cans",
-                          contactNo: "010-310123123",
-                          remarks: "Please come before 2/5/2034",
-                        ),
-                      ],
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('deliveries')
+                          .orderBy('createdAt', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData)
+                          return Center(child: CircularProgressIndicator());
+
+                        final docs = snapshot.data!.docs;
+
+                        if (docs.isEmpty) {
+                          return Center(child: Text("No deliveries found"));
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap:
+                              true, // Important if you're inside a Column
+                          physics:
+                              NeverScrollableScrollPhysics(), // Prevent internal scroll conflict
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final doc = docs[index];
+                            final docId = doc.id;
+                            final data = doc.data() as Map<String, dynamic>;
+
+                            return RequestContainerWidget(
+  location: data['address'] ?? '-',
+  materials: List<String>.from(data['materials'] ?? []),
+  bagSize: data['bagSize'] ?? '-',
+  status: data['status'] ?? 'Pending',
+  remark: data['remark'] ?? '-',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DeliveryDetailPage(documentId: docId),
+      ),
+    );
+  },
+);
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -106,87 +142,9 @@ class DeliveryRequest extends StatelessWidget {
                 // if contain request
                 // may use while true to check the availability of the data
                 // if no request display a no request picture
-
               ],
-
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class RequestContainerWidget extends StatelessWidget {
-  const RequestContainerWidget({
-    Key? key,
-    required this.location,
-    required this.description,
-    required this.contactNo,
-    required this.remarks,
-    this.textColor,
-  }) : super(key: key);
-
-  final String location;
-  final String description;
-  final String contactNo;
-  final String remarks;
-  final Color? textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6,
-              offset: Offset(0, 2),
-            )
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Location: $location",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: textColor ?? Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Description: $description",
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor ?? Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Contact: $contactNo",
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor ?? Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Remarks: $remarks",
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor ?? Colors.black87,
-              ),
-            ),
-          ],
         ),
       ),
     );
