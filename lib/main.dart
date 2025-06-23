@@ -13,13 +13,24 @@ void main() async {
       debugShowCheckedModeBanner: false,
       onGenerateRoute: RouteGenerator.generateRoute,
       theme: ThemeData(
-        primaryColor: green3, // from your color.dart
+        //Background
+        primaryColor: green3,
         scaffoldBackgroundColor: back1,
+
+        //AppBar Theme
         appBarTheme: AppBarTheme(
           backgroundColor: green3,
           foregroundColor: green1,
           elevation: 0,
         ),
+
+  //SnackBar Theme
+  snackBarTheme: SnackBarThemeData(
+    backgroundColor: green2, // Snackbar background color
+    contentTextStyle: TextStyle(color: Colors.white), // Snackbar text color
+    actionTextColor: Colors.orange, // Action button color
+  ),
+        //Text Theme
         textTheme: TextTheme(
           headlineLarge: TextStyle(
               fontSize: 32, fontWeight: FontWeight.bold, color: green1),
@@ -30,6 +41,8 @@ void main() async {
         colorScheme: ColorScheme.fromSwatch().copyWith(
           secondary: Colors.orange, // for accent color
         ),
+
+        //Button Theme
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: green2,

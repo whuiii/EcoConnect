@@ -7,7 +7,6 @@ import 'package:navigate/register.dart';
 
 import 'color.dart';
 import 'forgotPassword2.dart';
-import 'navigate.dart'; // this is only for testing
 
 class LoginPage extends StatefulWidget {
   @override

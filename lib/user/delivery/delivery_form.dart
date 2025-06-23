@@ -7,11 +7,7 @@ import 'package:navigate/color.dart';
 import 'package:navigate/services/delivery_service.dart';
 import 'package:navigate/user/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/user/delivery/dateTimePicker.dart';
-import 'package:navigate/user/delivery/delivery.dart';
 import 'package:navigate/user/delivery/placeholder_delivery.dart';
-import 'package:navigate/flash_message.dart';
-import 'package:navigate/user/ranking.dart/page_ranking.dart';
-import 'package:navigate/label_text.dart';
 import 'package:navigate/menu.dart';
 
 class Delivery extends StatefulWidget {
@@ -626,3 +622,22 @@ class _DeliveryState extends State<Delivery> {
     );
   }
 }
+
+
+
+class LabelText extends StatelessWidget {
+  final String text;
+  const LabelText({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      margin: EdgeInsets.only(top: 10, bottom: 5),
+      child: Text(text,
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400)),
+    );
+  }
+}
+
