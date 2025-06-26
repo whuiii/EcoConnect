@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/models/user_model.dart';
 import 'package:navigate/user/delivery/delivery.dart';
 import 'package:navigate/user/education/education.dart';
 import 'package:navigate/user/ranking.dart/cubit_ranking.dart';
@@ -19,6 +22,8 @@ class ProviderPage extends StatefulWidget {
 class _ProviderPageState extends State<ProviderPage> {
   late int currentPage;
   late int index;
+  bool _isLoading = true;
+  UserModel? currentUser;
 
   final List<Widget> pages = [
     BlocProvider(
@@ -41,6 +46,24 @@ class _ProviderPageState extends State<ProviderPage> {
     super.initState();
     currentPage = widget.initialPage;
     index = widget.initialPage;
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          currentUser = UserModel.fromMap(doc.data()!);
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
