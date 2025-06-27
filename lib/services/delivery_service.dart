@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 class DeliveryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Future<void> createDelivery(
-      {required String email,
+      {required String userId,
+      required String email,
       required String username,
       required String phoneNumber,
       required List<String> materials,
@@ -21,6 +22,7 @@ class DeliveryService {
     String formattedDate = DateFormat('dd/MM/yyyy').format(date);
 
     await FirebaseFirestore.instance.collection('deliveries').add({
+      'userId': userId,
       'email': email,
       'username': username,
       'phoneNumber': phoneNumber,

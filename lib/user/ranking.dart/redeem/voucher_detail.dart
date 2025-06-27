@@ -11,7 +11,7 @@ class VoucherDetailPage extends StatelessWidget {
   final String description;
   final String rules;
   final String imagePath;
-  final int points;
+  final int point;
   final DateTime? validUntil;
 
   const VoucherDetailPage({
@@ -21,7 +21,7 @@ class VoucherDetailPage extends StatelessWidget {
     required this.description,
     required this.rules,
     required this.imagePath,
-    required this.points,
+    required this.point,
     required this.validUntil,
   });
 
@@ -67,7 +67,7 @@ class VoucherDetailPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '$points pts',
+            '$point pts',
             style: TextStyle(
               fontSize: 18,
               color: Colors.orange.shade700,
@@ -125,7 +125,7 @@ class VoucherDetailPage extends StatelessWidget {
                 final userSnap = await userDoc.get();
                 final currentPoint = userSnap.data()?['point'] ?? 0;
 
-                if (currentPoint < points) {
+                if (currentPoint < point) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content:
@@ -141,7 +141,7 @@ class VoucherDetailPage extends StatelessWidget {
                     .update({'status': 'redeemed'});
 
                 // 2. Deduct points from the user
-                await userDoc.update({'point': currentPoint - points});
+                await userDoc.update({'point': currentPoint - point});
 
                 // 3. Refresh provider
                 final userProvider =

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
@@ -203,6 +204,7 @@ class _DeliveryState extends State<Delivery> {
 
     try {
       await DeliveryService().createDelivery(
+        userId: FirebaseAuth.instance.currentUser!.uid, // <-- add this
         email: emailController.text.trim(),
         username: usernameController.text.trim(),
         phoneNumber: phoneController.text.trim(),

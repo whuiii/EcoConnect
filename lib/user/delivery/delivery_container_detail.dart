@@ -56,6 +56,33 @@ class DeliveryDetailPage extends StatelessWidget {
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 SizedBox(height: 8),
                 _buildInfo(Iconsax.repeat_circle, "Materials", materialsText),
+
+                if (data['materialsBreakdown'] != null &&
+                    data['materialsBreakdown'] is List &&
+                    (data['materialsBreakdown'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text("Graded Materials Breakdown",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  ...(data['materialsBreakdown'] as List).map<Widget>((entry) {
+                    if (entry is! Map) return SizedBox.shrink();
+                    final material = entry['material'] ?? '-';
+                    final weight = entry['weight']?.toString() ?? '0';
+                    final point = entry['point']?.toString() ?? '-';
+
+                    //The Content of Graded Materials Breakdown
+                    return _buildInfo(
+                        Iconsax.task, material, "${weight}kg (${point} pts)");
+                  }).toList(),
+                  if (data['totalWeightKg'] != null)
+                    Text("    Total Weight: ${data['totalWeightKg']} kg",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: green2)),
+                ],
+                const SizedBox(height: 8),
                 _buildInfo(Iconsax.bag, "Bag Size", data['bagSize'] ?? '-'),
                 _buildInfo(Iconsax.box, "Status", data['status'] ?? '-'),
                 _buildInfo(Iconsax.note_text, "Remark", data['remark'] ?? '-'),

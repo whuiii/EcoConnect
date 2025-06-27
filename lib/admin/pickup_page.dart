@@ -60,9 +60,10 @@ class AdminDeliveryRequest extends StatelessWidget {
                                     List<String>.from(data['materials'] ?? []),
                                 bagSize: data['bagSize'] ?? '-',
                                 status: data['status'] ?? 'Pending',
-                                remark: data['remark'] ?? '-',
+                                rejectReason: data['rejectReason'] ?? '-',
                                 date: data['date'] ?? 'Unknown date',
                                 time: data['time'] ?? '',
+                                pointAwarded: data['pointAwarded'] ?? 0,
                                 onTap: () {
                                   Navigator.push(
                                     context,

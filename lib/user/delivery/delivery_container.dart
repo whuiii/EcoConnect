@@ -8,9 +8,10 @@ class RequestContainerWidget extends StatelessWidget {
   final List<String> materials;
   final String bagSize;
   final String status;
-  final String remark;
+  final String rejectReason;
   final String date;
   final String time;
+  final int? pointAwarded;
   final VoidCallback? onTap;
 
   const RequestContainerWidget({
@@ -20,10 +21,11 @@ class RequestContainerWidget extends StatelessWidget {
     required this.materials,
     required this.bagSize,
     required this.status,
-    required this.remark,
+    required this.rejectReason,
     required this.date,
     required this.time,
     this.onTap,
+    this.pointAwarded,
   });
 
   @override
@@ -40,6 +42,9 @@ class RequestContainerWidget extends StatelessWidget {
     } else if (status == "Rejected") {
       iconName = 'assets/images/rejected.json';
       statusColor = Colors.red;
+    } else if (status == "Completed") {
+      iconName = 'assets/images/rewarded.json';
+      statusColor = Colors.blue;
     }
     return InkWell(
       onTap: onTap,
@@ -52,7 +57,7 @@ class RequestContainerWidget extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left Side: Address + Status + Remarks
+              // Left Side: Address + Status + rejectReasons
               Expanded(
                 flex: 4,
                 child: Column(
@@ -81,15 +86,35 @@ class RequestContainerWidget extends StatelessWidget {
                       ],
                     ),
 
-                    // Remark
-                    if (remark.isNotEmpty && remark != "-") ...[
+                    // Points Awarded (only if completed)
+                    if (status == "Completed" && pointAwarded != null) ...[
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          const SizedBox(width: 6),
+                          Text(
+                            "+ $pointAwarded points",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // rejectReason
+                    if (status == "Rejected" &&
+                        rejectReason.isNotEmpty &&
+                        rejectReason != "-") ...[
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Iconsax.note_text, color: Colors.purple),
+                          const Icon(Iconsax.close_circle, color: Colors.red),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text("Remarks: $remark",
+                            child: Text("Reason: $rejectReason",
                                 style: const TextStyle(fontSize: 14)),
                           ),
                         ],
