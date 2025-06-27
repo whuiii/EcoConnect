@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/admin/dashboard.dart';
+import 'package:navigate/admin/pickup_page.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/models/user_model.dart';
 
@@ -28,11 +29,13 @@ class _AdminNavigateState extends State<AdminNavigate> {
       create: (context) => RankingCubit()..fetchRankings(),
       child: AdminDashboard(),
     ),
+    AdminDeliveryRequest(),
     Profile(),
   ];
 
   final items = <Widget>[
     Icon(Icons.home, size: 30),
+    Icon(Icons.delivery_dining, size: 30),
     Icon(Icons.person, size: 30),
   ];
   @override
