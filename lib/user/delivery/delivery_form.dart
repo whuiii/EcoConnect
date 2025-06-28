@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
@@ -188,6 +189,13 @@ class _DeliveryState extends State<Delivery> {
     });
   }
 
+  String formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
   Future<void> _saveDelivery() async {
     List<String> materials = [];
     if (isPlastic == true) materials.add('Plastic');
@@ -196,18 +204,19 @@ class _DeliveryState extends State<Delivery> {
 
     try {
       await DeliveryService().createDelivery(
+        userId: FirebaseAuth.instance.currentUser!.uid, // <-- add this
         email: emailController.text.trim(),
         username: usernameController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         materials: materials,
         bagSize: selectedBagSize,
         date: selectedDate!,
-        time: selectedTime!,
+        time: formatTimeOfDay(selectedTime!),
         address: currentAddress,
         latitude: myCurrentLocation.latitude,
         longitude: myCurrentLocation.longitude,
         remark: remarkController.text,
-        status: "Your order has been placed! Waiting for company to confirm",
+        status: "Pending",
       );
 
       if (!mounted) return;
@@ -623,8 +632,6 @@ class _DeliveryState extends State<Delivery> {
   }
 }
 
-
-
 class LabelText extends StatelessWidget {
   final String text;
   const LabelText({super.key, required this.text});
@@ -640,4 +647,3 @@ class LabelText extends StatelessWidget {
     );
   }
 }
-

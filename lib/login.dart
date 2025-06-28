@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:navigate/admin/admin_navigation_bar.dart';
+import 'package:navigate/admin/dashboard.dart';
 import 'package:navigate/services/auth.dart';
 import 'package:navigate/forgotPassword.dart';
 import 'package:navigate/register.dart';
@@ -274,14 +276,20 @@ class _LoginPageState extends State<LoginPage> {
                 duration: Duration(milliseconds: 1500),
                 child: MaterialButton(
                   onPressed: () {
-                    // function
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AdminNavigate(),
+                      ),
+                    );
                   },
                   color: Colors.grey.shade300,
                   elevation: 0,
                   minWidth: double.infinity,
                   height: 45,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -293,9 +301,10 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         "Continue with Google",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
                       )
                     ],
                   ),

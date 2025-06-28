@@ -1,25 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:navigate/admin/dashboard.dart';
+import 'package:navigate/admin/pickup_page.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/models/user_model.dart';
-import 'package:navigate/user/delivery/delivery.dart';
-import 'package:navigate/user/education/education.dart';
+
 import 'package:navigate/user/ranking.dart/cubit_ranking.dart';
-import 'package:navigate/user/ranking.dart/page_ranking.dart';
+
 import 'package:navigate/user/profile/profile.dart';
 
-class ProviderPage extends StatefulWidget {
+class AdminNavigate extends StatefulWidget {
   final int initialPage;
-  const ProviderPage({super.key, this.initialPage = 0});
+  const AdminNavigate({super.key, this.initialPage = 0});
 
   @override
-  State<ProviderPage> createState() => _ProviderPageState();
+  State<AdminNavigate> createState() => _AdminNavigateState();
 }
 
-class _ProviderPageState extends State<ProviderPage> {
+class _AdminNavigateState extends State<AdminNavigate> {
   late int currentPage;
   late int index;
   bool _isLoading = true;
@@ -28,17 +27,15 @@ class _ProviderPageState extends State<ProviderPage> {
   final List<Widget> pages = [
     BlocProvider(
       create: (context) => RankingCubit()..fetchRankings(),
-      child: RankingPage(),
+      child: AdminDashboard(),
     ),
-    DeliveryRequest(),
-    Education(),
+    AdminDeliveryRequest(),
     Profile(),
   ];
 
   final items = <Widget>[
     Icon(Icons.home, size: 30),
     Icon(Icons.delivery_dining, size: 30),
-    Icon(Icons.cast_for_education, size: 30),
     Icon(Icons.person, size: 30),
   ];
   @override
@@ -46,25 +43,25 @@ class _ProviderPageState extends State<ProviderPage> {
     super.initState();
     currentPage = widget.initialPage;
     index = widget.initialPage;
-    fetchUserData();
+    // fetchUserData();
   }
 
-  Future<void> fetchUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+  // Future<void> fetchUserData() async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     final doc = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(user.uid)
+  //         .get();
 
-      if (doc.exists) {
-        setState(() {
-          currentUser = UserModel.fromMap(doc.data()!);
-          _isLoading = false;
-        });
-      }
-    }
-  }
+  //     if (doc.exists) {
+  //       setState(() {
+  //         currentUser = UserModel.fromMap(doc.data()!);
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

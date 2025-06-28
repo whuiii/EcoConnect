@@ -96,35 +96,38 @@ class DeliveryRequest extends StatelessWidget {
                         }
 
                         return ListView.builder(
-                          shrinkWrap:
-                              true, // Important if you're inside a Column
-                          physics:
-                              NeverScrollableScrollPhysics(), // Prevent internal scroll conflict
-                          itemCount: docs.length,
-                          itemBuilder: (context, index) {
-                            final doc = docs[index];
-                            final docId = doc.id;
-                            final data = doc.data() as Map<String, dynamic>;
+                            shrinkWrap:
+                                true, // Important if you're inside a Column
+                            physics:
+                                NeverScrollableScrollPhysics(), // Prevent internal scroll conflict
+                            itemCount: docs.length,
+                            itemBuilder: (context, index) {
+                              final doc = docs[index];
+                              final docId = doc.id;
+                              final data = doc.data() as Map<String, dynamic>;
 
-                            return RequestContainerWidget(
-                              location: data['address'] ?? '-',
-                              materials:
-                                  List<String>.from(data['materials'] ?? []),
-                              bagSize: data['bagSize'] ?? '-',
-                              status: data['status'] ?? 'Pending',
-                              remark: data['remark'] ?? '-',
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        DeliveryDetailPage(documentId: docId),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        );
+                              return RequestContainerWidget(
+                                username: data['username'] ?? 'Unknown',
+                                location: data['address'] ?? '-',
+                                materials:
+                                    List<String>.from(data['materials'] ?? []),
+                                bagSize: data['bagSize'] ?? '-',
+                                status: data['status'] ?? 'Pending',
+                                rejectReason: data['rejectReason'] ?? '-',
+                                date: data['date'] ?? 'Unknown date',
+                                time: data['time'] ?? '',
+                                pointAwarded: data['pointAwarded'] ?? 0,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          DeliveryDetailPage(documentId: docId),
+                                    ),
+                                  );
+                                },
+                              );
+                            });
                       },
                     ),
                   ),

@@ -1,36 +1,62 @@
-//import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/providers/user_provider.dart';
 import 'package:navigate/route_generator.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(GetMaterialApp(
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.fetchUser(); // Load Firebase user data into model
+      _isInitialized = true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
       initialRoute: '/',
       debugShowCheckedModeBanner: false,
       onGenerateRoute: RouteGenerator.generateRoute,
       theme: ThemeData(
-        //Background
         primaryColor: green3,
         scaffoldBackgroundColor: back1,
-
-        //AppBar Theme
         appBarTheme: AppBarTheme(
           backgroundColor: green3,
           foregroundColor: green1,
           elevation: 0,
         ),
-
-  //SnackBar Theme
-  snackBarTheme: SnackBarThemeData(
-    backgroundColor: green2, // Snackbar background color
-    contentTextStyle: TextStyle(color: Colors.white), // Snackbar text color
-    actionTextColor: Colors.orange, // Action button color
-  ),
-        //Text Theme
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: green2,
+          contentTextStyle: TextStyle(color: Colors.white),
+          actionTextColor: Colors.orange,
+        ),
         textTheme: TextTheme(
           headlineLarge: TextStyle(
               fontSize: 32, fontWeight: FontWeight.bold, color: green1),
@@ -38,11 +64,8 @@ void main() async {
               fontSize: 20, fontWeight: FontWeight.w600, color: green1),
           bodyMedium: TextStyle(fontSize: 16, color: green1),
         ),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Colors.orange, // for accent color
-        ),
-
-        //Button Theme
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(secondary: Colors.orange),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: green2,
@@ -52,5 +75,7 @@ void main() async {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
         ),
-      )));
+      ),
+    );
+  }
 }
