@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:navigate/otp_verify.dart';
+import 'package:navigate/services/api_service.dart';
+import 'package:snippet_coder_utils/FormHelper.dart';
+import 'package:snippet_coder_utils/ProgressHUD.dart';
 
 class Forgotpassword2 extends StatefulWidget {
   const Forgotpassword2({super.key});
@@ -10,127 +12,123 @@ class Forgotpassword2 extends StatefulWidget {
 }
 
 class _Forgotpassword2State extends State<Forgotpassword2> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String email = '';
+  bool isApiCallProcess = false;
+  GlobalKey<FormState> globalKey = GlobalKey<FormState>();
 
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController otpController = TextEditingController();
-
-  String? verificationId;
-
-  // Send OTP
-  Future<void> sendOTP() async {
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneController.text.trim(),
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        // Automatic handling if Google Play Services can auto-detect
-        await _auth.signInWithCredential(credential);
-        print('Auto-verification completed!');
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        print('Verification failed: ${e.message}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Verification failed: ${e.message}')),
-        );
-      },
-      codeSent: (String verId, int? resendToken) {
-        setState(() {
-          verificationId = verId;
-        });
-        print('OTP sent to ${phoneController.text}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('OTP sent!')),
-        );
-      },
-      codeAutoRetrievalTimeout: (String verId) {
-        verificationId = verId;
-      },
-    );
-  }
-
-  // Verify OTP
-  Future<void> verifyOTP() async {
-    try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId!,
-        smsCode: otpController.text.trim(),
-      );
-
-      await _auth.signInWithCredential(credential);
-      print('Phone number verified and user signed in!');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Phone number verified!')),
-      );
-
-      // You can navigate the user to a different page here
-    } catch (e) {
-      print('Error verifying OTP: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error verifying OTP: $e')),
-      );
+  bool validateAndSave() {
+    final form = globalKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
     }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+    return SafeArea(
+      child: Scaffold(
+        body: ProgressHUD(
+          opacity: .3,
+          inAsyncCall: isApiCallProcess,
+          key: UniqueKey(),
+          child: Form(
+            key: globalKey,
+            child: _buildForgotPasswordUI(context),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForgotPasswordUI(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Phone Number Input
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                hintText: '+1234567890',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
+            Image.network(
+              "https://img.freepik.com/free-vector/emails-concept-illustration_114360-1355.jpg?w=1380&t=st=1673699432~exp=1673700032~hmac=d65454eb5c72e8310209bf8ae770f849ea388f318dc6b9b1300b24b03e8886ca",
+              height: 180,
+              fit: BoxFit.contain,
             ),
-            const SizedBox(height: 20),
-
-            // Send OTP button
-            ElevatedButton(
-              onPressed: sendOTP,
-              child: const Text('Send OTP'),
-            ),
-
-            const SizedBox(height: 20),
-
-            // OTP input
-            PinCodeTextField(
-              appContext: context,
-              length: 6,
-              controller: otpController,
-              onChanged: (value) {},
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(5),
-                fieldHeight: 50,
-                fieldWidth: 40,
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "Please enter your email address. You will receive an OTP for verification.",
+                style: TextStyle(color: Colors.grey, fontSize: 13.5),
+                textAlign: TextAlign.center,
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // Verify OTP button
-            ElevatedButton(
-              onPressed: () {
-                if (verificationId != null) {
-                  verifyOTP();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please send OTP first')),
-                  );
+            const SizedBox(height: 10),
+            FormHelper.inputFieldWidget(
+              context,
+              "email",
+              "Email Id",
+                  (onValidateVal) {
+                if (onValidateVal.isEmpty) {
+                  return 'Email is required';
                 }
+                return null;
               },
-              child: const Text('Verify OTP'),
+                  (onSavedVal) {
+                email = onSavedVal;
+              },
+              borderRadius: 10,
+              borderColor: Colors.grey,
+              prefixIcon: const Icon(Icons.email),
+              showPrefixIcon: true,
             ),
+            const SizedBox(height: 20),
+            FormHelper.submitButton("Continue", () {
+              if (validateAndSave()) {
+                setState(() {
+                  isApiCallProcess = true;
+                });
+
+                // Simulate API call or call your actual method
+                //print("Send OTP to: $email");
+
+                APIService.otpLogin(
+                    email).then((response){
+                  setState(() {
+                    isApiCallProcess = false;
+                  });
+
+                  if (response.data != null){
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>
+                    OtpVerification(
+                      otpHash: response.data,
+                      email: email,
+                    )), (route)=> false,);
+                  }
+                },
+                );
+
+                // Call your API service here, e.g.:
+                // APIService.sendOtpToEmail(email).then((response) {
+                //   setState(() {
+                //     isApiCallProcess = false;
+                //   });
+                //   // Navigate to OTP screen or show success
+                // });
+              };
+            }),
           ],
         ),
       ),
     );
   }
 }
+
+extension EmailValidator on String {
+  bool isValidEmail() {
+    return RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    ).hasMatch(this);
+  }
+
+}
+
