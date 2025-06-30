@@ -6,6 +6,7 @@ import 'package:navigate/user/profile/aboutUs.dart';
 import 'package:navigate/user/profile/editProfile.dart';
 import 'package:navigate/mainpage.dart';
 import 'package:navigate/user/profile/privacyPolicy.dart';
+import 'package:navigate/user/profile/termsConditions.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -159,6 +160,7 @@ class Profile extends StatelessWidget {
                       icon: Icons.star,
                       onPress: () {
                         print("Tap on Terms and Conditions");
+                        Get.to(TermsConditionsPage());
                       },
                     ),
                     ProfileMenuWidget(
