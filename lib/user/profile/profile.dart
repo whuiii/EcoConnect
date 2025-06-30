@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/user/profile/FAQs.dart';
+import 'package:navigate/user/profile/aboutUs.dart';
 import 'package:navigate/user/profile/editProfile.dart';
 import 'package:navigate/mainpage.dart';
+import 'package:navigate/user/profile/privacyPolicy.dart';
+import 'package:navigate/user/profile/termsConditions.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -29,13 +33,29 @@ class Profile extends StatelessWidget {
                   children: [
                     Stack(
                       children: [
-                        SizedBox(
+                        Container(
                           width: 120,
                           height: 120,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white, // Background color behind the image
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 4,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
                             child: Image.asset(
-                                'assets/images/EcoConnect_Logo.png'),
+                              'assets/images/EcoConnect_Logo.png',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -57,6 +77,7 @@ class Profile extends StatelessWidget {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
                     const Text(
                       "EcoConnect",
@@ -70,7 +91,7 @@ class Profile extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white70),
+                          color: Colors.white),
                     ),
                     // const SizedBox(height: 20),
                   ],
@@ -109,23 +130,49 @@ class Profile extends StatelessWidget {
                     SizedBox(height: 10),
                     const Divider(),
                     const SizedBox(height: 10),
-                    ProfileMenuWidget(
-                      title: "Settings",
-                      icon: Icons.settings,
-                      onPress: () {},
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 10),
+                    // ProfileMenuWidget(
+                    //   title: "Settings",
+                    //   icon: Icons.settings,
+                    //   onPress: () {},
+                    // ),
+                    // const Divider(),
+                    // const SizedBox(height: 10),
                     ProfileMenuWidget(
                       title: "About Us",
                       icon: Icons.info,
-                      onPress: () {},
+                      onPress: () {
+                        print("Tap on About Us");
+                        Get.to(AboutUs());
+
+                      },
+                    ),
+                    const Divider(),
+                    ProfileMenuWidget(
+                      title: "Privacy Policy",
+                      icon: Icons.privacy_tip,
+                      onPress: () {
+                        print("Tap on Privacy Policy");
+                        Get.to(PrivacyPolicy());
+                      },
                     ),
                     ProfileMenuWidget(
-                      title: "Rating",
+                      title: "Terms & Conditions",
                       icon: Icons.star,
-                      onPress: () {},
+                      onPress: () {
+                        print("Tap on Terms and Conditions");
+                        Get.to(TermsConditionsPage());
+                      },
                     ),
+                    ProfileMenuWidget(
+                      title: "FAQs",
+                      icon: Icons.question_mark,
+                      onPress: () {
+                        print("Tap on FAQs");
+                        Get.to(FAQPage());
+
+                      },
+                    ),
+                    const Divider(),
                     ProfileMenuWidget(
                       title: "Logout",
                       icon: Icons.logout_rounded,

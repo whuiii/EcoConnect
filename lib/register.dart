@@ -1,9 +1,13 @@
+//import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:navigate/services/user_service.dart';
+import 'package:navigate/utilis.dart';
 
 import 'color.dart';
 
@@ -13,6 +17,14 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  Uint8List? _image;
+
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = img;
+    });
+  }
   int activateIndex = 0;
   bool securePassword = true;
   bool? isChecked = false;
@@ -42,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
     'assets/images/3.gif',
   ];
 
-  
+
 
   @override
   void initState() {
@@ -94,21 +106,57 @@ void handleRegister() async {
               FadeInUp(
                 duration: Duration(milliseconds: 800),
                 child: Container(
-                  height: 300,
-                  child: Stack(
-                    children: _images.asMap().entries.map((e) {
-                      return Positioned.fill(
-                        child: AnimatedOpacity(
-                          duration: Duration(seconds: 1),
-                          opacity: activateIndex == e.key ? 1 : 0,
-                          child: Image.asset(
-                            e.value,
-                            fit: BoxFit.cover,
+                  padding: const EdgeInsets.all(30),
+                  //height: ,
+                  child:
+                  Stack(
+                    children: [
+                      _image != null
+                          ? CircleAvatar(
+                        radius: 60,
+                        backgroundImage: MemoryImage(_image!),
+                      )
+                          : CircleAvatar(
+                        radius: 60,
+                        backgroundImage:
+                        AssetImage('assets/images/EcoConnect_Logo.png'),
+                        //backgroundColor: Colors.transparent,
+                        backgroundColor: Colors.grey.shade200,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: Colors.grey.shade300,
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.add_a_photo),
+                            color: Colors.black,
+                            onPressed: selectImage,
+                            iconSize: 18,
                           ),
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
+                  // Stack(
+                  //   children: _images.asMap().entries.map((e) {
+                  //     return Positioned.fill(
+                  //       child: AnimatedOpacity(
+                  //         duration: Duration(seconds: 1),
+                  //         opacity: activateIndex == e.key ? 1 : 0,
+                  //         child: Image.asset(
+                  //           e.value,
+                  //           fit: BoxFit.cover,
+                  //         ),
+                  //       ),
+                  //     );
+                  //   }).toList(),
+                  // ),
                 ),
               ),
               SizedBox(height: 5),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/user/education/diy.dart';
+import 'package:navigate/user/education/news.dart';
 import 'package:navigate/user/education/paper.dart';
-import 'package:navigate/user/education/wasteSort.dart'; // Ensure this file defines the 'button' color variable
+import 'package:navigate/user/education/wasteSort.dart';
 
 class Education extends StatefulWidget {
   const Education({super.key});
@@ -14,7 +14,6 @@ class Education extends StatefulWidget {
 }
 
 class _EducationState extends State<Education> {
-  // Define category items with image and function
   final List<Map<String, dynamic>> categories = [
     {
       "image": "assets/images/FunFact.png",
@@ -32,6 +31,7 @@ class _EducationState extends State<Education> {
       "image": "assets/images/News.png",
       "onTap": () {
         print("Tapped on News");
+        Get.to(() => News());
       }
     },
     {
@@ -56,14 +56,12 @@ class _EducationState extends State<Education> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Education"),
-          automaticallyImplyLeading: false, // hide the go back icon button
-          centerTitle: true,
+          automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 25),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Top Banner Button
                 Padding(
@@ -73,9 +71,7 @@ class _EducationState extends State<Education> {
                     height: 300,
                     child: MaterialButton(
                       onPressed: () {
-                        //print("Sorting education tapped");
                         Get.to(WasteSort());
-                        //Get.to(WasteEducationScreen());
                       },
                       color: button.withOpacity(0.3),
                       shape: RoundedRectangleBorder(
@@ -140,59 +136,144 @@ class _EducationState extends State<Education> {
 
                 SizedBox(height: 20),
 
-                // Grid Buttons
+                // Custom 3-Button Layout with Fixed Height
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15,
-                    childAspectRatio: 1,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: categories.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      Map<String, dynamic> category = entry.value;
-
-                      return InkWell(
-                        onTap: category['onTap'],
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade400,
+                  child: SizedBox(
+                    height: 250,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Left Rectangle Button - DIY Video (now index 3)
+                        Expanded(
+                          flex: 2,
+                          child: InkWell(
+                            onTap: categories[3]['onTap'],
                             borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade400,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Image.asset(
+                                        categories[3]['image'],
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    labels[3],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          padding: EdgeInsets.all(10),
+                        ),
+
+                        // Right Column with 2 Equal Width Square Buttons
+                        Expanded(
+                          flex: 2,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Expanded(
-                                child: ClipRRect(
+                                child: InkWell(
+                                  onTap: categories[0]['onTap'],
                                   borderRadius: BorderRadius.circular(20),
-                                  child: Image.asset(
-                                    category['image'],
-                                    width: 250,
-                                    height: 250,
-                                    fit: BoxFit.contain,
+                                  child: Container(
+                                    width: 150,
+                                    //margin: EdgeInsets.only(left: 3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade400,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: EdgeInsets.all(5),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: Image.asset(
+                                              categories[0]['image'],
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          labels[0],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                labels[index],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                              SizedBox(height: 10), // Space between buttons
+                              Expanded(
+                                child: InkWell(
+                                  onTap: categories[2]['onTap'],
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade400,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: EdgeInsets.all(5),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: Image.asset(
+                                              categories[2]['image'],
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          labels[2],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    ),
                   ),
                 ),
+
+                SizedBox(height: 20),
               ],
             ),
           ),
