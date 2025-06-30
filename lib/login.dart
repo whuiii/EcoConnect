@@ -210,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ForgotPassword()));
+                                builder: (context) => Forgotpassword2()));
                       },
                       child: Text(
                         "Forgot Password?",
