@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/user/education/diy.dart';
+import 'package:navigate/user/education/funFact.dart';
 import 'package:navigate/user/education/news.dart';
 import 'package:navigate/user/education/paper.dart';
 import 'package:navigate/user/education/wasteSort.dart';
@@ -18,15 +19,16 @@ class _EducationState extends State<Education> {
     {
       "image": "assets/images/FunFact.png",
       "onTap": () {
+        Get.to(()=> FunFactPage());
         print("Tapped on Fun Fact");
       }
     },
-    {
-      "image": "assets/images/Tips.png",
-      "onTap": () {
-        print("Tapped on Recycle Tips");
-      }
-    },
+    // {
+    //   "image": "assets/images/Tips.png",
+    //   "onTap": () {
+    //     print("Tapped on Recycle Tips");
+    //   }
+    // },
     {
       "image": "assets/images/News.png",
       "onTap": () {
@@ -45,7 +47,7 @@ class _EducationState extends State<Education> {
 
   final List<String> labels = [
     "Fun Fact",
-    "Recycle Tips",
+    //"Recycle Tips",
     "News",
     "DIY Video",
   ];
@@ -148,7 +150,7 @@ class _EducationState extends State<Education> {
                         Expanded(
                           flex: 2,
                           child: InkWell(
-                            onTap: categories[3]['onTap'],
+                            onTap: categories[2]['onTap'],
                             borderRadius: BorderRadius.circular(20),
                             child: Container(
                               margin: EdgeInsets.only(right: 10),
@@ -164,14 +166,14 @@ class _EducationState extends State<Education> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Image.asset(
-                                        categories[3]['image'],
+                                        categories[2]['image'],
                                         fit: BoxFit.contain,
                                       ),
                                     ),
                                   ),
                                   SizedBox(height: 10),
                                   Text(
-                                    labels[3],
+                                    labels[2],
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -230,7 +232,7 @@ class _EducationState extends State<Education> {
                               SizedBox(height: 10), // Space between buttons
                               Expanded(
                                 child: InkWell(
-                                  onTap: categories[2]['onTap'],
+                                  onTap: categories[1]['onTap'],
                                   borderRadius: BorderRadius.circular(20),
                                   child: Container(
                                     width: 150,
@@ -246,14 +248,14 @@ class _EducationState extends State<Education> {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(20),
                                             child: Image.asset(
-                                              categories[2]['image'],
+                                              categories[1]['image'],
                                               fit: BoxFit.contain,
                                             ),
                                           ),
                                         ),
                                         SizedBox(height: 5),
                                         Text(
-                                          labels[2],
+                                          labels[1],
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

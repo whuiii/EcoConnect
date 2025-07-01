@@ -5,7 +5,7 @@ class News extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(child: Scaffold(
       appBar: AppBar(
         title: const Text("News"),
         backgroundColor: Colors.green.shade700,
@@ -35,6 +35,7 @@ class News extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
