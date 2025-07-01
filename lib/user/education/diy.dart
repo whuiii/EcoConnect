@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:navigate/user/education/youtubePlay.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../../color.dart';
 import 'diyVideo.dart';
@@ -15,6 +17,9 @@ class DiyVideo extends StatefulWidget {
 }
 
 class _DiyVideoState extends State<DiyVideo> {
+  bool _isYouTubeLink(String url) {
+    return url.contains('youtube.com') || url.contains('youtu.be');
+  }
   List videoInfo = [];
 
   @override
@@ -29,6 +34,21 @@ class _DiyVideoState extends State<DiyVideo> {
       videoInfo = json.decode(jsonString);
     });
   }
+
+  Future<void> _handleVideoTap(String url, String title) async {
+    print("$url");
+    if (url.contains("youtube.com") || url.contains("youtu.be")) {
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        Get.snackbar("Error", "Could not open YouTube link.");
+      }
+    } else {
+      Get.to(() => VideoPlayerScreen(videoUrl: url, title: title));
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +188,16 @@ class _DiyVideoState extends State<DiyVideo> {
       itemBuilder: (_, index) {
         return GestureDetector(
           onTap: () {
-            Get.to(() => VideoPlayerScreen(videoUrl: videoInfo[index]["videoUrl"], title: videoInfo[index]["title"],));
+            final videoUrl = videoInfo[index]["videoUrl"];
+            final title = videoInfo[index]["title"];
+
+            if (_isYouTubeLink(videoUrl)) {
+              // Open embedded YouTube player
+              Get.to(() => YouTubePlayerScreen(videoUrl: videoUrl, title: 'title',));
+            } else {
+              // Open local/network MP4 player
+              Get.to(() => VideoPlayerScreen(videoUrl: videoUrl, title: title));
+            }
           },
           child: _buildVideoCard(index),
         );
