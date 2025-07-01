@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class GlassBin extends StatelessWidget {
-  const GlassBin({super.key});
+class OrganicBin extends StatelessWidget {
+  const OrganicBin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.green.shade50,
+        backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
-          title: const Text("Glass Recycling"),
-          backgroundColor: Colors.green.shade700,
+          title: const Text("Organic / General Waste"),
+          backgroundColor: Colors.grey.shade800,
           centerTitle: true,
         ),
         body: SingleChildScrollView(
@@ -23,14 +23,14 @@ class GlassBin extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.brown.shade300.withOpacity(0.9),
+                  color: Colors.grey.shade700,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
-                        "Brown Bin",
+                        "Black Bin",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w600,
@@ -39,7 +39,7 @@ class GlassBin extends StatelessWidget {
                       ),
                     ),
                     Image.asset(
-                      "assets/images/Glass.png",
+                      "assets/images/organic.png", // Make sure this exists!
                       height: 80,
                       fit: BoxFit.contain,
                     ),
@@ -69,7 +69,7 @@ class GlassBin extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "How to Dispose of Glass",
+                      "How to Dispose of Organic / General Waste",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -77,11 +77,11 @@ class GlassBin extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 12),
-                    Text("• Rinse glass bottles and jars to remove food or liquid residue."),
-                    Text("• Remove caps, lids, or pumps – especially plastic or metal ones."),
-                    Text("• Do not break the glass. Handle with care to avoid injury."),
-                    Text("• Place cleaned glass items into the brown bin."),
-                    Text("• Do not include ceramic, Pyrex, mirrors, or window glass."),
+                    Text("• Place non-recyclable waste into the black bin."),
+                    Text("• Wrap wet waste to avoid leaks or odor."),
+                    Text("• Do not include recyclables like paper, plastic, or glass."),
+                    Text("• Hazardous waste like batteries or electronics should be disposed of separately."),
+                    Text("• Compost organic kitchen waste if possible to reduce landfill waste."),
                   ],
                 ),
               ),
@@ -99,85 +99,60 @@ class GlassBin extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // Example 1: Glass Bottle
+              // Example 1: Food Waste
               ExpansionTile(
-                leading: const Icon(Icons.local_drink, color: Colors.brown),
-                title: const Text("Glass Bottle"),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "assets/images/EcoConnect_Logo.png",
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                            const SizedBox(width: 16),
-                            Image.asset(
-                              "assets/images/EcoConnect_Logo.png",
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "Glass bottles such as those used for soda, juice, and wine "
-                              "are fully recyclable. Make sure they are clean and empty "
-                              "before placing them in the brown bin.",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
+                leading: const Icon(Icons.restaurant, color: Colors.grey),
+                title: const Text("Food Scraps"),
+                children: const [
+                  ListTile(
+                    title: Text("Description"),
+                    subtitle: Text(
+                      "Leftover food, fruit peels, vegetable scraps, and expired food items "
+                          "should go into the black bin if you can't compost them.",
                     ),
                   ),
                 ],
               ),
 
-              // Example 2: Glass Jar
+              // Example 2: Used Tissues
               ExpansionTile(
-                leading: const Icon(Icons.kitchen, color: Colors.brown),
-                title: const Text("Glass Jar"),
+                leading: const Icon(Icons.clean_hands, color: Colors.grey),
+                title: const Text("Used Tissues & Paper Towels"),
                 children: const [
                   ListTile(
                     title: Text("Description"),
                     subtitle: Text(
-                      "Jars from jam, pickles, or sauces are recyclable. "
-                          "Remove any food residue and take off plastic lids if possible.",
+                      "Used tissues, napkins, and paper towels cannot be recycled and should go into the black bin.",
                     ),
                   ),
                 ],
               ),
 
-              // Example 3: Perfume Bottle
+              // Example 3: Diapers
               ExpansionTile(
-                leading: const Icon(Icons.spa, color: Colors.brown),
-                title: const Text("Perfume or Cosmetic Glass Bottle"),
+                leading: const Icon(Icons.baby_changing_station, color: Colors.grey),
+                title: const Text("Diapers & Sanitary Products"),
                 children: const [
                   ListTile(
                     title: Text("Description"),
                     subtitle: Text(
-                      "Empty perfume or skincare bottles made of glass are accepted. "
-                          "Clean and remove pumps if applicable.",
+                      "Used diapers and sanitary products must be securely wrapped "
+                          "and disposed of in the black bin.",
                     ),
                   ),
                 ],
               ),
 
-              // Example 4: Colored Glass
+              // Example 4: Contaminated Packaging
               ExpansionTile(
-                leading: const Icon(Icons.color_lens, color: Colors.brown),
-                title: const Text("Colored Glass (Brown/Green/Clear)"),
+                leading: const Icon(Icons.delete, color: Colors.grey),
+                title: const Text("Contaminated Packaging"),
                 children: const [
                   ListTile(
                     title: Text("Description"),
                     subtitle: Text(
-                      "All colors of glass (brown, green, clear) are recyclable. "
-                          "Do not mix with ceramics or other non-glass materials.",
+                      "Pizza boxes, food-soiled paper plates, and plastic containers with leftover food "
+                          "cannot be recycled. Dispose of these in the black bin.",
                     ),
                   ),
                 ],

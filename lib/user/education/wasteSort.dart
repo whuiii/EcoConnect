@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/user/education/glass.dart';
-// TODO: Import actual screens for paper, waste, plastic bins
+import 'package:navigate/user/education/metal.dart';
+import 'package:navigate/user/education/organic.dart';
+import 'package:navigate/user/education/paper.dart';
+import 'package:navigate/user/education/plastic.dart';
+// TODO: Import actual screens for paper, waste, plastic bins when ready
 
 class WasteSort extends StatelessWidget {
   const WasteSort({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green.shade50, // light background for freshness
+    return SafeArea(child: Scaffold(
+      backgroundColor: Colors.green.shade50, // light background
       appBar: AppBar(
         title: const Text('Recycling Bins'),
         centerTitle: true,
@@ -29,7 +33,6 @@ class WasteSort extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -53,7 +56,7 @@ class WasteSort extends StatelessWidget {
                     RecyclingBin(
                       color: 'brown',
                       label: 'Glass',
-                      icon: Icons.wine_bar,
+                      icon: 'assets/images/glass-bin.png',
                       onTap: () => Get.to(
                             () => const GlassBin(),
                         transition: Transition.zoom,
@@ -62,25 +65,33 @@ class WasteSort extends StatelessWidget {
                     RecyclingBin(
                       color: 'blue',
                       label: 'Paper',
-                      icon: Icons.description,
+                      icon: 'assets/images/paper-bin.png',
                       onTap: () {
-                        Get.snackbar("Coming Soon", "Paper bin screen not yet implemented.");
+                        Get.to(PaperBin());
                       },
                     ),
                     RecyclingBin(
                       color: 'black',
                       label: 'General Waste',
-                      icon: Icons.delete,
+                      icon: 'assets/images/organic.png',
                       onTap: () {
-                        Get.snackbar("Coming Soon", "General waste bin screen not yet implemented.");
+                        Get.to(OrganicBin());
                       },
                     ),
                     RecyclingBin(
                       color: 'orange',
-                      label: 'Plastic & Metal',
-                      icon: Icons.recycling,
+                      label: 'Metal',
+                      icon: 'assets/images/metal.png',
                       onTap: () {
-                        Get.snackbar("Coming Soon", "Plastic & Metal bin screen not yet implemented.");
+                        Get.to(MetalBin());
+                      },
+                    ),
+                    RecyclingBin(
+                      color: 'yellow',
+                      label: 'Plastic',
+                      icon: 'assets/images/plastic.png',
+                      onTap: () {
+                        Get.to(PlasticBin());
                       },
                     ),
                   ],
@@ -90,6 +101,7 @@ class WasteSort extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -97,7 +109,7 @@ class WasteSort extends StatelessWidget {
 class RecyclingBin extends StatelessWidget {
   final String color;
   final String label;
-  final IconData icon;
+  final String icon;
   final VoidCallback onTap;
 
   const RecyclingBin({
@@ -118,6 +130,8 @@ class RecyclingBin extends StatelessWidget {
         return Colors.grey.shade800;
       case 'orange':
         return Colors.orange.shade400;
+      case 'yellow':
+        return Colors.yellow.shade400;
       default:
         return Colors.grey.shade300;
     }
@@ -133,6 +147,8 @@ class RecyclingBin extends StatelessWidget {
         return Colors.grey.shade500;
       case 'orange':
         return Colors.orange.shade200;
+      case 'yellow':
+        return Colors.yellow.shade400;
       default:
         return Colors.grey.shade200;
     }
@@ -159,7 +175,6 @@ class RecyclingBin extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: _getBackgroundColor(color),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -169,10 +184,10 @@ class RecyclingBin extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 50,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: _getBackgroundColor(color),
+                  backgroundImage: AssetImage(icon),
                 ),
               ),
               const SizedBox(height: 16),
