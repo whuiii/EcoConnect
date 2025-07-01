@@ -58,23 +58,23 @@ class Profile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              color: Colors.grey.shade300,
-                            ),
-                            child: Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   bottom: 0,
+                        //   right: 0,
+                        //   child: Container(
+                        //     width: 30,
+                        //     height: 30,
+                        //     decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(100),
+                        //       color: Colors.grey.shade300,
+                        //     ),
+                        //     child: Icon(
+                        //       Icons.edit,
+                        //       size: 18,
+                        //       color: Colors.grey.shade800,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
@@ -138,6 +138,16 @@ class Profile extends StatelessWidget {
                     // const Divider(),
                     // const SizedBox(height: 10),
                     ProfileMenuWidget(
+                      title: "Settings",
+                      icon: Icons.settings_outlined,
+                      onPress: () {
+                        print("Tap on Setting");
+                        Get.to(AboutUs());
+
+                      },
+                    ),
+                    const Divider(),
+                    ProfileMenuWidget(
                       title: "About Us",
                       icon: Icons.info,
                       onPress: () {
@@ -146,7 +156,7 @@ class Profile extends StatelessWidget {
 
                       },
                     ),
-                    const Divider(),
+
                     ProfileMenuWidget(
                       title: "Privacy Policy",
                       icon: Icons.privacy_tip,

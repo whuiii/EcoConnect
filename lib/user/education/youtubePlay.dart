@@ -17,8 +17,15 @@ class YouTubePlayerScreen extends StatefulWidget {
 }
 
 class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
+  bool _isLiked = false;
+  int _likesCount = 2300;
+
   late YoutubePlayerController _youtubeController;
   bool _isMuted = false;
+
+  Duration _videoPosition = Duration.zero;
+  Duration _videoDuration = Duration.zero;
+  double _progress = 0.0;
 
   @override
   void initState() {
@@ -30,13 +37,32 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
         autoPlay: true,
         mute: false,
       ),
-    );
+    )..addListener(() {
+      final metaData = _youtubeController.metadata;
+      final position = _youtubeController.value.position;
+      final duration = metaData.duration;
+
+      setState(() {
+        _videoPosition = position;
+        _videoDuration = duration;
+        _progress = duration.inMilliseconds == 0
+            ? 0
+            : position.inMilliseconds / duration.inMilliseconds;
+      });
+    });
   }
 
   @override
   void dispose() {
     _youtubeController.dispose();
     super.dispose();
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
   @override
@@ -48,7 +74,8 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -95,7 +122,8 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
                     children: [
                       Text(
                         widget.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const Text(
                         "Justin89",
@@ -104,10 +132,30 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
                     ],
                   ),
                   Row(
-                    children: const [
-                      Icon(Icons.favorite, color: Colors.redAccent),
-                      SizedBox(width: 4),
-                      Text("2.3k"),
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: _isLiked ? Colors.redAccent : Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isLiked = !_isLiked;
+                            if (_isLiked) {
+                              _likesCount++;
+                            } else {
+                              _likesCount--;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${_likesCount ~/ 1000}.${_likesCount % 1000 ~/ 100}k",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -116,17 +164,65 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
 
             const SizedBox(height: 16),
 
-            // Progress bar is handled by YouTubePlayer itself, no need for custom one
-            // But you can add extra controls if you like
+            // Progress bar + controls
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: _buildControlButtons(),
+              child: Column(
+                children: [
+                  _buildProgressBar(),
+                  const SizedBox(height: 8),
+                  _buildControlButtons(),
+                ],
+              ),
             ),
 
             const Spacer(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProgressBar() {
+    final currentFormatted = _formatDuration(_videoPosition);
+    final totalFormatted = _formatDuration(_videoDuration);
+
+    return Row(
+      children: [
+        Text(
+          currentFormatted,
+          style: const TextStyle(fontSize: 12, color: Colors.black54),
+        ),
+        Expanded(
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 4,
+              activeTrackColor: Colors.deepPurple,
+              inactiveTrackColor: Colors.deepPurple.shade100,
+              thumbColor: Colors.deepPurpleAccent,
+              overlayColor: Colors.deepPurple.withOpacity(0.1),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+            ),
+            child: Slider(
+              value: _progress * 100,
+              min: 0,
+              max: 100,
+              onChanged: (value) {
+                final newPosition = Duration(
+                  milliseconds: (_videoDuration.inMilliseconds * (value / 100))
+                      .round(),
+                );
+                _youtubeController.seekTo(newPosition);
+              },
+            ),
+          ),
+        ),
+        Text(
+          totalFormatted,
+          style: const TextStyle(fontSize: 12, color: Colors.black54),
+        ),
+      ],
     );
   }
 
@@ -170,5 +266,4 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
       ],
     );
   }
-
 }

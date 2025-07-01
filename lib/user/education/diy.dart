@@ -84,7 +84,7 @@ class _DiyVideoState extends State<DiyVideo> {
   Widget _buildInitialHeader() {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: 250,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       decoration: const BoxDecoration(
         boxShadow: [
@@ -193,7 +193,7 @@ class _DiyVideoState extends State<DiyVideo> {
 
             if (_isYouTubeLink(videoUrl)) {
               // Open embedded YouTube player
-              Get.to(() => YouTubePlayerScreen(videoUrl: videoUrl, title: 'title',));
+              Get.to(() => YouTubePlayerScreen(videoUrl: videoUrl, title: title,));
             } else {
               // Open local/network MP4 player
               Get.to(() => VideoPlayerScreen(videoUrl: videoUrl, title: title));

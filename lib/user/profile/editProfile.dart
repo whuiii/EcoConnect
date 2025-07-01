@@ -1,14 +1,12 @@
-import 'dart:typed_data'; // Correct import for Uint8List
+import 'dart:typed_data';
 
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/quickalert.dart';
 
 import '../../color.dart';
-import '../../mainpage.dart';
-import '../../utilis.dart'; // Assuming this contains your pickImage() function
+import '../../utilis.dart'; // Make sure this has your pickImage() helper
 
 class EditProfile extends StatefulWidget {
   @override
@@ -18,6 +16,13 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   Uint8List? _image;
 
+  // Controllers for fields
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   void selectImage() async {
     Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
@@ -26,13 +31,112 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _bioController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _showChangePasswordDialog() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Change Password'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: currentPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Current Password',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm New Password',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final current = currentPasswordController.text.trim();
+              final newPass = newPasswordController.text.trim();
+              final confirm = confirmPasswordController.text.trim();
+
+              if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.error,
+                  text: "All fields are required!",
+                );
+                return;
+              }
+
+              if (newPass != confirm) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.error,
+                  text: "New passwords do not match!",
+                );
+                return;
+              }
+
+              // You can add your current password validation here.
+              // Example: if (current != storedPassword) { ... }
+
+              setState(() {
+                _passwordController.text = newPass;
+              });
+
+              Navigator.of(context).pop();
+
+              QuickAlert.show(
+                context: context,
+                type: QuickAlertType.success,
+                text: "Password updated successfully!",
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            "Edit Profile",
-          ),
+          title: const Text("Edit Profile"),
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -43,15 +147,15 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     _image != null
                         ? CircleAvatar(
-                            radius: 60,
-                            backgroundImage: MemoryImage(_image!),
-                          )
-                        : CircleAvatar(
-                            radius: 60,
-                            backgroundImage:
-                                AssetImage('assets/images/EcoConnect_Logo.png'),
-                            backgroundColor: Colors.transparent,
-                          ),
+                      radius: 60,
+                      backgroundImage: MemoryImage(_image!),
+                    )
+                        : const CircleAvatar(
+                      radius: 60,
+                      backgroundImage:
+                      AssetImage('assets/images/EcoConnect_Logo.png'),
+                      backgroundColor: Colors.transparent,
+                    ),
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -63,157 +167,123 @@ class _EditProfileState extends State<EditProfile> {
                           color: Colors.grey.shade300,
                         ),
                         child: IconButton(
-                          icon: Icon(Icons.add_a_photo),
+                          icon: const Icon(Icons.add_a_photo, size: 18),
                           color: Colors.black,
                           onPressed: selectImage,
-                          iconSize: 18,
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   "EcoConnect",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
                 ),
-                Text(
-                  "Bio Data: Recycle, Reuse, Reduce",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 const Divider(),
-                SizedBox(height: 10),
-                FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      labelText: "Username",
-                      hintText: "Username",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                      labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400),
-                      prefixIcon: Icon(
-                        Iconsax.user,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.grey.shade200, width: 2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      floatingLabelStyle:
-                          TextStyle(color: Colors.black, fontSize: 18),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                const SizedBox(height: 10),
+
+                // Username
+                _buildTextField(
+                  controller: _usernameController,
+                  label: "Username",
+                  hint: "Username",
+                  icon: Iconsax.user,
+                ),
+                const SizedBox(height: 20),
+
+                // Email
+                _buildTextField(
+                  controller: _emailController,
+                  label: "Email",
+                  hint: "Email",
+                  icon: Iconsax.sms,
+                ),
+                const SizedBox(height: 20),
+
+                // Phone Number
+                _buildTextField(
+                  controller: _phoneController,
+                  label: "Phone Number",
+                  hint: "Phone Number without -",
+                  icon: Iconsax.call,
+                ),
+                const SizedBox(height: 20),
+
+                // Bio Data
+                _buildTextField(
+                  controller: _bioController,
+                  label: "Bio Data",
+                  hint: "Write something about yourself",
+                  icon: Iconsax.note_text,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+
+                // Change Password
+                TextField(
+                  controller: _passwordController,
+                  readOnly: true, // prevent editing directly
+                  obscureText: true,
+                  cursorColor: Colors.black,
+                  decoration: InputDecoration(
+                    labelText: "Change Password",
+                    hintText: "********",
+                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                    labelStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    prefixIcon: const Icon(
+                      Iconsax.key,
+                      color: Colors.black,
+                      size: 18,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.black),
+                      onPressed: _showChangePasswordDialog,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                      BorderSide(color: Colors.grey.shade200, width: 2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    floatingLabelStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-                FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      hintText: "Email",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                      labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400),
-                      prefixIcon: Icon(
-                        Iconsax.sms,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.grey.shade200, width: 2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      floatingLabelStyle:
-                          TextStyle(color: Colors.black, fontSize: 18),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                FadeInUp(
-                  delay: Duration(milliseconds: 800),
-                  duration: Duration(milliseconds: 1500),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      labelText: "Phone Number",
-                      hintText: "Phone Number without -",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                      labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400),
-                      prefixIcon: Icon(
-                        Iconsax.call,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.grey.shade200, width: 2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      floatingLabelStyle:
-                          TextStyle(color: Colors.black, fontSize: 18),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
+                const SizedBox(height: 30),
+
                 SizedBox(
                   width: double.infinity,
                   child: MaterialButton(
                     onPressed: () {
-                      // Save profile changes
                       QuickAlert.show(
                         context: context,
                         type: QuickAlertType.confirm,
-                        text: "Are you want to save changes?",
-                        title: "Alert",
+                        text: "Do you want to save these changes?",
+                        title: "Save Changes",
                         confirmBtnText: 'Yes',
                         cancelBtnText: 'No',
                         confirmBtnColor: Colors.green,
                       );
                     },
                     color: button,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      "Edit Profile",
+                    child: const Text(
+                      "Save Changes",
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
@@ -221,6 +291,44 @@ class _EditProfileState extends State<EditProfile> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool obscureText = false,
+    int maxLines = 1,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      maxLines: maxLines,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+        labelStyle: const TextStyle(
+            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w400),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.black,
+          size: 18,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        floatingLabelStyle:
+        const TextStyle(color: Colors.black, fontSize: 18),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black, width: 1.5),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );

@@ -22,6 +22,8 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+  bool _isLiked = false;
+  int _likesCount = 2300;
   late VideoPlayerController _controller;
   bool _isPlaying = false;
   Duration? _duration;
@@ -122,12 +124,32 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ],
                   ),
                   Row(
-                    children: const [
-                      Icon(Icons.favorite, color: Colors.redAccent),
-                      SizedBox(width: 4),
-                      Text("2.3k"),
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: _isLiked ? Colors.redAccent : Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isLiked = !_isLiked;
+                            if (_isLiked) {
+                              _likesCount++;
+                            } else {
+                              _likesCount--;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${_likesCount ~/ 1000}.${_likesCount % 1000 ~/ 100}k",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
