@@ -8,17 +8,15 @@ import '../models/forgotpassword_model.dart';
 class APIService{
   static var client = http.Client();
 
-  static Future<ForgotPasswordModel> otpLogin(String email) async{
-    var url = Uri.http("127.0.0.1:4500", "emailjs/otp-login");
+  static Future<ForgotPasswordModel> otpLogin(String email) async {
+    var url = Uri.http("0.0.0.0:4500", "/emailjs-backend/otp-login");
 
     var response = await client.post(
-        url,
-        headers: {'Content-type': "application/json"},
+      url,
+      headers: {'Content-type': "application/json"},
       body: jsonEncode({
-          {"email": email
-
-          }
-        })
+        "email": email
+      }),
     );
     return forgotPasswordModel(response.body);
   }
@@ -28,7 +26,7 @@ class APIService{
       String otpHash,
       String otpCode,
       ) async{
-    var url = Uri.http("127.0.0.1:4500", "emailjs/otp-verify");
+    var url = Uri.http("0.0.0.0:4500", "/emailjs-backend/otp-verify"); //change the ip
 
     var response = await client.post(
         url,

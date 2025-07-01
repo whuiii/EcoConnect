@@ -1,12 +1,33 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+// ✅ Define your router
+const otpRoutes = require("./routes/app.routes"); // or otp.route.js if that's your file
+
+// ✅ Middleware
+app.use(cors());
 app.use(express.json());
-app.use("/emailjs-backend", require("./routes/app.routes"));
 
-app.listen(4500, function(){
-    console.log("Server Started")
+// ✅ Mount your router ONCE
+app.use("/emailjs-backend", otpRoutes);
 
-})
+// ✅ Listen on all interfaces
+const PORT = 4500;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server Started on port ${PORT}`);
+});
+
+
+//const express = require("express");
+//const app = express();
+//app.use(express.json());
+//app.use("/emailjs-backend", require("./routes/app.routes"));
+//
+//app.listen(4500, '0.0.0.0', function(){
+//    console.log("Server Started")
+//
+//})
 
 
 //const express = require('express');

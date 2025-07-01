@@ -2,8 +2,9 @@ var nodemailer = require('nodemailer');
 
 async function sendEmail(params, callback){
     const transport = nodemailer.createTransport({
-        host: 'imap.gmail.com',
-        port: 993,
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
             user: 'ecoconnect100@gmail.com',
             pass: 'EcoConnect$+1'
@@ -12,7 +13,7 @@ async function sendEmail(params, callback){
     );
 
     var mailOptions = {
-        from: 'tan_22003586@utp.edu.my'
+        from: 'tan_22003586@utp.edu.my',
         to: params.email,
         subject: params.subject,
         text: params.body,
