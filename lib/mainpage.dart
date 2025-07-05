@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:navigate/admin/admin_login.dart';
+import 'package:navigate/admin/admin_navigation_bar.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/login.dart';
 
@@ -127,9 +131,10 @@ Earn rewards for a greener lifestyle.''',
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pushNamed('/1');
+                            //Get.to(AdminNavigate());
                           },
                           child: Text(
-                            "LOGIN",
+                            "LOGIN AS USER",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -160,10 +165,10 @@ Earn rewards for a greener lifestyle.''',
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/2');
+                            Get.to(AdminLoginPage());
                           },
                           child: Text(
-                            "REGISTER",
+                            "LOGIN AS COMPANY",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
