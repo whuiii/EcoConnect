@@ -69,6 +69,9 @@ dependencies:
   fl_chart: ^1.0.0
   lottie: ^3.3.1
   flutter_datetime_picker_plus: ^2.2.0
+  csv: ^6.0.0
+  path_provider: ^2.1.5
+  share_plus: ^11.0.0
 
 
 dev_dependencies:
