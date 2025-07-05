@@ -144,6 +144,7 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
         'totalWeightKg': totalWeight,
         'pointAwarded': totalPoint,
         'materialsBreakdown': materials,
+        'completedAt': DateTime.now(),
       };
 
       await FirebaseFirestore.instance
@@ -151,7 +152,7 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
           .doc(widget.documentId)
           .update(updateData);
 
-      // 📌 Update user’s total point
+      // 📌 Update user’s total point, total weight, and frequency
       final userRef =
           FirebaseFirestore.instance.collection('users').doc(userId);
 
@@ -160,11 +161,21 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
 
         if (snapshot.exists) {
           final data = snapshot.data() as Map<String, dynamic>;
-          final currentPoint =
-              data.containsKey('point') ? data['point'] as int : 0;
-          transaction.update(userRef, {'point': currentPoint + totalPoint});
+          final currentPoint = data['point'] ?? 0;
+          final currentWeight = (data['weight'] ?? 0).toDouble();
+          final currentFrequency = data['frequency'] ?? 0;
+
+          transaction.update(userRef, {
+            'point': currentPoint + totalPoint,
+            'weight': currentWeight + totalWeight,
+            'frequency': currentFrequency + 1,
+          });
         } else {
-          transaction.set(userRef, {'point': totalPoint});
+          transaction.set(userRef, {
+            'point': totalPoint,
+            'weight': totalWeight,
+            'frequency': 1,
+          });
         }
       });
 
@@ -173,7 +184,8 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Completed. $totalPoint points awarded.')),
       );
-      Navigator.pop(context);
+      Navigator.of(context).pop(); // Close the dialog
+      Navigator.of(context).pop(); // Close the detail page
     }
 
     showDialog(

@@ -49,7 +49,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     for (var doc in snapshot.docs) {
       final completedAt = (doc['completedAt'] as Timestamp).toDate();
       final weight =
-          double.tryParse(doc['bagWeight']?.toString() ?? '0') ?? 0.0;
+          double.tryParse(doc['totalWeightKg']?.toString() ?? '0') ?? 0.0;
 
       bool include = false;
       String key = '';
