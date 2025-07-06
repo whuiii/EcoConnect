@@ -1,8 +1,13 @@
 import 'dart:typed_data';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:navigate/admin/admin%20services/admin_service.dart';
+import 'package:navigate/admin/admin_login.dart';
 import 'package:navigate/utilis.dart';
 
 import '../color.dart';
@@ -21,6 +26,24 @@ class _AdminRegisterState extends State<AdminRegister> {
     setState(() {
       _image = img;
     });
+  }
+
+  Future<String> uploadImageToStorage(Uint8List image) async {
+    // Create a reference to Firebase Storage
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('companyLogos')
+        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+    // Upload the file
+    firebase_storage.UploadTask uploadTask = ref.putData(image);
+
+    // Wait for upload to finish
+    firebase_storage.TaskSnapshot snap = await uploadTask;
+
+    // Get download URL
+    String downloadUrl = await snap.ref.getDownloadURL();
+    return downloadUrl;
   }
 
   bool securePassword = true;
@@ -48,32 +71,61 @@ class _AdminRegisterState extends State<AdminRegister> {
     });
   }
 
+  final companyService = AdminService();
   void handleAdminRegister() async {
-    if (_image == null) {
+    try {
+      String logoUrl = '';
+
+      if (_image != null) {
+        logoUrl = await uploadImageToStorage(_image!);
+      }
+      String? result = await companyService.registerAdminCompany(
+      companyLogo: logoUrl,
+      companyName: companyNameController.text.trim(),
+      registrationNumber: registrationNumberController.text.trim(),
+      address: addressController.text.trim(),
+      email: emailController.text.trim(),
+      phone: phoneController.text.trim(),
+      password: passwordController.text,
+      confirmPassword: confirmPasswordController.text,
+    );
+    if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please upload your company logo.")),
+          SnackBar(content: Text("Registration successful!"))
       );
-      return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result))
+      );
+    }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}"))
+      );
     }
 
-    // TODO: Add Firebase/Backend logic here.
-    print("Company Name: ${companyNameController.text}");
-    print("Reg No: ${registrationNumberController.text}");
-    print("Service Type: ${serviceTypeController.text}");
-    print("Address: ${addressController.text}");
-    print("Username: ${usernameController.text}");
-    print("Email: ${emailController.text}");
-    print("Phone: ${phoneController.text}");
-    print("Password: ${passwordController.text}");
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Admin company registered successfully!")),
-    );
   }
+
+    // TODO: Add Firebase/Backend logic here.
+  //   print("Company Name: ${companyNameController.text}");
+  //   print("Reg No: ${registrationNumberController.text}");
+  //   print("Service Type: ${serviceTypeController.text}");
+  //   print("Address: ${addressController.text}");
+  //   print("Username: ${usernameController.text}");
+  //   print("Email: ${emailController.text}");
+  //   print("Phone: ${phoneController.text}");
+  //   print("Password: ${passwordController.text}");
+  //
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text("Admin company registered successfully!")),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(child:
+      Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -137,17 +189,19 @@ class _AdminRegisterState extends State<AdminRegister> {
                 child: TextField(
                   controller: registrationNumberController,
                   cursorColor: Colors.black,
-                  decoration: inputDecoration("Business Reg. No.", Iconsax.document),
+
+                  decoration: inputDecoration("Business Reg. No.in SSM",
+                      Iconsax.document),
                 ),
               ),
-              SizedBox(height: 20),
-              FadeInUp(
-                child: TextField(
-                  controller: serviceTypeController,
-                  cursorColor: Colors.black,
-                  decoration: inputDecoration("Waste Service Type", Iconsax.trash),
-                ),
-              ),
+              // SizedBox(height: 20),
+              // FadeInUp(
+              //   child: TextField(
+              //     controller: serviceTypeController,
+              //     cursorColor: Colors.black,
+              //     decoration: inputDecoration("Waste Service Type", Iconsax.trash),
+              //   ),
+              // ),
               SizedBox(height: 20),
               FadeInUp(
                 child: TextField(
@@ -157,22 +211,22 @@ class _AdminRegisterState extends State<AdminRegister> {
                   decoration: inputDecoration("Company Address", Iconsax.location),
                 ),
               ),
-              SizedBox(height: 20),
-
-              // Reuse user fields
-              FadeInUp(
-                child: TextField(
-                  controller: usernameController,
-                  cursorColor: Colors.black,
-                  decoration: inputDecoration("Username", Iconsax.user),
-                ),
-              ),
+              // SizedBox(height: 20),
+              //
+              // // Reuse user fields
+              // FadeInUp(
+              //   child: TextField(
+              //     controller: usernameController,
+              //     cursorColor: Colors.black,
+              //     decoration: inputDecoration("Username", Iconsax.user),
+              //   ),
+              // ),
               SizedBox(height: 20),
               FadeInUp(
                 child: TextField(
                   controller: emailController,
                   cursorColor: Colors.black,
-                  decoration: inputDecoration("Admin Email", Iconsax.sms),
+                  decoration: inputDecoration("Company Email", Iconsax.sms),
                 ),
               ),
               SizedBox(height: 20),
@@ -180,7 +234,7 @@ class _AdminRegisterState extends State<AdminRegister> {
                 child: TextField(
                   controller: phoneController,
                   cursorColor: Colors.black,
-                  decoration: inputDecoration("Admin Phone", Iconsax.call),
+                  decoration: inputDecoration("Company Phone", Iconsax.call),
                 ),
               ),
               SizedBox(height: 20),
@@ -256,7 +310,7 @@ class _AdminRegisterState extends State<AdminRegister> {
                     Text("Already have an account?", style: TextStyle(color: Colors.grey)),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/login');
+                        Get.to(AdminLoginPage());
                       },
                       child: Text("Login", style: TextStyle(color: Colors.blue)),
                     ),
@@ -266,6 +320,7 @@ class _AdminRegisterState extends State<AdminRegister> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:navigate/admin/admin%20profile/admin_profile.dart';
 import 'package:navigate/admin/dashboard.dart';
 import 'package:navigate/admin/pickup_page.dart';
 import 'package:navigate/color.dart';
@@ -30,7 +31,7 @@ class _AdminNavigateState extends State<AdminNavigate> {
       child: AdminDashboard(),
     ),
     AdminDeliveryRequest(),
-    Profile(),
+    AdminProfile(),
   ];
 
   final items = <Widget>[

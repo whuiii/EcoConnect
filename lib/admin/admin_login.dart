@@ -4,7 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:navigate/admin/admin_navigation_bar.dart';
-import 'package:navigate/admin/admin_profile.dart';
+import 'package:navigate/admin/admin%20profile/admin_profile.dart';
 import 'package:navigate/admin/dashboard.dart';
 import 'package:navigate/services/auth.dart';
 import 'package:navigate/forgotPassword.dart';
@@ -66,7 +66,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
     if (userCredential != null) {
       _showMessage("Login successful");
-      Navigator.of(context).pushNamed('/3');
+      Get.to(AdminNavigate());
+      //Navigator.of(context).pushNamed('/3');
     } else {
       _showMessage("Invalid credentials. Please try again.");
     }
@@ -234,8 +235,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 delay: Duration(milliseconds: 800),
                 child: MaterialButton(
                   onPressed: () {
-                    Get.to(AdminNavigate());
-                   // _signIn(); // <-- Call Firebase sign-in function
+                    //Get.to(AdminNavigate());
+                    _signIn(); // <-- Call Firebase sign-in function
                   },
                   height: 45,
                   minWidth: double.infinity,
