@@ -1,12 +1,11 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/quickalert.dart';
 
 import '../../color.dart';
-import '../../utilis.dart';
+import '../../utilis.dart'; // Make sure this has your pickImage() helper
 
 class AdminEditProfile extends StatefulWidget {
   @override
@@ -126,6 +125,19 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // TODO: Load the initial data from your backend or database.
+    // Example:
+    _companyNameController.text = "EcoConnect Ltd.";
+    _regNumberController.text = "EC123456";
+    _emailController.text = "admin@ecoconnect.com";
+    _phoneController.text = "+60123456789";
+    _addressController.text = "123 Green Road, EcoCity, Malaysia";
+    _passwordController.text = "********"; // Placeholder
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -145,8 +157,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                   )
                       : const CircleAvatar(
                     radius: 60,
-                    backgroundImage: AssetImage(
-                        'assets/images/EcoConnect_Logo.png'),
+                    backgroundImage:
+                    AssetImage('assets/images/EcoConnect_Logo.png'),
                     backgroundColor: Colors.transparent,
                   ),
                   Positioned(
@@ -177,22 +189,27 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               const Divider(),
               const SizedBox(height: 10),
 
+              // Company Name - read only
               _buildTextField(
                 controller: _companyNameController,
                 label: "Company Name",
-                hint: "Enter your company name",
+                hint: "Company name",
                 icon: Iconsax.building,
+                readOnly: true,
               ),
               const SizedBox(height: 20),
 
+              // Registration Number - read only
               _buildTextField(
                 controller: _regNumberController,
                 label: "Registration Number",
-                hint: "Enter registration number",
+                hint: "Registration number",
                 icon: Iconsax.document,
+                readOnly: true,
               ),
               const SizedBox(height: 20),
 
+              // Email
               _buildTextField(
                 controller: _emailController,
                 label: "Email",
@@ -201,6 +218,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               ),
               const SizedBox(height: 20),
 
+              // Phone Number
               _buildTextField(
                 controller: _phoneController,
                 label: "Phone Number",
@@ -209,6 +227,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               ),
               const SizedBox(height: 20),
 
+              // Address
               _buildTextField(
                 controller: _addressController,
                 label: "Company Address",
@@ -218,6 +237,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               ),
               const SizedBox(height: 20),
 
+              // Change Password
               TextField(
                 controller: _passwordController,
                 readOnly: true,
@@ -226,15 +246,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                 decoration: InputDecoration(
                   labelText: "Change Password",
                   hintText: "********",
-                  hintStyle:
-                  const TextStyle(color: Colors.grey, fontSize: 14),
-                  labelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  prefixIcon: const Icon(Iconsax.key,
-                      color: Colors.black, size: 18),
+                  prefixIcon:
+                  const Icon(Iconsax.key, color: Colors.black, size: 18),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.edit, color: Colors.black),
                     onPressed: _showChangePasswordDialog,
@@ -253,8 +266,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
+
               SizedBox(
                 width: double.infinity,
                 child: MaterialButton(
@@ -268,10 +281,11 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                       cancelBtnText: 'No',
                       confirmBtnColor: Colors.green,
                     );
+                    // TODO: Add your logic to save the updated profile here.
                   },
                   color: button,
-                  padding:
-                  const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 12, horizontal: 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -294,23 +308,19 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     required String hint,
     required IconData icon,
     bool obscureText = false,
+    bool readOnly = false,
     int maxLines = 1,
   }) {
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      readOnly: readOnly,
       maxLines: maxLines,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-        labelStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-        ),
-        prefixIcon: Icon(icon, color: Colors.black, size: 18),
+        prefixIcon: Icon(icon, size: 18),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
           borderRadius: BorderRadius.circular(10),

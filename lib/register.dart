@@ -1,5 +1,6 @@
 //import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
 import 'dart:typed_data';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:animate_do/animate_do.dart';
@@ -54,7 +55,19 @@ class _RegisterPageState extends State<RegisterPage> {
     'assets/images/3.gif',
   ];
 
+  Future<String> uploadImageToStorage(Uint8List image) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('profileImages')
+        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
+    UploadTask uploadTask = ref.putData(image);
+
+    TaskSnapshot snap = await uploadTask;
+
+    String downloadUrl = await snap.ref.getDownloadURL();
+    return downloadUrl;
+  }
 
   @override
   void initState() {
@@ -71,12 +84,18 @@ class _RegisterPageState extends State<RegisterPage> {
 
 final userService = UserService();
 void handleRegister() async {
+  String imageUrl = '';
+
+  if (_image != null) {
+    imageUrl = await uploadImageToStorage(_image!);
+  }
   String? result = await userService.registerUser(
   email: emailController.text.trim(),
   password: passwordController.text,
   confirmPassword: confirmPasswordController.text,
   username: usernameController.text.trim(),
   phone: phoneController.text.trim(),
+    profileImage: imageUrl,
 );
 
 

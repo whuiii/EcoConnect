@@ -33,9 +33,12 @@ class _RankingPageState extends State<RankingPage> {
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
+
     if (currentUser == null) {
       return const Scaffold(
-        body: Center(child: Text("Not logged in")),
+        body: Center(
+          child: Text("Not logged in"),
+        ),
       );
     }
 
@@ -49,7 +52,9 @@ class _RankingPageState extends State<RankingPage> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
 
@@ -61,75 +66,156 @@ class _RankingPageState extends State<RankingPage> {
           body: SafeArea(
             child: Column(
               children: [
-                // Top Banner
+               // Top Container
                 Container(
-                  color: green3,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        green3.withOpacity(0.9),  // Original green3 shade
+                        green3.withOpacity(0.7),  // Slight variation for depth
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Profile Image
+                      //Profile Image with subtle glow border
                       Container(
-                        width: 100,
-                        height: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(45),
-                            child: Image.asset(
-                              "assets/images/ava.jpg",
-                              fit: BoxFit.cover,
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.5),
+                              blurRadius: 8,
                             ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            "assets/images/ava.jpg",
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
-                      // Profile Name
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: Text(
-                          username,
-                          style: TextName,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      // Points
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Point: $point", style: TextPoint),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RedeemPage(),
+
+                      const SizedBox(width: 20),
+
+                      // Username & Points with icon badge
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              username,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Point: $point",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              height: 28,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const RedeemPage(),
+                                    ),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(horizontal: 12),
+                                  backgroundColor: Colors.white.withOpacity(0.2),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
                                 ),
-                              );
-                            },
-                            child: Text(
-                              "Click to exchange reward",
-                              style: TextLink,
+                                child: const Text(
+                                  "Click to exchange reward",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    //decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
 
-                // Top 3 Ranking and Tab Bar
+                const SizedBox(height: 20),
                 Container(
                   color: back1,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Column(
                     children: [
-                      Top3RankingSection(category: getSelectedCategoryName()),
+                      Top3RankingSection(
+                        category: getSelectedCategoryName(),
+                      ),
+                      const SizedBox(height: 10),
                       CupertinoSlidingSegmentedControl<RankingCategory>(
                         backgroundColor: CupertinoColors.systemGrey5,
                         thumbColor: _selectedTab == RankingCategory.point
                             ? point_color
                             : _selectedTab == RankingCategory.weight
-                                ? weight_color
-                                : frequency_color,
+                            ? weight_color
+                            : frequency_color,
                         groupValue: _selectedTab,
                         onValueChanged: (RankingCategory? value) {
                           if (value != null) {
@@ -157,9 +243,10 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                 ),
 
-                // Ranking List
                 Expanded(
-                  child: RankingContainer(category: getSelectedCategoryName()),
+                  child: RankingContainer(
+                    category: getSelectedCategoryName(),
+                  ),
                 ),
               ],
             ),

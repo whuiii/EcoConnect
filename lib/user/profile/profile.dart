@@ -128,24 +128,17 @@ class Profile extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    // ProfileMenuWidget(
-                    //   title: "Settings",
-                    //   icon: Icons.settings,
-                    //   onPress: () {},
-                    // ),
                     // const Divider(),
                     // const SizedBox(height: 10),
-                    ProfileMenuWidget(
-                      title: "Settings",
-                      icon: Icons.settings_outlined,
-                      onPress: () {
-                        print("Tap on Setting");
-                        Get.to(AboutUs());
-
-                      },
-                    ),
+                    // ProfileMenuWidget(
+                    //   title: "Settings",
+                    //   icon: Icons.settings_outlined,
+                    //   onPress: () {
+                    //     print("Tap on Setting");
+                    //     Get.to(AboutUs());
+                    //
+                    //   },
+                    // ),
                     const Divider(),
                     ProfileMenuWidget(
                       title: "About Us",

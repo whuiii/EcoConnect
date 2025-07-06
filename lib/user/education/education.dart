@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/user/education/diy.dart';
 import 'package:navigate/user/education/funFact.dart';
@@ -66,60 +67,88 @@ class _EducationState extends State<Education> {
             child: Column(
               children: [
                 // Top Banner Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 300,
-                    child: MaterialButton(
-                      onPressed: () {
-                        Get.to(WasteSort());
-                      },
-                      color: button.withOpacity(0.3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(20, 10, 20, 20), // LEFT, TOP, RIGHT, BOTTOM
+                  height: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.greenAccent.withOpacity(0.6),
+                        Colors.lightGreenAccent.withOpacity(0.3),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                        offset: Offset(0, 6),
                       ),
-                      padding: EdgeInsets.zero,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment(0, 0.6),
-                              child: Image.asset(
-                                "assets/images/SortWaste.png",
-                                width: 300,
-                                height: 300,
-                                fit: BoxFit.contain,
-                              ),
+                    ],
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Get.to(WasteSort());
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          // Lottie Animation in the background
+                          Positioned.fill(
+                            child: Lottie.asset(
+                              'assets/images/Sort.json',
+                              fit: BoxFit.cover,
+                              repeat: true,
                             ),
-                            Container(
-                              alignment: Alignment.topCenter,
-                              padding: EdgeInsets.only(top: 10),
-                              child: Text(
+                          ),
+                          // Semi-transparent overlay for better text contrast
+                          Container(
+                            color: Colors.black.withOpacity(0.15),
+                          ),
+                          // Centered title text
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.45),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
                                 'How to sort?',
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   fontSize: 30,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
                                   shadows: [
                                     Shadow(
                                       offset: Offset(1, 1),
-                                      blurRadius: 2,
-                                      color: Colors.black45,
+                                      blurRadius: 5,
+                                      color: Colors.black54,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-
-                SizedBox(height: 20),
+                SizedBox(height: 15),
 
                 // Categories Title
                 Padding(

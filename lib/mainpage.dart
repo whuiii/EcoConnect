@@ -134,7 +134,7 @@ Earn rewards for a greener lifestyle.''',
                             //Get.to(AdminNavigate());
                           },
                           child: Text(
-                            "LOGIN AS USER",
+                            "Login as User",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -168,7 +168,7 @@ Earn rewards for a greener lifestyle.''',
                             Get.to(AdminLoginPage());
                           },
                           child: Text(
-                            "LOGIN AS COMPANY",
+                            "Login as Company",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,

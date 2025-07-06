@@ -7,6 +7,7 @@ class UserService {
 
   // Registration function
   Future<String?> registerUser({
+    required String profileImage,
     required String email,
     required String password,
     required String confirmPassword,
@@ -30,6 +31,7 @@ class UserService {
       // Store extra data in Firestore
       await _firestore.collection('users').doc(uid).set({
         'username': username,
+        'profileImage': profileImage,
         'email': email,
         'phone': phone,
         'point': 0,

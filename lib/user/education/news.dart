@@ -1,41 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class News extends StatelessWidget {
   const News({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: Scaffold(
-      appBar: AppBar(
-        title: const Text("News"),
-        backgroundColor: Colors.green.shade700,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            NewsPane(
-              title: 'How recycle can help the environment',
-              image: 'assets/images/SortWaste.png',
-              date: '18 March 2024',
-              onTap: () {
-                print("Tap on the news pane");
-              },
-            ),
-            SizedBox(height: 10),
-            NewsPane(
-              title: 'This is News',
-              image: 'assets/images/SortWaste.png',
-              date: '18 March 2024',
-              onTap: () {
-                print("Tap on the news pane");
-              },
-            ),
-
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("News"),
+          backgroundColor: Colors.green.shade700,
         ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                NewsPane(
+                  title: 'How and Where to Recycle Your Old Computers and Printers',
+                  image: 'assets/images/SortWaste.png',
+                  date: '30 June 2025',
+                  url: 'https://www.cnet.com/tech/computing/how-and-where-to-recycle-your-old-computers-and-printers/',
+                ),
+                const SizedBox(height: 10),
+                NewsPane(
+                  title: 'Rural recycling on the rise',
+                  image: 'assets/images/SortWaste.png',
+                  date: '06 July 2025',
+                  url: 'https://www.sunlive.co.nz/news/368387-rural-recycling-on-the-rise.html',
+                ),
+                const SizedBox(height: 10),
+                NewsPane(
+                  title: 'How to recycle your beauty empties',
+                  image: 'assets/images/SortWaste.png',
+                  date: '02 May 2025',
+                  url: 'https://www.russh.com/how-to-recycle-your-beauty-empties/',
+                ),
+              ],
+            ),
+          ),
+        )
+
       ),
-    ),
     );
   }
 }
@@ -44,20 +51,32 @@ class NewsPane extends StatelessWidget {
   final String title;
   final String image;
   final String date;
-  final VoidCallback onTap;
+  final String url;
 
   const NewsPane({
     super.key,
     required this.title,
     required this.image,
     required this.date,
-    required this.onTap,
+    required this.url,
   });
+
+  //Function to launch URL
+  Future<void> _launchURL(BuildContext context) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch the news link')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () => _launchURL(context), // ✅ Launch URL on tap
       borderRadius: BorderRadius.circular(16),
       splashColor: Colors.black12,
       child: Card(
@@ -79,7 +98,6 @@ class NewsPane extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-
             // TEXT CONTAINER
             Container(
               width: double.infinity,
@@ -108,10 +126,8 @@ class NewsPane extends StatelessWidget {
               ),
             ),
           ],
-
         ),
       ),
     );
-
   }
 }
