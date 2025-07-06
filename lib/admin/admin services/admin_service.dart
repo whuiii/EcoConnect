@@ -17,6 +17,8 @@ class AdminService {
     required String phone,
     required String password,
     required String confirmPassword,
+    required double latitude,
+    required double longitude,
   }) async {
     if (password != confirmPassword) {
       return "Passwords do not match.";
@@ -32,11 +34,13 @@ class AdminService {
       String uid = userCredential.user!.uid;
 
       // Store extra data in Firestore
-      await _firestore.collection('admins').doc(uid).set({
+      await _firestore.collection('companies').doc(uid).set({
         'companyName': companyName,
         'companyLogo': companyLogo,
         'registrationNumber': registrationNumber,
         'address': address,
+        'latitude': latitude,
+        'longitude': longitude,
         'email': email,
         'phone': phone,
         'uid': uid,
@@ -49,7 +53,7 @@ class AdminService {
       return null; // success
     } catch (e) {
       print(e);
-      return "Admin registration failed: ${e.toString()}";
+      return "Company registration failed: ${e.toString()}";
     }
   }
 
@@ -57,14 +61,14 @@ class AdminService {
   Future<Map<String, dynamic>?> getAdminProfile(String uid) async {
     try {
       DocumentSnapshot doc =
-      await _firestore.collection('admins').doc(uid).get();
+      await _firestore.collection('companies').doc(uid).get();
       if (doc.exists) {
         return doc.data() as Map<String, dynamic>;
       } else {
         return null;
       }
     } catch (e) {
-      print("Error getting admin profile: $e");
+      print("Error getting company profile: $e");
       return null;
     }
   }
@@ -72,12 +76,12 @@ class AdminService {
   // Get all admin companies
   Future<List<Map<String, dynamic>>> getAllAdmins() async {
     try {
-      QuerySnapshot snapshot = await _firestore.collection('admins').get();
+      QuerySnapshot snapshot = await _firestore.collection('companies').get();
       return snapshot.docs.map((doc) {
         return doc.data() as Map<String, dynamic>;
       }).toList();
     } catch (e) {
-      print("Error fetching admins: $e");
+      print("Error fetching companies: $e");
       return [];
     }
   }
