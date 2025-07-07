@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -46,9 +47,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
   //Fetch Delivery Data from Deliveries
   Future<void> fetchData() async {
     setState(() => isLoading = true);
+    final currentAdminUid = FirebaseAuth.instance.currentUser?.uid;
+    if (currentAdminUid == null) return;
 
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('deliveries')
+        .where('companyUid', isEqualTo: currentAdminUid)
         .orderBy('completedAt', descending: false)
         .get();
 
@@ -136,9 +140,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final now = _viewDate;
     final start = DateTime(now.year, now.month, 1);
     final end = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
-
+    final currentAdminUid = FirebaseAuth.instance.currentUser!.uid;
+    print(currentAdminUid);
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('deliveries')
+        .where('companyUid', isEqualTo: currentAdminUid)
         .orderBy('completedAt', descending: false)
         .get();
 
@@ -205,9 +211,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final start =
         _viewDate.subtract(Duration(days: _viewDate.weekday - 1)); // Monday
     final end = start.add(const Duration(days: 6)); // Sunday
+    //Get the current company uid
+    final currentAdminUid = FirebaseAuth.instance.currentUser!.uid;
 
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('deliveries')
+        .where('companyUid', isEqualTo: currentAdminUid)
         .orderBy('completedAt', descending: false)
         .get();
 

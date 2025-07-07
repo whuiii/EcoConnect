@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:navigate/admin/admin_navigation_bar.dart';
 import 'package:navigate/mainpage.dart';
 import 'package:navigate/login.dart';
 import 'package:navigate/menu.dart';
@@ -18,7 +19,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => RegisterPage());
       case '/3':
         return MaterialPageRoute(builder: (_) => ProviderPage());
-
+      case '/4':
+        return MaterialPageRoute(builder: (_) => AdminNavigate());
       default:
         return MaterialPageRoute(builder: (_) => MainPage());
     }

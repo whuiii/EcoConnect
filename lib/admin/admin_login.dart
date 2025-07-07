@@ -66,8 +66,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
     if (userCredential != null) {
       _showMessage("Login successful");
-      Get.to(AdminNavigate());
-      //Navigator.of(context).pushNamed('/3');
+      Navigator.of(context).pushNamed('/4');
     } else {
       _showMessage("Invalid credentials. Please try again.");
     }

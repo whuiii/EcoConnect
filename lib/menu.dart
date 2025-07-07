@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:navigate/color.dart';
 import 'package:navigate/models/user_model.dart';
-import 'package:navigate/user/delivery/delivery.dart';
+import 'package:navigate/user/delivery/delivery_homepage.dart';
 import 'package:navigate/user/education/education.dart';
 import 'package:navigate/user/ranking.dart/cubit_ranking.dart';
 import 'package:navigate/user/ranking.dart/page_ranking.dart';

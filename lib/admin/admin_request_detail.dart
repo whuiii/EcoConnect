@@ -328,7 +328,7 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Delivery Details (Admin)"),
+        title: Text("Delivery Details"),
         backgroundColor: green3,
       ),
       body: isLoading
@@ -485,7 +485,11 @@ class _AdminDeliveryDetailPageState extends State<AdminDeliveryDetailPage> {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 FillInBlank(
-                    text: value, icon: icon, hint: title, isEnabled: false),
+                    text: value,
+                    icon: icon,
+                    showLabel: true,
+                    hint: title,
+                    isEnabled: false),
                 SizedBox(height: 4),
               ],
             ),

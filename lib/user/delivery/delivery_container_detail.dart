@@ -123,7 +123,11 @@ class DeliveryDetailPage extends StatelessWidget {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 FillInBlank(
-                    text: value, icon: icon, hint: title, isEnabled: false),
+                    text: value,
+                    showLabel: true,
+                    icon: icon,
+                    hint: title,
+                    isEnabled: false),
                 SizedBox(height: 4),
               ],
             ),
