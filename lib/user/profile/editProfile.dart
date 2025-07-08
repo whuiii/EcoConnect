@@ -9,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 import '../../color.dart';
-import '../../utilis.dart'; // Make sure pickImage() is defined here
+import '../../utilis.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -20,11 +20,9 @@ class _EditProfileState extends State<EditProfile> {
   Uint8List? _image;
   String? existingImageUrl;
 
-  // Controllers for fields
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -38,18 +36,19 @@ class _EditProfileState extends State<EditProfile> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('No user signed in.');
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final userDoc =
+      await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         final data = userDoc.data()!;
         _usernameController.text = data['username'] ?? '';
         _emailController.text = data['email'] ?? '';
         _phoneController.text = data['phone'] ?? '';
-        _bioController.text = data['bio'] ?? '';
         existingImageUrl = data['profileImage'];
 
         if (existingImageUrl != null && existingImageUrl!.isNotEmpty) {
-          final networkImage = await networkImageToUint8List(existingImageUrl!);
+          final networkImage =
+          await networkImageToUint8List(existingImageUrl!);
           setState(() {
             _image = networkImage;
           });
@@ -104,11 +103,13 @@ class _EditProfileState extends State<EditProfile> {
         'username': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'bio': _bioController.text.trim(),
         'profileImage': imageUrl,
       };
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).update(updatedData);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update(updatedData);
 
       QuickAlert.show(
         context: context,
@@ -139,7 +140,8 @@ class _EditProfileState extends State<EditProfile> {
               TextField(
                 controller: currentPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Current Password'),
+                decoration:
+                const InputDecoration(labelText: 'Current Password'),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -151,7 +153,8 @@ class _EditProfileState extends State<EditProfile> {
               TextField(
                 controller: confirmPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Confirm New Password'),
+                decoration:
+                const InputDecoration(labelText: 'Confirm New Password'),
               ),
             ],
           ),
@@ -162,7 +165,7 @@ class _EditProfileState extends State<EditProfile> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final current = currentPasswordController.text.trim();
               final newPass = newPasswordController.text.trim();
               final confirm = confirmPasswordController.text.trim();
@@ -183,15 +186,34 @@ class _EditProfileState extends State<EditProfile> {
                 );
                 return;
               }
-              setState(() {
-                _passwordController.text = newPass;
-              });
-              Navigator.of(context).pop();
-              QuickAlert.show(
-                context: context,
-                type: QuickAlertType.success,
-                text: "Password updated locally! (Hook up your backend)",
-              );
+
+              try {
+                final user = FirebaseAuth.instance.currentUser;
+                final email = user?.email;
+                if (email == null) throw Exception('No user email found.');
+
+                final cred = EmailAuthProvider.credential(
+                  email: email,
+                  password: current,
+                );
+
+                await user!.reauthenticateWithCredential(cred);
+                await user.updatePassword(newPass);
+
+                Navigator.of(context).pop();
+
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.success,
+                  text: "Password changed successfully!",
+                );
+              } catch (e) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.error,
+                  text: "Failed: ${e.toString()}",
+                );
+              }
             },
             child: const Text('Save'),
           ),
@@ -205,7 +227,6 @@ class _EditProfileState extends State<EditProfile> {
     _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _bioController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -223,12 +244,14 @@ class _EditProfileState extends State<EditProfile> {
                 Stack(
                   children: [
                     _image != null
-                        ? CircleAvatar(radius: 60, backgroundImage: MemoryImage(_image!))
+                        ? CircleAvatar(
+                        radius: 60, backgroundImage: MemoryImage(_image!))
                         : CircleAvatar(
                       radius: 60,
                       backgroundImage: existingImageUrl != null
                           ? NetworkImage(existingImageUrl!)
-                          : AssetImage('assets/images/EcoConnect_Logo.png')
+                          : AssetImage(
+                          'assets/images/EcoConnect_Logo.png')
                       as ImageProvider,
                     ),
                     Positioned(
@@ -251,17 +274,29 @@ class _EditProfileState extends State<EditProfile> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text("EcoConnect", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
+                const Text("EcoConnect",
+                    style:
+                    TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 30),
                 const Divider(),
                 const SizedBox(height: 10),
-                _buildTextField(controller: _usernameController, label: "Username", hint: "Username", icon: Iconsax.user),
+                _buildTextField(
+                    controller: _usernameController,
+                    label: "Username",
+                    hint: "Username",
+                    icon: Iconsax.user),
                 const SizedBox(height: 20),
-                _buildTextField(controller: _emailController, label: "Email", hint: "Email", icon: Iconsax.sms),
+                _buildTextField(
+                    controller: _emailController,
+                    label: "Email",
+                    hint: "Email",
+                    icon: Iconsax.sms),
                 const SizedBox(height: 20),
-                _buildTextField(controller: _phoneController, label: "Phone Number", hint: "Phone Number", icon: Iconsax.call),
-                const SizedBox(height: 20),
-                _buildTextField(controller: _bioController, label: "Bio", hint: "Write something about yourself", icon: Iconsax.note_text, maxLines: 3),
+                _buildTextField(
+                    controller: _phoneController,
+                    label: "Phone Number",
+                    hint: "Phone Number",
+                    icon: Iconsax.call),
                 const SizedBox(height: 20),
                 TextField(
                   controller: _passwordController,
@@ -276,11 +311,13 @@ class _EditProfileState extends State<EditProfile> {
                       onPressed: _showChangePasswordDialog,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+                      borderSide:
+                      BorderSide(color: Colors.grey.shade200, width: 2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                      borderSide:
+                      const BorderSide(color: Colors.black, width: 1.5),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -306,8 +343,10 @@ class _EditProfileState extends State<EditProfile> {
                     },
                     color: button,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: const Text("Save Changes", style: TextStyle(fontSize: 16, color: Colors.white)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Text("Save Changes",
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ],

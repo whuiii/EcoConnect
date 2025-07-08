@@ -182,15 +182,15 @@ class AdminProfile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    ProfileMenuWidget(
-                      title: "Settings",
-                      icon: Icons.settings_outlined,
-                      onPress: () {
-                        Get.to(AboutUs());
-                      },
-                    ),
+                    // const Divider(),
+                    // const SizedBox(height: 10),
+                    // ProfileMenuWidget(
+                    //   title: "Settings",
+                    //   icon: Icons.settings_outlined,
+                    //   onPress: () {
+                    //     Get.to(AboutUs());
+                    //   },
+                    // ),
                     const Divider(),
                     ProfileMenuWidget(
                       title: "About Us",

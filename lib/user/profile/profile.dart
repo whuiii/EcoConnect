@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/color.dart';
@@ -11,34 +13,62 @@ import 'package:navigate/user/profile/termsConditions.dart';
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
+  Future<Map<String, String>> fetchUserData() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return {'username': 'EcoConnect', 'email': '', 'address': ''};
+
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data()!;
+        return {
+          'username': data['username'] ?? 'EcoConnect',
+          'email': data['email'] ?? '',
+          'address': data['address'] ?? '',
+        };
+      } else {
+        return {'username': 'EcoConnect', 'email': '', 'address': ''};
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return {'username': 'EcoConnect', 'email': '', 'address': ''};
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Top Container
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: green3,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                padding: const EdgeInsets.all(30),
-                child: Column(
-                  children: [
-                    Stack(
+          child: FutureBuilder<Map<String, String>>(
+            future: fetchUserData(),
+            builder: (context, snapshot) {
+              final username = snapshot.data?['username'] ?? 'EcoConnect';
+              final userEmail = snapshot.data?['email'] ?? '';
+              final userAddress = snapshot.data?['address'] ?? '';
+
+              return Column(
+                children: [
+                  // Top Container
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: green3,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(30),
+                    child: Column(
                       children: [
                         Container(
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white, // Background color behind the image
+                            color: Colors.white,
                             border: Border.all(
                               color: Colors.white,
                               width: 4,
@@ -58,141 +88,157 @@ class Profile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // Positioned(
-                        //   bottom: 0,
-                        //   right: 0,
-                        //   child: Container(
-                        //     width: 30,
-                        //     height: 30,
-                        //     decoration: BoxDecoration(
-                        //       borderRadius: BorderRadius.circular(100),
-                        //       color: Colors.grey.shade300,
-                        //     ),
-                        //     child: Icon(
-                        //       Icons.edit,
-                        //       size: 18,
-                        //       color: Colors.grey.shade800,
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-                    const Text(
-                      "EcoConnect",
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white),
-                    ),
-                    const Text(
-                      "Bio Data: Recycle, Reuse, Reduce",
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
-                    // const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-
-              // Bottom Container (White)
-              Container(
-                width: double.infinity,
-                color: back1,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 200,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.to(EditProfile());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: button,
-                          foregroundColor: button,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        const SizedBox(height: 15),
+                        snapshot.connectionState == ConnectionState.waiting
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                          username,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
-                        child: const Text(
-                          "Edit Profile",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        const SizedBox(height: 15),
+                        if (userEmail.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.email,
+                                    color: Colors.white, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    userEmail,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (userAddress.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Colors.white, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    userAddress,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // Bottom Container (White)
+                  Container(
+                    width: double.infinity,
+                    color: back1,
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.to(EditProfile());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: button,
+                              foregroundColor: button,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              "Edit Profile",
+                              style:
+                              TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        const Divider(),
+                        ProfileMenuWidget(
+                          title: "About Us",
+                          icon: Icons.info,
+                          onPress: () {
+                            Get.to(AboutUs());
+                          },
+                        ),
+                        ProfileMenuWidget(
+                          title: "Privacy Policy",
+                          icon: Icons.privacy_tip,
+                          onPress: () {
+                            Get.to(PrivacyPolicy());
+                          },
+                        ),
+                        ProfileMenuWidget(
+                          title: "Terms & Conditions",
+                          icon: Icons.star,
+                          onPress: () {
+                            Get.to(TermsConditionsPage());
+                          },
+                        ),
+                        ProfileMenuWidget(
+                          title: "FAQs",
+                          icon: Icons.question_mark,
+                          onPress: () {
+                            Get.to(FAQPage());
+                          },
+                        ),
+                        const Divider(),
+                        ProfileMenuWidget(
+                          title: "Logout",
+                          icon: Icons.logout_rounded,
+                          textColor: Colors.red,
+                          endIcon: false,
+                          onPress: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => MainPage()),
+                                  (route) => false,
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10),
-                    // const Divider(),
-                    // const SizedBox(height: 10),
-                    // ProfileMenuWidget(
-                    //   title: "Settings",
-                    //   icon: Icons.settings_outlined,
-                    //   onPress: () {
-                    //     print("Tap on Setting");
-                    //     Get.to(AboutUs());
-                    //
-                    //   },
-                    // ),
-                    const Divider(),
-                    ProfileMenuWidget(
-                      title: "About Us",
-                      icon: Icons.info,
-                      onPress: () {
-                        print("Tap on About Us");
-                        Get.to(AboutUs());
-
-                      },
-                    ),
-
-                    ProfileMenuWidget(
-                      title: "Privacy Policy",
-                      icon: Icons.privacy_tip,
-                      onPress: () {
-                        print("Tap on Privacy Policy");
-                        Get.to(PrivacyPolicy());
-                      },
-                    ),
-                    ProfileMenuWidget(
-                      title: "Terms & Conditions",
-                      icon: Icons.star,
-                      onPress: () {
-                        print("Tap on Terms and Conditions");
-                        Get.to(TermsConditionsPage());
-                      },
-                    ),
-                    ProfileMenuWidget(
-                      title: "FAQs",
-                      icon: Icons.question_mark,
-                      onPress: () {
-                        print("Tap on FAQs");
-                        Get.to(FAQPage());
-
-                      },
-                    ),
-                    const Divider(),
-                    ProfileMenuWidget(
-                      title: "Logout",
-                      icon: Icons.logout_rounded,
-                      textColor: Colors.red,
-                      endIcon: false,
-                      onPress: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => MainPage()),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -239,15 +285,15 @@ class ProfileMenuWidget extends StatelessWidget {
       ),
       trailing: endIcon
           ? Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                color: Colors.grey.shade300,
-              ),
-              child: Icon(Icons.keyboard_arrow_right,
-                  size: 18, color: Colors.grey.shade800),
-            )
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: Colors.grey.shade300,
+        ),
+        child: Icon(Icons.keyboard_arrow_right,
+            size: 18, color: Colors.grey.shade800),
+      )
           : null,
     );
   }
