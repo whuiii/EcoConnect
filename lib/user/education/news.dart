@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../color.dart';
+
 class News extends StatelessWidget {
   const News({super.key});
 
@@ -10,7 +12,7 @@ class News extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("News"),
-          backgroundColor: Colors.green.shade700,
+          backgroundColor: green3,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -19,21 +21,21 @@ class News extends StatelessWidget {
               children: [
                 NewsPane(
                   title: 'How and Where to Recycle Your Old Computers and Printers',
-                  image: 'assets/images/SortWaste.png',
+                  image: 'assets/images/news1.jpg',
                   date: '30 June 2025',
                   url: 'https://www.cnet.com/tech/computing/how-and-where-to-recycle-your-old-computers-and-printers/',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 NewsPane(
                   title: 'Rural recycling on the rise',
-                  image: 'assets/images/SortWaste.png',
+                  image: 'assets/images/news2.png',
                   date: '06 July 2025',
                   url: 'https://www.sunlive.co.nz/news/368387-rural-recycling-on-the-rise.html',
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 NewsPane(
                   title: 'How to recycle your beauty empties',
-                  image: 'assets/images/SortWaste.png',
+                  image: 'assets/images/news3.jpg',
                   date: '02 May 2025',
                   url: 'https://www.russh.com/how-to-recycle-your-beauty-empties/',
                 ),

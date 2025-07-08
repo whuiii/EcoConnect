@@ -5,6 +5,8 @@ import 'package:navigate/user/education/metal.dart';
 import 'package:navigate/user/education/organic.dart';
 import 'package:navigate/user/education/paper.dart';
 import 'package:navigate/user/education/plastic.dart';
+
+import '../../color.dart';
 // TODO: Import actual screens for paper, waste, plastic bins when ready
 
 class WasteSort extends StatelessWidget {
@@ -17,7 +19,7 @@ class WasteSort extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Recycling Bins'),
         centerTitle: true,
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: green3,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -70,14 +72,14 @@ class WasteSort extends StatelessWidget {
                         Get.to(PaperBin());
                       },
                     ),
-                    RecyclingBin(
-                      color: 'black',
-                      label: 'General Waste',
-                      icon: 'assets/images/organic.png',
-                      onTap: () {
-                        Get.to(OrganicBin());
-                      },
-                    ),
+                    // RecyclingBin(
+                    //   color: 'black',
+                    //   label: 'General Waste',
+                    //   icon: 'assets/images/organic.png',
+                    //   onTap: () {
+                    //     Get.to(OrganicBin());
+                    //   },
+                    // ),
                     RecyclingBin(
                       color: 'orange',
                       label: 'Metal',

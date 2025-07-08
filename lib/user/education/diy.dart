@@ -84,7 +84,7 @@ class _DiyVideoState extends State<DiyVideo> {
   Widget _buildInitialHeader() {
     return Container(
       width: double.infinity,
-      height: 250,
+      height: 230,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       decoration: const BoxDecoration(
         boxShadow: [
@@ -112,19 +112,19 @@ class _DiyVideoState extends State<DiyVideo> {
                 child: Text(
                   "Learn to create fun and useful items using recyclable materials. "
                       "Eco-friendly, creative, and easy to do at home!",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 30),
-          Row(
-            children: [
-              _buildInfoBox("Avg Time: 5-10 mins"),
-              const SizedBox(width: 20),
-              _buildInfoBox("Eco-friendly", width: 140),
-            ],
-          ),
+          const SizedBox(height: 10),
+          // Row(
+          //   children: [
+          //     _buildInfoBox("Avg Time: 5-10 mins"),
+          //     const SizedBox(width: 20),
+          //     _buildInfoBox("Eco-friendly", width: 140),
+          //   ],
+          // ),
         ],
       ),
     );
