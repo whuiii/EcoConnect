@@ -6,6 +6,7 @@ class FillInBlank extends StatelessWidget {
   final String hint;
   final IconData icon;
   final bool isEnabled;
+  final bool showLabel;
   final TextEditingController? controller;
   const FillInBlank(
       {super.key,
@@ -13,7 +14,7 @@ class FillInBlank extends StatelessWidget {
       required this.icon,
       required this.hint,
       required this.isEnabled,
-      this.controller});
+      this.controller, required this.showLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,9 @@ class FillInBlank extends StatelessWidget {
       cursorColor: Colors.black,
       controller: controller,
       decoration: InputDecoration(
-        labelText: text,
+        labelText: showLabel ? text : null,
         hintText: hint,
+        
         filled: true, // Enable background fill
         fillColor: isEnabled ? Colors.white : Colors.grey[100],
         hintStyle: TextStyle(

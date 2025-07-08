@@ -7,7 +7,7 @@ import 'package:navigate/user/delivery/delivery_info.dart';
 import 'package:navigate/user/delivery/page_delivery.dart';
 
 import '../../color.dart';
-import 'delivery_form.dart';
+import 'add_delivery_request.dart';
 
 class DeliveryRequest extends StatelessWidget {
   const DeliveryRequest({super.key});

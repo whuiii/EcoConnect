@@ -17,7 +17,8 @@ class DeliveryService {
       required double latitude,
       required double longitude,
       required String remark,
-      required String status}) async {
+      required String status,
+      required String companyUid}) async {
     // Format date to dd/MM/yyyy
     String formattedDate = DateFormat('dd/MM/yyyy').format(date);
 
@@ -35,6 +36,7 @@ class DeliveryService {
       'longitude': longitude,
       'remark': remark,
       'status': status,
+      'companyUid': companyUid,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

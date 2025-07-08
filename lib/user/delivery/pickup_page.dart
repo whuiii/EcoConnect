@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart' as loc;
@@ -8,6 +10,7 @@ import 'package:navigate/color.dart';
 import 'package:navigate/services/delivery_service.dart';
 import 'package:navigate/user/delivery/bagsize_roundcheck.dart';
 import 'package:navigate/user/delivery/dateTimePicker.dart';
+import 'package:navigate/user/delivery/placeholder_address.dart';
 import 'package:navigate/user/delivery/placeholder_delivery.dart';
 import 'package:navigate/menu.dart';
 
@@ -31,6 +34,7 @@ class _PickUpFormState extends State<PickUpForm> {
   final _formKey = GlobalKey<FormState>();
 
   //Collect Account (Step 1)
+  bool _loadingUser = true;
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final phoneController = TextEditingController();
@@ -49,10 +53,16 @@ class _PickUpFormState extends State<PickUpForm> {
   LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
   final remarkController = TextEditingController();
 
+  //Get Company List (Step 3)
+  List<Map<String, dynamic>> _companies = [];
+  String? _selectedCompanyUid;
+  Map<String, double> _companyDistances = {};
+
   @override
   void initState() {
     super.initState();
     _requestLocationPermission(); // Request location when widget is initialized
+    _loadUserData();
   }
 
   @override
@@ -64,6 +74,56 @@ class _PickUpFormState extends State<PickUpForm> {
     remarkController.dispose();
     googleMapController.dispose();
     super.dispose();
+  }
+
+//Load User Name, Email and Phone
+  Future<void> _loadUserData() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    if (userDoc.exists) {
+      final data = userDoc.data()!;
+      setState(() {
+        emailController.text = data['email'] ?? '';
+        usernameController.text = data['username'] ?? '';
+        phoneController.text = data['phone'] ?? '';
+        _loadingUser = false;
+      });
+    } else {
+      setState(() {
+        _loadingUser = false;
+      });
+    }
+  }
+
+  //Load Company List and Distance
+  Future<void> _loadCompanies() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('companies').get();
+    setState(() {
+      _companies = snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      for (var company in _companies) {
+        print('Loaded company: ${company['companyName']}');
+
+        final double distance = Geolocator.distanceBetween(
+          myCurrentLocation.latitude,
+          myCurrentLocation.longitude,
+          company['latitude'],
+          company['longitude'],
+        );
+
+        _companyDistances[company['uid']] = distance / 1000.0;
+      }
+
+      if (_companies.isNotEmpty) {
+        _selectedCompanyUid = _companies.first['uid'];
+      }
+    });
   }
 
   Future<void> _requestLocationPermission() async {
@@ -218,12 +278,14 @@ class _PickUpFormState extends State<PickUpForm> {
         longitude: myCurrentLocation.longitude,
         remark: remarkController.text,
         status: "Pending",
+        companyUid: _selectedCompanyUid!,
       );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Delivery successfully saved!')));
+      Navigator.pop(context);
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
@@ -259,7 +321,7 @@ class _PickUpFormState extends State<PickUpForm> {
                     child: Text("Cancel"),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final isLastStep = currentStep == getStep().length - 1;
 
                       if (currentStep == 0) {
@@ -270,7 +332,7 @@ class _PickUpFormState extends State<PickUpForm> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content:
-                                Text('Please fill in your information')),
+                                    Text('Please fill in your information')),
                           );
                           return;
                         }
@@ -290,7 +352,7 @@ class _PickUpFormState extends State<PickUpForm> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content:
-                                Text('Please select estimated quantity')),
+                                    Text('Please select estimated quantity')),
                           );
                           return;
                         }
@@ -322,6 +384,7 @@ class _PickUpFormState extends State<PickUpForm> {
                           );
                           return;
                         }
+                        await _loadCompanies();
                       }
                       if (isLastStep) {
                         // Final submit
@@ -357,28 +420,28 @@ class _PickUpFormState extends State<PickUpForm> {
             child: Column(
               children: [
                 FillInBlank(
-                  text: "Email",
-                  isEnabled: true,
-                  hint: "Email",
-                  icon: Iconsax.sms,
-                  controller: emailController,
-                ),
+                    text: emailController.text,
+                    isEnabled: false,
+                    hint: "Email",
+                    icon: Iconsax.sms,
+                    controller: emailController,
+                    showLabel: false),
                 SizedBox(height: 16),
                 FillInBlank(
-                  text: "Username",
-                  isEnabled: true,
-                  hint: "Username",
-                  icon: Iconsax.user,
-                  controller: usernameController,
-                ),
+                    text: usernameController.text,
+                    isEnabled: false,
+                    hint: "Username",
+                    icon: Iconsax.user,
+                    controller: usernameController,
+                    showLabel: false),
                 SizedBox(height: 16),
                 FillInBlank(
-                  text: "Phone Number",
-                  hint: "Phone Number",
-                  isEnabled: true,
-                  icon: Iconsax.call,
-                  controller: phoneController,
-                ),
+                    text: phoneController.text,
+                    isEnabled: false,
+                    hint: "Phone Number",
+                    icon: Iconsax.call,
+                    controller: phoneController,
+                    showLabel: false),
                 LabelText(text: "Recyclable Materials:"),
                 Column(
                   children: [
@@ -451,7 +514,6 @@ class _PickUpFormState extends State<PickUpForm> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: "Your Address",
-                  labelText: currentAddress,
                   prefixIcon: Icon(Iconsax.location),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.search),
@@ -479,11 +541,13 @@ class _PickUpFormState extends State<PickUpForm> {
               ),
               SizedBox(height: 10),
               FillInBlank(
-                  text: "Remarks",
-                  controller: remarkController,
-                  icon: Iconsax.edit,
-                  hint: "Remarks",
-                  isEnabled: true),
+                text: "Remarks",
+                controller: remarkController,
+                icon: Iconsax.edit,
+                hint: "Remarks",
+                isEnabled: true,
+                showLabel: false,
+              ),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -531,34 +595,103 @@ class _PickUpFormState extends State<PickUpForm> {
         ),
         Step(
           isActive: currentStep >= 2,
-          title: Text("Complete"),
+          title: const Text("Complete"),
           content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 48),
-              SizedBox(height: 10),
-              Text("All steps completed!",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              LabelText(text: "Company Name:"),
-              FillInBlank(
-                  text: "Sun Soon Yik Sdn Bhd",
-                  icon: Iconsax.building,
-                  hint: "Company Details",
-                  isEnabled: false),
-              SizedBox(height: 10),
-              LabelText(text: "Driver Name:"),
-              FillInBlank(
-                  text: "Yusuf Taiyoob",
-                  icon: Iconsax.user,
-                  hint: "Driver Name",
-                  isEnabled: false),
-              SizedBox(height: 10),
-              LabelText(text: "Driver Contact No:"),
-              FillInBlank(
-                  text: "0118885555",
-                  icon: Iconsax.call,
-                  hint: "Driver Contact",
-                  isEnabled: false),
+              const Icon(Icons.check_circle, color: Colors.green, size: 48),
+              const SizedBox(height: 10),
+              const Text(
+                "All steps completed!",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              const LabelText(text: "Select a Company:"),
+              DropdownButtonFormField<String>(
+                isExpanded: true,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                value: _selectedCompanyUid,
+                items: _companies.map((company) {
+                  final distance = _companyDistances[company['uid']] ?? 0.0;
+                  return DropdownMenuItem<String>(
+                    value: company['uid'],
+                    child: SizedBox(
+                        height: 60,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                company['companyName'] ?? 'Unnamed Company',
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w500),
+                                overflow:
+                                    TextOverflow.ellipsis, // Prevent overflow
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              "${distance.toStringAsFixed(2)} km",
+                              style: TextStyle(
+                                  fontSize: 9, color: Colors.grey[600]),
+                            ),
+                          ],
+                        )),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCompanyUid = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              if (_selectedCompanyUid != null)
+                Builder(builder: (context) {
+                  final selectedCompany = _companies.firstWhere(
+                    (company) => company['uid'] == _selectedCompanyUid,
+                    orElse: () => {},
+                  );
+                  if (selectedCompany.isEmpty) {
+                    return const Text("Company details not available");
+                  }
+                  return Column(
+                    children: [
+                      FillInBlank(
+                        text: selectedCompany['companyName'] ?? '',
+                        icon: Iconsax.building,
+                        hint: "Company Name",
+                        showLabel: true,
+                        isEnabled: false,
+                      ),
+                      const SizedBox(height: 10),
+                      FillInBlank(
+                        text: selectedCompany['email'] ?? '',
+                        icon: Icons.email,
+                        hint: "Company Email",
+                        showLabel: true,
+                        isEnabled: false,
+                      ),
+                      const SizedBox(height: 10),
+                      FillInBlank(
+                        text: selectedCompany['phone'] ?? '',
+                        icon: Iconsax.call,
+                        hint: "Company Phone",
+                        showLabel: true,
+                        isEnabled: false,
+                      ),
+                      const SizedBox(height: 10),
+                      AddressPlaceholder(
+                          selectedCompany:
+                              selectedCompany['address'] ?? 'no valid address')
+                    ],
+                  );
+                }),
             ],
           ),
         ),
@@ -645,7 +778,3 @@ class LabelText extends StatelessWidget {
     );
   }
 }
-
-
-
-

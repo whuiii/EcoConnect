@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart'; // Optional: for modern icons
-import 'package:navigate/user/delivery/pickUp_Container.dart';
-import 'package:navigate/user/delivery/dropOff.dart';
+import 'package:navigate/color.dart';
+import 'package:navigate/user/delivery/pickup_page.dart';
+import 'package:navigate/user/delivery/drop_off_list.dart';
 
 class Delivery extends StatefulWidget {
   const Delivery({super.key});
@@ -49,7 +50,7 @@ class _DeliveryState extends State<Delivery> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: isSelected ? Colors.green : Colors.grey.shade300,
+            color: isSelected ? green2 : Colors.grey.shade300,
             width: 2,
           ),
         ),
@@ -60,7 +61,7 @@ class _DeliveryState extends State<Delivery> {
               Icon(
                 icon,
                 size: 40,
-                color: isSelected ? Colors.green : Colors.grey.shade700,
+                color: isSelected ? green2 : Colors.grey.shade700,
               ),
               SizedBox(width: 16),
               Expanded(
@@ -72,7 +73,7 @@ class _DeliveryState extends State<Delivery> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.green : Colors.black,
+                        color: isSelected ? green2 : Colors.black,
                       ),
                     ),
                     SizedBox(height: 4),
@@ -83,8 +84,7 @@ class _DeliveryState extends State<Delivery> {
                   ],
                 ),
               ),
-              if (isSelected)
-                Icon(Icons.check_circle, color: Colors.green, size: 28),
+              if (isSelected) Icon(Icons.check_circle, color: green2, size: 28),
             ],
           ),
         ),
@@ -97,7 +97,6 @@ class _DeliveryState extends State<Delivery> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Choose Delivery Option"),
-        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -111,7 +110,8 @@ class _DeliveryState extends State<Delivery> {
             SizedBox(height: 30),
             _buildOptionCard(
               title: "Pick-Up Service",
-              description: "We’ll come to your location to collect your recyclables.",
+              description:
+                  "We’ll come to your location to collect your recyclables.",
               icon: Iconsax.truck, // uses iconsax, can change
               optionValue: "Pick-Up",
             ),
@@ -128,10 +128,9 @@ class _DeliveryState extends State<Delivery> {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: _continue,
-                icon: Icon(Icons.arrow_forward),
                 label: Text("Continue"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: green2,
                   textStyle: TextStyle(fontSize: 18),
                 ),
               ),
