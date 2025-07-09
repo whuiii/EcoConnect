@@ -1,27 +1,35 @@
 [
   {
-    "title": "Soap Making",
-    "time": "45 seconds",
-    "thumbnail": "assets/images/FunFact.png",
-    "videoUrl": "https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4"
+    "title": "Make Soap from Used oil",
+    "time": "2 minutes 32 seconds",
+    "thumbnail": "assets/images/diy1.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=wFNtxbo3m8A&ab_channel=EcoKnights",
+    "author": "EcoKnights",
+    "description": "An effort of our amazing Dutch interns, Valerie and Luuk, here's showing you how we make our eco soaps from used cooking oil"
   },
   {
     "title": "Trash bin From Cardboard",
-    "time": "55 seconds",
-    "thumbnail": "assets/images/SortWaste.png",
-    "videoUrl": "https://www.youtube.com/watch?v=IOb0R7tObD0&ab_channel=GoodHousekeeping"
+    "time": "37 seconds",
+    "thumbnail": "assets/images/diy2.png",
+    "videoUrl": "https://www.youtube.com/watch?v=IOb0R7tObD0&ab_channel=GoodHousekeeping",
+    "author": "Good Housekeeping",
+    "description": "Bored at home? Recycle an old soda bottle to create an adorable animal plant pot!\n\n*STEPS*\n0:05 Draw an animal outline on a clear, plastic bottle with a dry erase marker.  \n0:08 Cut out the outline with scissors. \n0:12 Wipe off the dry erase marker outline from the cut-out bottle. \n0:14 Coat the bottle with acrylic paint and let dry. \n0:20 Draw on your animal’s face with paint pens and permanent marker. \n0:26 Pot your plant inside the planter with potting soil. \n\n*SUPPLIES*\n2-liter soda bottle\nDry erase marker\nScissors \nAcrylic paint\nPaint pens\nPermanent marker\nPotting soil\nSmall plant\n\n*TIPS*\nUse a box cutter to poke a slit in the bottle before cutting out the animal outline with scissors. \nOptional: You can also use the box cutter to create small drainage holes on the bottom of the bottle."
   },
   {
-    "title": "Squat Kickback",
-    "time": "60 seconds",
-    "thumbnail": "assets/images/EcoConnect_Logo.png",
-    "videoUrl": "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4"
+    "title": "Desktop Organizer",
+    "time": "5 minutes 41 seconds",
+    "thumbnail": "assets/images/diy3.png",
+    "videoUrl": "https://www.youtube.com/watch?v=rgh_hI712bI&ab_channel=BirPar%C3%A7aKa%C4%9F%C4%B1t",
+    "author": "Bir Parça Kağıt",
+    "description": "DIY Desktop Organizer Waste Paper | Recycle waste paper | Paper Crafts | pen holder organizer | diy desk organizer | pen stand | paper desk organizer\n\nMaterials I Use\n\n. Waste paper\n. 6 mm skewer\n. Pva craft glue\n. Glue gun\n. Cardboard\n. Acrylic paint"
   },
   {
-    "title": "Squat with Side Leg Lift",
-    "time": "120 seconds",
-    "thumbnail": "assets/images/EcoConnect_Logo.png",
-    "videoUrl": "https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4"
+    "title": "Cardboard Calendar",
+    "time": "11 minutes 53 seconds",
+    "thumbnail": "assets/images/diy4.png",
+    "videoUrl": "https://www.youtube.com/watch?v=CrngKvTJagk&ab_channel=TatzkreenArt",
+    "author": "Takzreen Art",
+    "description": "Tutorial video on how to make Creative desk calendar out of cardboard. Cardboard home decor ideas.\n\nRequirements:\n\n• Cardboard\n• Glue\n• Scissor\n• Pencil\n• Ruler\n• Bond Paper\n• Glue Gun\n"
   }
 
 ]

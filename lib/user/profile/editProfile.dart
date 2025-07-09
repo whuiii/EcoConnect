@@ -9,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 import '../../color.dart';
-import '../../utilis.dart';
+import '../../utilis.dart'; // your pickImage helper
 
 class EditProfile extends StatefulWidget {
   @override
@@ -36,9 +36,7 @@ class _EditProfileState extends State<EditProfile> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('No user signed in.');
 
-      final userDoc =
-      await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (userDoc.exists) {
         final data = userDoc.data()!;
         _usernameController.text = data['username'] ?? '';
@@ -47,15 +45,14 @@ class _EditProfileState extends State<EditProfile> {
         existingImageUrl = data['profileImage'];
 
         if (existingImageUrl != null && existingImageUrl!.isNotEmpty) {
-          final networkImage =
-          await networkImageToUint8List(existingImageUrl!);
+          final networkImage = await networkImageToUint8List(existingImageUrl!);
           setState(() {
             _image = networkImage;
           });
         }
       }
     } catch (e) {
-      print('Error loading profile: $e');
+      print('❌ Error loading profile: $e');
     }
   }
 
@@ -69,23 +66,60 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void selectImage() async {
-    Uint8List img = await pickImage(ImageSource.gallery);
-    setState(() {
-      _image = img;
-    });
+    Uint8List? img = await pickImage(ImageSource.gallery);
+    if (img != null) {
+      // Confirm with user before saving
+      bool confirm = await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Confirm Image"),
+          content: const Text("Use this image for your profile?"),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirm")),
+          ],
+        ),
+      );
+      if (confirm == true) {
+        setState(() {
+          _image = img;
+        });
+      } else {
+        print('❌ [DEBUG] User cancelled image selection.');
+      }
+    } else {
+      print('❌ [DEBUG] No image picked.');
+    }
   }
 
   Future<String> uploadImageToStorage(Uint8List image) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    final ref = firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('profileImages')
-        .child('$uid.jpg');
+    try {
+      print('🟢 [DEBUG] Starting image upload...');
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) throw Exception('User not signed in');
+      if (image.isEmpty) throw Exception('Image data is empty');
 
-    firebase_storage.UploadTask uploadTask = ref.putData(image);
-    firebase_storage.TaskSnapshot snap = await uploadTask;
-    String downloadUrl = await snap.ref.getDownloadURL();
-    return downloadUrl;
+      final ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('profileImages')
+          .child('$uid.jpg');
+
+      print('🟢 [DEBUG] Uploading to path: ${ref.fullPath}');
+      firebase_storage.UploadTask uploadTask = ref.putData(image);
+
+      uploadTask.snapshotEvents.listen((snap) {
+        print('📡 [DEBUG] State: ${snap.state}, ${snap.bytesTransferred}/${snap.totalBytes}');
+      });
+
+      firebase_storage.TaskSnapshot snap = await uploadTask;
+      String downloadUrl = await snap.ref.getDownloadURL();
+      print('✅ [DEBUG] Uploaded. URL: $downloadUrl');
+      return downloadUrl;
+
+    } catch (e) {
+      print('❌ [DEBUG] Upload error: $e');
+      throw Exception('Upload failed: $e');
+    }
   }
 
   Future<void> saveProfileChanges() async {
@@ -94,7 +128,6 @@ class _EditProfileState extends State<EditProfile> {
       if (uid == null) throw Exception('No user signed in.');
 
       String imageUrl = existingImageUrl ?? '';
-
       if (_image != null) {
         imageUrl = await uploadImageToStorage(_image!);
       }
@@ -106,113 +139,57 @@ class _EditProfileState extends State<EditProfile> {
         'profileImage': imageUrl,
       };
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update(updatedData);
-
-      QuickAlert.show(
-        context: context,
-        type: QuickAlertType.success,
-        text: "Profile updated successfully!",
-      );
+      await FirebaseFirestore.instance.collection('users').doc(uid).update(updatedData);
+      QuickAlert.show(context: context, type: QuickAlertType.success, text: "Profile updated!");
     } catch (e) {
-      QuickAlert.show(
-        context: context,
-        type: QuickAlertType.error,
-        text: "Error: ${e.toString()}",
-      );
+      print('❌ [DEBUG] Error saving profile: $e');
+      QuickAlert.show(context: context, type: QuickAlertType.error, text: "Error: ${e.toString()}");
     }
   }
 
   void _showChangePasswordDialog() {
-    final currentPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Change Password'),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextField(
-                controller: currentPasswordController,
-                obscureText: true,
-                decoration:
-                const InputDecoration(labelText: 'Current Password'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'New Password'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: confirmPasswordController,
-                obscureText: true,
-                decoration:
-                const InputDecoration(labelText: 'Confirm New Password'),
-              ),
-            ],
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: currentPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Current Password')),
+            TextField(controller: newPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'New Password')),
+            TextField(controller: confirmPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Confirm New Password')),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
-              final current = currentPasswordController.text.trim();
-              final newPass = newPasswordController.text.trim();
-              final confirm = confirmPasswordController.text.trim();
+              final current = currentPassCtrl.text.trim();
+              final newPass = newPassCtrl.text.trim();
+              final confirm = confirmPassCtrl.text.trim();
 
               if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.error,
-                  text: "All fields are required!",
-                );
+                QuickAlert.show(context: context, type: QuickAlertType.error, text: "All fields required.");
                 return;
               }
               if (newPass != confirm) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.error,
-                  text: "New passwords do not match!",
-                );
+                QuickAlert.show(context: context, type: QuickAlertType.error, text: "Passwords do not match.");
                 return;
               }
 
               try {
                 final user = FirebaseAuth.instance.currentUser;
-                final email = user?.email;
-                if (email == null) throw Exception('No user email found.');
-
-                final cred = EmailAuthProvider.credential(
-                  email: email,
-                  password: current,
-                );
-
-                await user!.reauthenticateWithCredential(cred);
+                final cred = EmailAuthProvider.credential(email: user!.email!, password: current);
+                await user.reauthenticateWithCredential(cred);
                 await user.updatePassword(newPass);
-
-                Navigator.of(context).pop();
-
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.success,
-                  text: "Password changed successfully!",
-                );
+                Navigator.pop(context);
+                QuickAlert.show(context: context, type: QuickAlertType.success, text: "Password updated!");
               } catch (e) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.error,
-                  text: "Failed: ${e.toString()}",
-                );
+                QuickAlert.show(context: context, type: QuickAlertType.error, text: "Failed: ${e.toString()}");
               }
             },
             child: const Text('Save'),
@@ -237,151 +214,91 @@ class _EditProfileState extends State<EditProfile> {
       child: Scaffold(
         appBar: AppBar(title: const Text("Edit Profile")),
         body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    _image != null
-                        ? CircleAvatar(
-                        radius: 60, backgroundImage: MemoryImage(_image!))
-                        : CircleAvatar(
-                      radius: 60,
-                      backgroundImage: existingImageUrl != null
-                          ? NetworkImage(existingImageUrl!)
-                          : AssetImage(
-                          'assets/images/EcoConnect_Logo.png')
-                      as ImageProvider,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Colors.grey.shade300,
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.add_a_photo, size: 18),
-                          color: Colors.black,
-                          onPressed: selectImage,
-                        ),
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  _image != null
+                      ? CircleAvatar(radius: 60, backgroundImage: MemoryImage(_image!))
+                      : CircleAvatar(
+                    radius: 60,
+                    backgroundImage: existingImageUrl != null
+                        ? NetworkImage(existingImageUrl!)
+                        : const AssetImage('assets/images/EcoConnect_Logo.png') as ImageProvider,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.grey.shade300,
+                      radius: 18,
+                      child: IconButton(
+                        icon: const Icon(Icons.add_a_photo, size: 18),
+                        onPressed: selectImage,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const Text("EcoConnect",
-                    style:
-                    TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 30),
-                const Divider(),
-                const SizedBox(height: 10),
-                _buildTextField(
-                    controller: _usernameController,
-                    label: "Username",
-                    hint: "Username",
-                    icon: Iconsax.user),
-                const SizedBox(height: 20),
-                _buildTextField(
-                    controller: _emailController,
-                    label: "Email",
-                    hint: "Email",
-                    icon: Iconsax.sms),
-                const SizedBox(height: 20),
-                _buildTextField(
-                    controller: _phoneController,
-                    label: "Phone Number",
-                    hint: "Phone Number",
-                    icon: Iconsax.call),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _passwordController,
-                  readOnly: true,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Change Password",
-                    hintText: "********",
-                    prefixIcon: const Icon(Iconsax.key, size: 18),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.black),
-                      onPressed: _showChangePasswordDialog,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide:
-                      BorderSide(color: Colors.grey.shade200, width: 2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide:
-                      const BorderSide(color: Colors.black, width: 1.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text("EcoConnect", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
+              const Divider(height: 40),
+              _buildTextField(_usernameController, "Username", "Username", Iconsax.user),
+              const SizedBox(height: 15),
+              _buildTextField(_emailController, "Email", "Email", Iconsax.sms),
+              const SizedBox(height: 15),
+              _buildTextField(_phoneController, "Phone Number", "Phone Number", Iconsax.call),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _passwordController,
+                readOnly: true,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: "Change Password",
+                  prefixIcon: const Icon(Iconsax.key, size: 18),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: _showChangePasswordDialog,
                   ),
                 ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: MaterialButton(
-                    onPressed: () {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.confirm,
-                        title: "Save Changes",
-                        text: "Do you want to save these changes?",
-                        confirmBtnText: 'Yes',
-                        cancelBtnText: 'No',
-                        confirmBtnColor: Colors.green,
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          saveProfileChanges();
-                        },
-                      );
-                    },
-                    color: button,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: const Text("Save Changes",
-                        style: TextStyle(fontSize: 16, color: Colors.white)),
-                  ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: button),
+                  child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.confirm,
+                      title: "Confirm",
+                      text: "Save profile changes?",
+                      confirmBtnText: 'Yes',
+                      cancelBtnText: 'No',
+                      onConfirmBtnTap: () {
+                        Navigator.pop(context);
+                        saveProfileChanges();
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    bool obscureText = false,
-    int maxLines = 1,
-  }) {
+  Widget _buildTextField(TextEditingController controller, String label, String hint, IconData icon) {
     return TextField(
       controller: controller,
-      obscureText: obscureText,
-      maxLines: maxLines,
-      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon, size: 18),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black, width: 1.5),
-          borderRadius: BorderRadius.circular(10),
-        ),
       ),
     );
   }

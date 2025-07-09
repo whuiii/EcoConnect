@@ -5,11 +5,14 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class YouTubePlayerScreen extends StatefulWidget {
   final String videoUrl;
   final String title;
-
+  final String description;
+  final String author;
   const YouTubePlayerScreen({
     super.key,
     required this.videoUrl,
     required this.title,
+    required this.description,
+    required this.author,
   });
 
   @override
@@ -65,6 +68,54 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
     return "$minutes:$seconds";
   }
 
+
+  void _showReportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Report Video'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.flag),
+                title: const Text('Inappropriate Content'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar('Reported as Inappropriate Content');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.copyright),
+                title: const Text('Copyright Issue'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar('Reported as Copyright Issue');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.error_outline),
+                title: const Text('Spam or Misleading'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSnackBar('Reported as Spam');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,10 +137,15 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   ),
                   const Text(
-                    'Player',
+                    'DIY Video',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const Icon(Icons.info_outline_rounded),
+                  IconButton(
+                    icon: const Icon(Icons.flag_outlined),
+                    onPressed: () {
+                      _showReportDialog();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -125,9 +181,9 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      const Text(
-                        "Justin89",
-                        style: TextStyle(color: Colors.grey),
+                      Text(
+                        "Author: ${widget.author}",
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -164,14 +220,55 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
 
             const SizedBox(height: 16),
 
-            // Progress bar + controls
+            // Progress bar + description
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildProgressBar(),
+
                   const SizedBox(height: 8),
                   _buildControlButtons(),
+                  // Inside the Padding -> Column (after _buildControlButtons)
+                  const SizedBox(height: 20),
+
+                  const Divider(
+                    color: Colors.black12,
+                    thickness: 1,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.deepPurple.shade50),
+                    ),
+                    child: Text(
+                      widget.description,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),
@@ -210,8 +307,8 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
               max: 100,
               onChanged: (value) {
                 final newPosition = Duration(
-                  milliseconds: (_videoDuration.inMilliseconds * (value / 100))
-                      .round(),
+                  milliseconds:
+                  (_videoDuration.inMilliseconds * (value / 100)).round(),
                 );
                 _youtubeController.seekTo(newPosition);
               },
@@ -267,3 +364,4 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
     );
   }
 }
+

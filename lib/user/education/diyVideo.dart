@@ -1,8 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../color.dart';
@@ -10,11 +8,15 @@ import '../../color.dart';
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
   final String title;
+  final String description;
+  final String author;
 
   const VideoPlayerScreen({
     super.key,
     required this.videoUrl,
     required this.title,
+    required this.description,
+    required this.author,
   });
 
   @override
@@ -29,10 +31,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Duration? _duration;
   Duration? _position;
   var _progress = 0.0;
-  var _onUpdateControllerTime;
   bool _disposed = false;
-  String convertTwo(int value) => value < 10 ? "0$value" : "$value";
-
 
   @override
   void initState() {
@@ -45,7 +44,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _controller.addListener(_onControllerUpdate);
       });
   }
-
 
   @override
   void dispose() {
@@ -68,12 +66,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(onPressed: (){
-                    Get.back();
-                  },
-                      icon:const Icon(Icons.arrow_back_ios_new_rounded) ),
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  ),
                   const Text(
-                    'Player',
+                    'DIY Video',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const Icon(Icons.info_outline_rounded),
@@ -104,24 +104,27 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               ),
             ),
 
-            // Title and Subtext
+            // Title and like button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                        "Justin89",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.title,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          widget.author.isNotEmpty ? widget.author : "Unknown Author",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     children: [
@@ -133,20 +136,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         onPressed: () {
                           setState(() {
                             _isLiked = !_isLiked;
-                            if (_isLiked) {
-                              _likesCount++;
-                            } else {
-                              _likesCount--;
-                            }
+                            _likesCount += _isLiked ? 1 : -1;
                           });
                         },
                       ),
                       const SizedBox(width: 4),
                       Text(
                         "${_likesCount ~/ 1000}.${_likesCount % 1000 ~/ 100}k",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -156,39 +153,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
             const SizedBox(height: 16),
 
-            // Video Progress Indicator
+            // Video Progress & Description
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _controlView(context),
-                  // VideoProgressIndicator(
-                  //   _controller,
-                  //   allowScrubbing: true,
-                  //   colors: VideoProgressColors(
-                  //     playedColor: Colors.purple,
-                  //     backgroundColor: Colors.purple.shade100,
-                  //     bufferedColor: Colors.purple.shade200,
-                  //   ),
-                  // ),
-
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.description,
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
                 ],
               ),
             ),
 
             const Spacer(),
-
-            // Bottom Status (optional volume or subtitle buttons)
-            // Padding(
-            //   padding: const EdgeInsets.only(bottom: 24.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     children: const [
-            //       Icon(Icons.volume_up_outlined),
-            //       Text("11:59"),
-            //     ],
-            //   ),
-            // )
           ],
         ),
       ),
@@ -250,27 +231,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     inactiveTrackColor: Colors.deepPurple.shade100,
                     thumbColor: Colors.deepPurpleAccent,
                     overlayColor: Colors.deepPurple.withOpacity(0.1),
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                    thumbShape:
+                    const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    overlayShape:
+                    const RoundSliderOverlayShape(overlayRadius: 18),
                   ),
                   child: Slider(
                     value: _progress * 100,
                     min: 0,
                     max: 100,
                     onChanged: (value) {
-                      setState(() {
-                        final newPosition = Duration(
-                          milliseconds: (_controller.value.duration.inMilliseconds * (value / 100)).round(),
-                        );
-                        _controller.seekTo(newPosition);
-                      });
+                      final newPosition = Duration(
+                        milliseconds: (_controller.value.duration.inMilliseconds *
+                            (value / 100))
+                            .round(),
+                      );
+                      _controller.seekTo(newPosition);
                     },
                     onChangeStart: (_) => _controller.pause(),
                     onChangeEnd: (value) {
                       final duration = _controller.value.duration;
                       if (duration != null) {
                         final newValue = value.clamp(0, 100) * 0.01;
-                        final millis = (duration.inMilliseconds * newValue).toInt();
+                        final millis =
+                        (duration.inMilliseconds * newValue).toInt();
                         _controller.seekTo(Duration(milliseconds: millis));
                         _controller.play();
                       }
@@ -322,8 +306,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     );
   }
 
-
-
   void _onControllerUpdate() {
     if (_disposed) return;
     if (!_controller.value.isInitialized) return;
@@ -340,7 +322,4 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       _isPlaying = _controller.value.isPlaying;
     });
   }
-
 }
-
-
