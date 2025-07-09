@@ -1,11 +1,13 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/quickalert.dart';
 
 import '../../color.dart';
-import '../../utilis.dart'; // Make sure this has your pickImage() helper
+import '../../utilis.dart';
 
 class AdminEditProfile extends StatefulWidget {
   @override
@@ -22,6 +24,27 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  Future<void> loadCompanyData() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+
+      final doc = await FirebaseFirestore.instance.collection('companies').doc(uid).get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        _companyNameController.text = data['companyName'] ?? '';
+        _regNumberController.text = data['registrationNumber'] ?? '';
+        _emailController.text = data['email'] ?? '';
+        _phoneController.text = data['phoneNumber'] ?? '';
+        _addressController.text = data['address'] ?? '';
+        _passwordController.text = "********";
+      }
+    } catch (e) {
+      print("Error loading company data: $e");
+    }
+  }
+
   void selectImage() async {
     Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
@@ -30,59 +53,52 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
   }
 
   void _showChangePasswordDialog() {
-    final currentPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Change Password'),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextField(
-                controller: currentPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Current Password',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'New Password',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: confirmPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm New Password',
-                ),
-              ),
-            ],
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: currentPassCtrl,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Current Password'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: newPassCtrl,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'New Password'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: confirmPassCtrl,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Confirm New Password'),
+            ),
+          ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              final current = currentPasswordController.text.trim();
-              final newPass = newPasswordController.text.trim();
-              final confirm = confirmPasswordController.text.trim();
+            onPressed: () async {
+              final current = currentPassCtrl.text.trim();
+              final newPass = newPassCtrl.text.trim();
+              final confirm = confirmPassCtrl.text.trim();
 
               if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
                 QuickAlert.show(
                   context: context,
                   type: QuickAlertType.error,
-                  text: "All fields are required!",
+                  text: "All fields are required.",
                 );
                 return;
               }
@@ -90,21 +106,36 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                 QuickAlert.show(
                   context: context,
                   type: QuickAlertType.error,
-                  text: "New passwords do not match!",
+                  text: "New passwords do not match.",
                 );
                 return;
               }
 
-              setState(() {
-                _passwordController.text = newPass;
-              });
+              try {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) throw Exception("No user signed in.");
 
-              Navigator.of(context).pop();
-              QuickAlert.show(
-                context: context,
-                type: QuickAlertType.success,
-                text: "Password updated successfully!",
-              );
+                final cred = EmailAuthProvider.credential(
+                  email: user.email!,
+                  password: current,
+                );
+
+                await user.reauthenticateWithCredential(cred);
+                await user.updatePassword(newPass);
+
+                Navigator.pop(context);
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.success,
+                  text: "Password updated successfully!",
+                );
+              } catch (e) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.error,
+                  text: "Failed: ${e.toString()}",
+                );
+              }
             },
             child: const Text('Save'),
           ),
@@ -112,6 +143,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
       ),
     );
   }
+
 
   @override
   void dispose() {
@@ -125,178 +157,162 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    // TODO: Load the initial data from your backend or database.
-    // Example:
-    _companyNameController.text = "EcoConnect Ltd.";
-    _regNumberController.text = "EC123456";
-    _emailController.text = "admin@ecoconnect.com";
-    _phoneController.text = "+60123456789";
-    _addressController.text = "123 Green Road, EcoCity, Malaysia";
-    _passwordController.text = "********"; // Placeholder
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Edit Company Profile"),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            children: [
-              Stack(
+        body: FutureBuilder(
+          future: loadCompanyData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(30),
+              child: Column(
                 children: [
-                  _image != null
-                      ? CircleAvatar(
-                    radius: 60,
-                    backgroundImage: MemoryImage(_image!),
-                  )
-                      : const CircleAvatar(
-                    radius: 60,
-                    backgroundImage:
-                    AssetImage('assets/images/EcoConnect_Logo.png'),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.grey.shade300,
+                  Stack(
+                    children: [
+                      _image != null
+                          ? CircleAvatar(
+                        radius: 60,
+                        backgroundImage: MemoryImage(_image!),
+                      )
+                          : const CircleAvatar(
+                        radius: 60,
+                        backgroundImage: AssetImage('assets/images/EcoConnect_Logo.png'),
+                        backgroundColor: Colors.transparent,
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.add_a_photo, size: 18),
-                        color: Colors.black,
-                        onPressed: selectImage,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: Colors.grey.shade300,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.add_a_photo, size: 18),
+                            color: Colors.black,
+                            onPressed: selectImage,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "EcoConnect",
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 30),
+                  const Divider(),
+                  const SizedBox(height: 10),
+
+                  _buildTextField(
+                    controller: _companyNameController,
+                    label: "Company Name",
+                    hint: "Company name",
+                    icon: Iconsax.building,
+                    readOnly: true,
+                  ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    controller: _regNumberController,
+                    label: "Registration Number",
+                    hint: "Registration number",
+                    icon: Iconsax.document,
+                    readOnly: true,
+                  ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    controller: _emailController,
+                    label: "Email",
+                    hint: "company@email.com",
+                    icon: Iconsax.sms,
+                  ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    controller: _phoneController,
+                    label: "Phone Number",
+                    hint: "Company phone number",
+                    icon: Iconsax.call,
+                  ),
+                  const SizedBox(height: 20),
+
+                  _buildTextField(
+                    controller: _addressController,
+                    label: "Company Address",
+                    hint: "Full company address",
+                    icon: Iconsax.location,
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: _passwordController,
+                    readOnly: true,
+                    obscureText: true,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      labelText: "Change Password",
+                      hintText: "********",
+                      prefixIcon: const Icon(Iconsax.key, color: Colors.black, size: 18),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.black),
+                        onPressed: _showChangePasswordDialog,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      floatingLabelStyle: const TextStyle(color: Colors.black, fontSize: 18),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: MaterialButton(
+                      onPressed: () {
+                        QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.confirm,
+                          title: "Save Changes",
+                          text: "Do you want to save these changes?",
+                          confirmBtnText: 'Yes',
+                          cancelBtnText: 'No',
+                          confirmBtnColor: Colors.green,
+                        );
+                        // TODO: Save changes to Firestore here
+                      },
+                      color: button,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "Save Changes",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              const Text(
-                "EcoConnect",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 30),
-              const Divider(),
-              const SizedBox(height: 10),
-
-              // Company Name - read only
-              _buildTextField(
-                controller: _companyNameController,
-                label: "Company Name",
-                hint: "Company name",
-                icon: Iconsax.building,
-                readOnly: true,
-              ),
-              const SizedBox(height: 20),
-
-              // Registration Number - read only
-              _buildTextField(
-                controller: _regNumberController,
-                label: "Registration Number",
-                hint: "Registration number",
-                icon: Iconsax.document,
-                readOnly: true,
-              ),
-              const SizedBox(height: 20),
-
-              // Email
-              _buildTextField(
-                controller: _emailController,
-                label: "Email",
-                hint: "company@email.com",
-                icon: Iconsax.sms,
-              ),
-              const SizedBox(height: 20),
-
-              // Phone Number
-              _buildTextField(
-                controller: _phoneController,
-                label: "Phone Number",
-                hint: "Company phone number",
-                icon: Iconsax.call,
-              ),
-              const SizedBox(height: 20),
-
-              // Address
-              _buildTextField(
-                controller: _addressController,
-                label: "Company Address",
-                hint: "Full company address",
-                icon: Iconsax.location,
-                maxLines: 3,
-              ),
-              const SizedBox(height: 20),
-
-              // Change Password
-              TextField(
-                controller: _passwordController,
-                readOnly: true,
-                obscureText: true,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  labelText: "Change Password",
-                  hintText: "********",
-                  prefixIcon:
-                  const Icon(Iconsax.key, color: Colors.black, size: 18),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.black),
-                    onPressed: _showChangePasswordDialog,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                    BorderSide(color: Colors.grey.shade200, width: 2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  floatingLabelStyle:
-                  const TextStyle(color: Colors.black, fontSize: 18),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide:
-                    const BorderSide(color: Colors.black, width: 1.5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              SizedBox(
-                width: double.infinity,
-                child: MaterialButton(
-                  onPressed: () {
-                    QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.confirm,
-                      title: "Save Changes",
-                      text: "Do you want to save these changes?",
-                      confirmBtnText: 'Yes',
-                      cancelBtnText: 'No',
-                      confirmBtnColor: Colors.green,
-                    );
-                    // TODO: Add your logic to save the updated profile here.
-                  },
-                  color: button,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12, horizontal: 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    "Save Changes",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -325,8 +341,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
           borderSide: BorderSide(color: Colors.grey.shade200, width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
-        floatingLabelStyle:
-        const TextStyle(color: Colors.black, fontSize: 18),
+        floatingLabelStyle: const TextStyle(color: Colors.black, fontSize: 18),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black, width: 1.5),
           borderRadius: BorderRadius.circular(10),
