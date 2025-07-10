@@ -26,6 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
       _image = img;
     });
   }
+
   int activateIndex = 0;
   bool securePassword = true;
   bool? isChecked = false;
@@ -55,14 +56,14 @@ class _RegisterPageState extends State<RegisterPage> {
     'assets/images/3.gif',
   ];
 
+  //Upload to Storage
   Future<String> uploadImageToStorage(Uint8List image) async {
     final ref = FirebaseStorage.instance
         .ref()
         .child('profileImages')
         .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-    UploadTask uploadTask = ref.putData(image);
-
+    UploadTask uploadTask = ref.putData(image); // ✅ Correct for Uint8List
     TaskSnapshot snap = await uploadTask;
 
     String downloadUrl = await snap.ref.getDownloadURL();
@@ -82,36 +83,31 @@ class _RegisterPageState extends State<RegisterPage> {
     });
   }
 
-final userService = UserService();
-void handleRegister() async {
-  String imageUrl = '';
+  final userService = UserService();
+  void handleRegister() async {
+    String imageUrl = '';
 
-  if (_image != null) {
-    imageUrl = await uploadImageToStorage(_image!);
-  }
-  String? result = await userService.registerUser(
-  email: emailController.text.trim(),
-  password: passwordController.text,
-  confirmPassword: confirmPasswordController.text,
-  username: usernameController.text.trim(),
-  phone: phoneController.text.trim(),
-    profileImage: imageUrl,
-);
-
-
-  if (result == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Registration successful!"))
+    if (_image != null) {
+      imageUrl = await uploadImageToStorage(_image!);
+    }
+    String? result = await userService.registerUser(
+      email: emailController.text.trim(),
+      password: passwordController.text,
+      confirmPassword: confirmPasswordController.text,
+      username: usernameController.text.trim(),
+      phone: phoneController.text.trim(),
+      profileImage: imageUrl,
     );
-    Navigator.pushReplacementNamed(context, '/home');
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result))
-    );
+
+    if (result == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Registration successful!")));
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result)));
+    }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,21 +123,20 @@ void handleRegister() async {
                 child: Container(
                   padding: const EdgeInsets.all(30),
                   //height: ,
-                  child:
-                  Stack(
+                  child: Stack(
                     children: [
                       _image != null
                           ? CircleAvatar(
-                        radius: 60,
-                        backgroundImage: MemoryImage(_image!),
-                      )
+                              radius: 60,
+                              backgroundImage: MemoryImage(_image!),
+                            )
                           : CircleAvatar(
-                        radius: 60,
-                        backgroundImage:
-                        AssetImage('assets/images/EcoConnect_Logo.png'),
-                        //backgroundColor: Colors.transparent,
-                        backgroundColor: Colors.grey.shade200,
-                      ),
+                              radius: 60,
+                              backgroundImage: AssetImage(
+                                  'assets/images/EcoConnect_Logo.png'),
+                              //backgroundColor: Colors.transparent,
+                              backgroundColor: Colors.grey.shade200,
+                            ),
                       Positioned(
                         bottom: 0,
                         right: 0,

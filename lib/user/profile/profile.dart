@@ -10,15 +10,26 @@ import 'package:navigate/mainpage.dart';
 import 'package:navigate/user/profile/privacyPolicy.dart';
 import 'package:navigate/user/profile/termsConditions.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
 
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
   Future<Map<String, String>> fetchUserData() async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return {'username': 'EcoConnect', 'email': '', 'address': ''};
+      if (uid == null)
+        return {
+          'username': 'EcoConnect',
+          'email': '',
+          'address': '',
+        };
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         final data = userDoc.data()!;
@@ -26,6 +37,7 @@ class Profile extends StatelessWidget {
           'username': data['username'] ?? 'EcoConnect',
           'email': data['email'] ?? '',
           'address': data['address'] ?? '',
+          'profileImage': data['profileImage'] ?? ''
         };
       } else {
         return {'username': 'EcoConnect', 'email': '', 'address': ''};
@@ -47,6 +59,7 @@ class Profile extends StatelessWidget {
               final username = snapshot.data?['username'] ?? 'EcoConnect';
               final userEmail = snapshot.data?['email'] ?? '';
               final userAddress = snapshot.data?['address'] ?? '';
+              final profileImageUrl = snapshot.data?['profileImage'] ?? '';
 
               return Column(
                 children: [
@@ -82,24 +95,31 @@ class Profile extends StatelessWidget {
                             ],
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/EcoConnect_Logo.png',
+                            child: Image.network(
+                              profileImageUrl,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/EcoConnect_Logo.png',
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
                         ),
                         const SizedBox(height: 15),
                         snapshot.connectionState == ConnectionState.waiting
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
                             : Text(
-                          username,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
+                                username,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
                         const SizedBox(height: 15),
                         if (userEmail.isNotEmpty)
                           Container(
@@ -163,15 +183,19 @@ class Profile extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     color: back1,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Column(
                       children: [
                         SizedBox(
                           width: 200,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Get.to(EditProfile());
+                            onPressed: () async {
+                              final result = await Get.to(() => EditProfile());
+                              if (result == true) {
+                                setState(
+                                    () {}); // ✅ This refreshes the FutureBuilder
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: button,
@@ -185,7 +209,7 @@ class Profile extends StatelessWidget {
                             child: const Text(
                               "Edit Profile",
                               style:
-                              TextStyle(fontSize: 16, color: Colors.white),
+                                  TextStyle(fontSize: 16, color: Colors.white),
                             ),
                           ),
                         ),
@@ -228,8 +252,9 @@ class Profile extends StatelessWidget {
                           onPress: () {
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => MainPage()),
-                                  (route) => false,
+                              MaterialPageRoute(
+                                  builder: (context) => MainPage()),
+                              (route) => false,
                             );
                           },
                         ),
@@ -285,15 +310,15 @@ class ProfileMenuWidget extends StatelessWidget {
       ),
       trailing: endIcon
           ? Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: Colors.grey.shade300,
-        ),
-        child: Icon(Icons.keyboard_arrow_right,
-            size: 18, color: Colors.grey.shade800),
-      )
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                color: Colors.grey.shade300,
+              ),
+              child: Icon(Icons.keyboard_arrow_right,
+                  size: 18, color: Colors.grey.shade800),
+            )
           : null,
     );
   }

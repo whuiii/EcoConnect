@@ -66,15 +66,15 @@ class _RankingPageState extends State<RankingPage> {
           body: SafeArea(
             child: Column(
               children: [
-               // Top Container
+                // Top Container
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        green3.withOpacity(0.9),  // Original green3 shade
-                        green3.withOpacity(0.7),  // Slight variation for depth
+                        green3.withOpacity(0.9), // Original green3 shade
+                        green3.withOpacity(0.7), // Slight variation for depth
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -108,9 +108,16 @@ class _RankingPageState extends State<RankingPage> {
                           ],
                         ),
                         child: ClipOval(
-                          child: Image.asset(
-                            "assets/images/ava.jpg",
+                          child: Image.network(
+                            data['profileImage'] ?? '', // from Firestore
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Fallback if the image URL is broken or empty
+                              return Image.asset(
+                                'assets/images/ava.jpg',
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -176,7 +183,8 @@ class _RankingPageState extends State<RankingPage> {
                                 },
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.symmetric(horizontal: 12),
-                                  backgroundColor: Colors.white.withOpacity(0.2),
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.2),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
@@ -198,7 +206,6 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                 ),
 
-
                 const SizedBox(height: 20),
                 Container(
                   color: back1,
@@ -214,8 +221,8 @@ class _RankingPageState extends State<RankingPage> {
                         thumbColor: _selectedTab == RankingCategory.point
                             ? point_color
                             : _selectedTab == RankingCategory.weight
-                            ? weight_color
-                            : frequency_color,
+                                ? weight_color
+                                : frequency_color,
                         groupValue: _selectedTab,
                         onValueChanged: (RankingCategory? value) {
                           if (value != null) {

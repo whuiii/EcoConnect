@@ -1,3 +1,4 @@
+// Add at the top:
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -7,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
-
 import '../../color.dart';
 import '../../utilis.dart'; // your pickImage helper
 
@@ -36,7 +36,8 @@ class _EditProfileState extends State<EditProfile> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('No user signed in.');
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (userDoc.exists) {
         final data = userDoc.data()!;
         _usernameController.text = data['username'] ?? '';
@@ -44,11 +45,9 @@ class _EditProfileState extends State<EditProfile> {
         _phoneController.text = data['phone'] ?? '';
         existingImageUrl = data['profileImage'];
 
-        if (existingImageUrl != null && existingImageUrl!.isNotEmpty) {
-          final networkImage = await networkImageToUint8List(existingImageUrl!);
-          setState(() {
-            _image = networkImage;
-          });
+        // ✅ No need to pre-download the image
+        if (mounted) {
+          setState(() {});
         }
       }
     } catch (e) {
@@ -66,59 +65,53 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void selectImage() async {
-    Uint8List? img = await pickImage(ImageSource.gallery);
-    if (img != null) {
-      // Confirm with user before saving
-      bool confirm = await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Confirm Image"),
-          content: const Text("Use this image for your profile?"),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirm")),
-          ],
-        ),
-      );
-      if (confirm == true) {
-        setState(() {
-          _image = img;
-        });
-      } else {
-        print('❌ [DEBUG] User cancelled image selection.');
-      }
-    } else {
-      print('❌ [DEBUG] No image picked.');
+    try {
+      Uint8List img = await pickImage(ImageSource.gallery);
+      setState(() {
+        _image = img;
+      });
+    } catch (_) {
+      debugPrint("Image pick canceled");
     }
   }
 
   Future<String> uploadImageToStorage(Uint8List image) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw Exception('User not signed in');
+    if (image.isEmpty) throw Exception('Image data is empty');
+
+    final ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profileImages/users')
+        .child('$uid.jpg');
+
+    firebase_storage.UploadTask uploadTask = ref.putData(image);
+    firebase_storage.TaskSnapshot snap = await uploadTask;
+    return await snap.ref.getDownloadURL();
+  }
+
+  Future<void> uploadImage(BuildContext context) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? imageFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (imageFile == null) return; // User cancelled the picker
+
+    final Uint8List imageData = await imageFile.readAsBytes();
+
     try {
-      print('🟢 [DEBUG] Starting image upload...');
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) throw Exception('User not signed in');
-      if (image.isEmpty) throw Exception('Image data is empty');
+      // Upload to Firebase Storage
+      final imageUrl = await uploadImageToStorage(imageData);
 
-      final ref = firebase_storage.FirebaseStorage.instance
-          .ref()
-          .child('profileImages')
-          .child('$uid.jpg');
-
-      print('🟢 [DEBUG] Uploading to path: ${ref.fullPath}');
-      firebase_storage.UploadTask uploadTask = ref.putData(image);
-
-      uploadTask.snapshotEvents.listen((snap) {
-        print('📡 [DEBUG] State: ${snap.state}, ${snap.bytesTransferred}/${snap.totalBytes}');
-      });
-
-      firebase_storage.TaskSnapshot snap = await uploadTask;
-      String downloadUrl = await snap.ref.getDownloadURL();
-      print('✅ [DEBUG] Uploaded. URL: $downloadUrl');
-      return downloadUrl;
-
+      // Show success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image uploaded! URL: $imageUrl')),
+      );
     } catch (e) {
-      print('❌ [DEBUG] Upload error: $e');
-      throw Exception('Upload failed: $e');
+      // Show error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Upload failed: $e')),
+      );
     }
   }
 
@@ -139,11 +132,28 @@ class _EditProfileState extends State<EditProfile> {
         'profileImage': imageUrl,
       };
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).update(updatedData);
-      QuickAlert.show(context: context, type: QuickAlertType.success, text: "Profile updated!");
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update(updatedData);
+
+      if (!mounted) return;
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        text: "Profile updated!",
+        onConfirmBtnTap: () {
+          Navigator.pop(context); // Dismiss alert
+          Navigator.pop(context, true); // Go back to previous screen
+        },
+      );
     } catch (e) {
       print('❌ [DEBUG] Error saving profile: $e');
-      QuickAlert.show(context: context, type: QuickAlertType.error, text: "Error: ${e.toString()}");
+      if (!mounted) return;
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          text: "Error: ${e.toString()}");
     }
   }
 
@@ -159,13 +169,26 @@ class _EditProfileState extends State<EditProfile> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: currentPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Current Password')),
-            TextField(controller: newPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'New Password')),
-            TextField(controller: confirmPassCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Confirm New Password')),
+            TextField(
+                controller: currentPassCtrl,
+                obscureText: true,
+                decoration:
+                    const InputDecoration(labelText: 'Current Password')),
+            TextField(
+                controller: newPassCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'New Password')),
+            TextField(
+                controller: confirmPassCtrl,
+                obscureText: true,
+                decoration:
+                    const InputDecoration(labelText: 'Confirm New Password')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               final current = currentPassCtrl.text.trim();
@@ -173,23 +196,39 @@ class _EditProfileState extends State<EditProfile> {
               final confirm = confirmPassCtrl.text.trim();
 
               if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-                QuickAlert.show(context: context, type: QuickAlertType.error, text: "All fields required.");
+                QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.error,
+                    text: "All fields required.");
                 return;
               }
               if (newPass != confirm) {
-                QuickAlert.show(context: context, type: QuickAlertType.error, text: "Passwords do not match.");
+                QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.error,
+                    text: "Passwords do not match.");
                 return;
               }
 
               try {
                 final user = FirebaseAuth.instance.currentUser;
-                final cred = EmailAuthProvider.credential(email: user!.email!, password: current);
+                final cred = EmailAuthProvider.credential(
+                    email: user!.email!, password: current);
                 await user.reauthenticateWithCredential(cred);
                 await user.updatePassword(newPass);
-                Navigator.pop(context);
-                QuickAlert.show(context: context, type: QuickAlertType.success, text: "Password updated!");
+                if (mounted) {
+                  Navigator.pop(context);
+                  QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.success,
+                      text: "Password updated!");
+                }
               } catch (e) {
-                QuickAlert.show(context: context, type: QuickAlertType.error, text: "Failed: ${e.toString()}");
+                if (!mounted) return;
+                QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.error,
+                    text: "Failed: ${e.toString()}");
               }
             },
             child: const Text('Save'),
@@ -208,6 +247,14 @@ class _EditProfileState extends State<EditProfile> {
     super.dispose();
   }
 
+  ImageProvider getProfileImage() {
+    if (_image != null) return MemoryImage(_image!);
+    if (existingImageUrl != null && existingImageUrl!.isNotEmpty) {
+      return NetworkImage(existingImageUrl!); // Load directly
+    }
+    return const AssetImage('assets/images/EcoConnect_Logo.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -219,13 +266,37 @@ class _EditProfileState extends State<EditProfile> {
             children: [
               Stack(
                 children: [
-                  _image != null
-                      ? CircleAvatar(radius: 60, backgroundImage: MemoryImage(_image!))
-                      : CircleAvatar(
-                    radius: 60,
-                    backgroundImage: existingImageUrl != null
-                        ? NetworkImage(existingImageUrl!)
-                        : const AssetImage('assets/images/EcoConnect_Logo.png') as ImageProvider,
+                  SizedBox(
+                    width: 120,
+                    height: 120,
+                    child: ClipOval(
+                      child: _image != null
+                          ? Image.memory(
+                              _image!,
+                              fit: BoxFit.cover,
+                            )
+                          : (existingImageUrl != null &&
+                                  existingImageUrl!.isNotEmpty
+                              ? Image.network(
+                                  existingImageUrl!,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      color: Colors.grey[300],
+                                      child: const Center(
+                                          child: CircularProgressIndicator()),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                        'assets/images/EcoConnect_Logo.png');
+                                  },
+                                )
+                              : Image.asset(
+                                  'assets/images/EcoConnect_Logo.png')),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -242,13 +313,16 @@ class _EditProfileState extends State<EditProfile> {
                 ],
               ),
               const SizedBox(height: 10),
-              const Text("EcoConnect", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
+              const Text("EcoConnect",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
               const Divider(height: 40),
-              _buildTextField(_usernameController, "Username", "Username", Iconsax.user),
+              _buildTextField(
+                  _usernameController, "Username", "Username", Iconsax.user),
               const SizedBox(height: 15),
               _buildTextField(_emailController, "Email", "Email", Iconsax.sms),
               const SizedBox(height: 15),
-              _buildTextField(_phoneController, "Phone Number", "Phone Number", Iconsax.call),
+              _buildTextField(_phoneController, "Phone Number", "Phone Number",
+                  Iconsax.call),
               const SizedBox(height: 15),
               TextField(
                 controller: _passwordController,
@@ -268,7 +342,8 @@ class _EditProfileState extends State<EditProfile> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: button),
-                  child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+                  child: const Text("Save Changes",
+                      style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     QuickAlert.show(
                       context: context,
@@ -292,7 +367,8 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, String hint, IconData icon) {
+  Widget _buildTextField(TextEditingController controller, String label,
+      String hint, IconData icon) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(

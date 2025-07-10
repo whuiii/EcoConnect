@@ -11,26 +11,42 @@ import 'package:navigate/user/profile/termsConditions.dart';
 
 import 'admin_editprofile.dart';
 
-class AdminProfile extends StatelessWidget {
+class AdminProfile extends StatefulWidget {
   const AdminProfile({super.key});
 
+  @override
+  State<AdminProfile> createState() => _AdminProfileState();
+}
+
+class _AdminProfileState extends State<AdminProfile> {
   // Fallback mock company data
   final String companyName = "EcoWaste Management Sdn Bhd";
-  final String registrationNumber = "SSM 1234567";
-  final String companyEmail = "info@ecowaste.com";
-  final String companyAddress = "123 Green Street, Eco City, Selangor, Malaysia";
 
+  final String registrationNumber = "SSM 1234567";
+
+  final String companyEmail = "info@ecowaste.com";
+
+  final String companyAddress =
+      "123 Green Street, Eco City, Selangor, Malaysia";
+
+  final String companyLogo = "";
+  // default empty
   Future<Map<String, String>> fetchCompanyData() async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return {
-        'companyName': '',
-        'email': '',
-        'address': '',
-        'registrationNumber': '',
-      };
+      if (uid == null)
+        return {
+          'companyName': '',
+          'email': '',
+          'address': '',
+          'registrationNumber': '',
+          'companyLogo': '',
+        };
 
-      final userDoc = await FirebaseFirestore.instance.collection('companies').doc(uid).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('companies')
+          .doc(uid)
+          .get();
 
       if (userDoc.exists) {
         final data = userDoc.data()!;
@@ -39,6 +55,7 @@ class AdminProfile extends StatelessWidget {
           'email': data['email'] ?? '',
           'address': data['address'] ?? '',
           'registrationNumber': data['registrationNumber'] ?? '',
+          'companyLogo': data['companyLogo'] ?? '',
         };
       } else {
         return {
@@ -46,6 +63,7 @@ class AdminProfile extends StatelessWidget {
           'email': '',
           'address': '',
           'registrationNumber': '',
+          'companyLogo': '',
         };
       }
     } catch (e) {
@@ -55,6 +73,7 @@ class AdminProfile extends StatelessWidget {
         'email': '',
         'address': '',
         'registrationNumber': '',
+        'companyLogo': '',
       };
     }
   }
@@ -66,7 +85,6 @@ class AdminProfile extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              // 🔥 Top container using FutureBuilder
               FutureBuilder<Map<String, String>>(
                 future: fetchCompanyData(),
                 builder: (context, snapshot) {
@@ -86,27 +104,40 @@ class AdminProfile extends StatelessWidget {
                   } else {
                     final data = snapshot.data!;
                     return _buildTopContainer(
-                      companyName: data['companyName']!.isNotEmpty ? data['companyName']! : companyName,
-                      registrationNumber: data['registrationNumber']!.isNotEmpty ? data['registrationNumber']! : registrationNumber,
-                      companyEmail: data['email']!.isNotEmpty ? data['email']! : companyEmail,
-                      companyAddress: data['address']!.isNotEmpty ? data['address']! : companyAddress,
+                      companyName: data['companyName']!.isNotEmpty
+                          ? data['companyName']!
+                          : companyName,
+                      registrationNumber: data['registrationNumber']!.isNotEmpty
+                          ? data['registrationNumber']!
+                          : registrationNumber,
+                      companyEmail: data['email']!.isNotEmpty
+                          ? data['email']!
+                          : companyEmail,
+                      companyAddress: data['address']!.isNotEmpty
+                          ? data['address']!
+                          : companyAddress,
+                      companyLogo: data['companyLogo']!,
                     );
                   }
                 },
               ),
-
-              // ✅ Bottom Container stays same
               Container(
                 width: double.infinity,
                 color: back1,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   children: [
                     SizedBox(
                       width: 200,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Get.to(AdminEditProfile());
+                        onPressed: () async {
+                          final result =
+                              await Get.to(() => const AdminEditProfile());
+                          if (result == true) {
+                            setState(
+                                () {}); // ✅ This refreshes the FutureBuilder
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: button,
@@ -161,7 +192,7 @@ class AdminProfile extends StatelessWidget {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => MainPage()),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -180,6 +211,7 @@ class AdminProfile extends StatelessWidget {
     required String registrationNumber,
     required String companyEmail,
     required String companyAddress,
+    required String companyLogo,
   }) {
     return Container(
       width: double.infinity,
@@ -205,10 +237,9 @@ class AdminProfile extends StatelessWidget {
               child: Text(
                 "Reg. No: $registrationNumber",
                 style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
             ),
           ),
@@ -222,17 +253,21 @@ class AdminProfile extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 4),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 6,
-                  offset: Offset(0, 3),
-                ),
+                    color: Colors.black26, blurRadius: 6, offset: Offset(0, 3)),
               ],
             ),
             child: ClipOval(
-              child: Image.asset(
-                'assets/images/EcoConnect_Logo.png',
-                fit: BoxFit.cover,
-              ),
+              child: companyLogo.isNotEmpty
+                  ? Image.network(
+                      companyLogo,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset('assets/images/EcoConnect_Logo.png',
+                            fit: BoxFit.cover);
+                      },
+                    )
+                  : Image.asset('assets/images/EcoConnect_Logo.png',
+                      fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 15),
@@ -240,10 +275,7 @@ class AdminProfile extends StatelessWidget {
             companyName,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+                fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
           ),
           const SizedBox(height: 15),
           Container(
@@ -251,18 +283,15 @@ class AdminProfile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
-              color: Colors.white24,
-              borderRadius: BorderRadius.circular(10),
-            ),
+                color: Colors.white24, borderRadius: BorderRadius.circular(10)),
             child: Row(
               children: [
                 const Icon(Icons.email, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    companyEmail,
-                    style: const TextStyle(fontSize: 15, color: Colors.white),
-                  ),
+                  child: Text(companyEmail,
+                      style:
+                          const TextStyle(fontSize: 15, color: Colors.white)),
                 ),
               ],
             ),
@@ -271,19 +300,16 @@ class AdminProfile extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             decoration: BoxDecoration(
-              color: Colors.white24,
-              borderRadius: BorderRadius.circular(10),
-            ),
+                color: Colors.white24, borderRadius: BorderRadius.circular(10)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(Icons.location_on, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    companyAddress,
-                    style: const TextStyle(fontSize: 15, color: Colors.white),
-                  ),
+                  child: Text(companyAddress,
+                      style:
+                          const TextStyle(fontSize: 15, color: Colors.white)),
                 ),
               ],
             ),
@@ -334,15 +360,15 @@ class ProfileMenuWidget extends StatelessWidget {
       ),
       trailing: endIcon
           ? Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: Colors.grey.shade300,
-        ),
-        child: Icon(Icons.keyboard_arrow_right,
-            size: 18, color: Colors.grey.shade800),
-      )
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                color: Colors.grey.shade300,
+              ),
+              child: Icon(Icons.keyboard_arrow_right,
+                  size: 18, color: Colors.grey.shade800),
+            )
           : null,
     );
   }

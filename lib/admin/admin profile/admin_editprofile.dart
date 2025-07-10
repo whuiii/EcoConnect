@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:navigate/color.dart'; // ✅ your centralized colors
 import 'package:geocoding/geocoding.dart' as geo;
@@ -30,15 +31,18 @@ class AdminEditProfile extends StatefulWidget {
 
 class _AdminEditProfileState extends State<AdminEditProfile> {
   Uint8List? _image;
+  String? existingImageUrl;
 
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _regNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController(text: "********");
+  final TextEditingController _passwordController =
+      TextEditingController(text: "********");
 
-  final GlobalKey<LocationPickerMapState> _mapKey = GlobalKey<LocationPickerMapState>();
+  final GlobalKey<LocationPickerMapState> _mapKey =
+      GlobalKey<LocationPickerMapState>();
   LatLng companyLocation = const LatLng(3.1319, 101.6841);
 
   @override
@@ -52,14 +56,18 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
 
-      final doc = await FirebaseFirestore.instance.collection('companies').doc(uid).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('companies')
+          .doc(uid)
+          .get();
       if (doc.exists) {
         final data = doc.data()!;
         _companyNameController.text = data['companyName'] ?? '';
         _regNumberController.text = data['registrationNumber'] ?? '';
         _emailController.text = data['email'] ?? '';
-        _phoneController.text = data['phoneNumber'] ?? '';
+        _phoneController.text = data['phone'] ?? '';
         _addressController.text = data['address'] ?? '';
+        existingImageUrl = data['companyLogo'];
 
         double lat = data['latitude'] ?? 3.1319;
         double lng = data['longitude'] ?? 101.6841;
@@ -81,6 +89,20 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     } catch (_) {
       debugPrint("Image pick canceled");
     }
+  }
+
+  Future<String> uploadImageToStorage(Uint8List image) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw Exception('User not signed in');
+
+    final ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('companyLogos')
+        .child('$uid.jpg');
+
+    final uploadTask = ref.putData(image);
+    final snap = await uploadTask;
+    return await snap.ref.getDownloadURL();
   }
 
   void _searchAndNavigate(String address) async {
@@ -112,7 +134,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     }
 
     loc.LocationData locationData = await location.getLocation();
-    LatLng newLocation = LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0);
+    LatLng newLocation =
+        LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0);
     _mapKey.currentState?.moveToLocation(newLocation);
   }
 
@@ -143,7 +166,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
             TextField(
               controller: confirmPassCtrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Confirm New Password'),
+              decoration:
+                  const InputDecoration(labelText: 'Confirm New Password'),
             ),
           ],
         ),
@@ -192,6 +216,10 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                   context: context,
                   type: QuickAlertType.success,
                   text: "Password updated successfully!",
+                  onConfirmBtnTap: () {
+                    Navigator.pop(context); // Dismiss alert
+                    Navigator.pop(context); // Go back to previous screen
+                  },
                 );
               } catch (e) {
                 QuickAlert.show(
@@ -212,18 +240,36 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    await FirebaseFirestore.instance.collection('companies').doc(uid).update({
+    String? imageUrl;
+    if (_image != null) {
+      imageUrl = await uploadImageToStorage(_image!);
+    }
+
+    final dataToUpdate = {
       'email': _emailController.text.trim(),
       'phoneNumber': _phoneController.text.trim(),
       'address': _addressController.text.trim(),
       'latitude': companyLocation.latitude,
       'longitude': companyLocation.longitude,
-    });
+    };
+
+    if (imageUrl != null) {
+      dataToUpdate['companyLogo'] = imageUrl;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(uid)
+        .update(dataToUpdate);
 
     QuickAlert.show(
       context: context,
       type: QuickAlertType.success,
       text: "Profile updated successfully!",
+      onConfirmBtnTap: () {
+        Navigator.pop(context); // Dismiss alert
+        Navigator.pop(context, true);  // Go back to previous screen
+      },
     );
   }
 
@@ -237,9 +283,17 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
           children: [
             Stack(
               children: [
-                _image != null
-                    ? CircleAvatar(radius: 60, backgroundImage: MemoryImage(_image!))
-                    : const CircleAvatar(radius: 60, backgroundImage: AssetImage('assets/images/EcoConnect_Logo.png')),
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: _image != null
+                      ? MemoryImage(_image!)
+                      : (existingImageUrl != null &&
+                              existingImageUrl!.isNotEmpty)
+                          ? NetworkImage(existingImageUrl!)
+                          : const AssetImage(
+                                  'assets/images/EcoConnect_Logo.png')
+                              as ImageProvider,
+                ),
                 Positioned(
                   bottom: 0,
                   right: 0,
@@ -251,8 +305,12 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildTextField(_companyNameController, "Company Name", Iconsax.building, readOnly: true),
-            _buildTextField(_regNumberController, "Registration Number", Iconsax.document, readOnly: true),
+            _buildTextField(
+                _companyNameController, "Company Name", Iconsax.building,
+                readOnly: true),
+            _buildTextField(
+                _regNumberController, "Registration Number", Iconsax.document,
+                readOnly: true),
             _buildTextField(_emailController, "Email", Iconsax.sms),
             _buildTextField(_phoneController, "Phone Number", Iconsax.call),
             TextField(
@@ -266,7 +324,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.search),
-                      onPressed: () => _searchAndNavigate(_addressController.text),
+                      onPressed: () =>
+                          _searchAndNavigate(_addressController.text),
                     ),
                     IconButton(
                       icon: const Icon(Icons.my_location),
@@ -302,7 +361,8 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: button),
-                child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+                child: const Text("Save Changes",
+                    style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   QuickAlert.show(
                     context: context,
@@ -325,7 +385,9 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     );
   }
 
-  Widget _buildTextField(TextEditingController ctrl, String label, IconData icon, {bool readOnly = false}) {
+  Widget _buildTextField(
+      TextEditingController ctrl, String label, IconData icon,
+      {bool readOnly = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextField(
@@ -387,10 +449,12 @@ class LocationPickerMapState extends State<LocationPickerMap> {
 
   Future<void> _getAddress(LatLng pos) async {
     try {
-      List<geo.Placemark> placemarks = await geo.placemarkFromCoordinates(pos.latitude, pos.longitude);
+      List<geo.Placemark> placemarks =
+          await geo.placemarkFromCoordinates(pos.latitude, pos.longitude);
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
-        final address = "${p.street}, ${p.locality}, ${p.administrativeArea}, ${p.country}";
+        final address =
+            "${p.street}, ${p.locality}, ${p.administrativeArea}, ${p.country}";
         widget.onAddressChanged(address);
       }
     } catch (e) {
@@ -403,7 +467,8 @@ class LocationPickerMapState extends State<LocationPickerMap> {
     return SizedBox(
       height: 300,
       child: GoogleMap(
-        initialCameraPosition: CameraPosition(target: _currentLocation, zoom: 16),
+        initialCameraPosition:
+            CameraPosition(target: _currentLocation, zoom: 16),
         onMapCreated: (controller) {
           _controller = controller;
         },
