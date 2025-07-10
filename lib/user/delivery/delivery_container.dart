@@ -8,6 +8,7 @@ class RequestContainerWidget extends StatelessWidget {
   final List<String> materials;
   final String bagSize;
   final String status;
+  final String remarks;
   final String rejectReason;
   final String date;
   final String time;
@@ -26,6 +27,7 @@ class RequestContainerWidget extends StatelessWidget {
     required this.time,
     this.onTap,
     this.pointAwarded,
+    required this.remarks,
   });
 
   @override
@@ -85,7 +87,23 @@ class RequestContainerWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-
+// Remarks (if available)
+                    if (remarks.isNotEmpty && remarks != "-") ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Iconsax.message_text, color: Colors.teal),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Remarks: $remarks",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     // Points Awarded (only if completed)
                     if (status == "Completed" && pointAwarded != null) ...[
                       const SizedBox(height: 14),

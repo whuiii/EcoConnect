@@ -107,6 +107,7 @@ class _AdminDeliveryList extends StatelessWidget {
                     date: data['date'] ?? 'Unknown date',
                     time: data['time'] ?? '',
                     pointAwarded: data['pointAwarded'] ?? 0,
+                    remarks: data['remark'] ?? '-',
                     onTap: () {
                       Navigator.push(
                         context,

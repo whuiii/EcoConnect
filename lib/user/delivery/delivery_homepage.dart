@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:navigate/user/delivery/delivery_container.dart';
@@ -72,12 +73,13 @@ class _DeliveryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('deliveries')
-            .orderBy('createdAt', descending: true)
+            .where('userId', isEqualTo: currentUser?.uid)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -113,6 +115,7 @@ class _DeliveryList extends StatelessWidget {
                 date: data['date'] ?? 'Unknown date',
                 time: data['time'] ?? '',
                 pointAwarded: data['pointAwarded'] ?? 0,
+                remarks: data['remark'] ?? '-',
                 onTap: () {
                   Navigator.push(
                     context,

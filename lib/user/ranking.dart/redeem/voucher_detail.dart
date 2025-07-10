@@ -134,11 +134,15 @@ class VoucherDetailPage extends StatelessWidget {
                   return;
                 }
 
-                // 1. Redeem the voucher
+                // 1. Create user voucher record
                 await FirebaseFirestore.instance
-                    .collection('vouchers')
-                    .doc(docId)
-                    .update({'status': 'redeemed'});
+                    .collection('userVouchers')
+                    .add({
+                  'userId': userId,
+                  'voucherId': docId,
+                  'redeemedAt': Timestamp.now(),
+                  'status': 'redeemed',
+                });
 
                 // 2. Deduct points from the user
                 await userDoc.update({'point': currentPoint - point});
@@ -169,6 +173,7 @@ class VoucherDetailPage extends StatelessWidget {
                 );
               }
             },
+            icon: const Icon(Icons.redeem, color: Colors.white),
             label: const Text(
               'Redeem Voucher',
               style: TextStyle(fontSize: 16, color: Colors.white),

@@ -31,41 +31,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     }
 
     try {
-      final signInMethods =
-          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-
-      if (signInMethods.isEmpty) {
-        // Email not found
-        showDialog(
-          context: context,
-          builder: (context) {
-            return const AlertDialog(
-              content: Text("No account found for that email."),
-            );
-          },
-        );
-        return;
-      }
-
-      // Email exists, proceed with sending reset link
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       showDialog(
         context: context,
-        builder: (context) {
-          return const AlertDialog(
-            content: Text("Password reset link sent! Check your email."),
-          );
-        },
+        builder: (context) => const AlertDialog(
+          content: Text(
+            "A password reset link has been sent to this email",
+          ),
+        ),
       );
     } on FirebaseAuthException catch (e) {
-      print("Error: ${e.message}");
+      String message = "Something went wrong. Please try again.";
+      if (e.code == 'invalid-email') {
+        message = "The email address is badly formatted.";
+      }
+
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text(e.message.toString()),
-          );
-        },
+        builder: (context) => AlertDialog(content: Text(message)),
       );
     }
   }
@@ -74,43 +57,46 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Forgot Password')),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            Image.asset(
-              'assets/images/EcoConnect_Logo.png',
-              height: 200,
-              width: 200,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Enter your email and we’ll send you a password reset link.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+      resizeToAvoidBottomInset: true, // Makes body adjust when keyboard appears
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+              Image.asset(
+                'assets/images/EcoConnect_Logo.png',
+                height: 200,
+                width: 200,
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: passwordReset,
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              const SizedBox(height: 20),
+              const Text(
+                'Enter your email and we’ll send you a password reset link.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
               ),
-              child: const Text('Reset Password'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: passwordReset,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                ),
+                child: const Text('Reset Password'),
+              ),
+            ],
+          ),
         ),
       ),
     );
