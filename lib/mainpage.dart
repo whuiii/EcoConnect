@@ -45,151 +45,152 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          backgroundColor: primary,
-        body: Container(
-          color: primary,
-          //width: double.infinity,
-          // decoration: BoxDecoration(
-          //     gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-          //
-          //       Colors.green,
-          //       Colors.green.shade300,
-          //       Colors.green.shade200,
-          //       Colors.green.shade100,
-          //       Colors.green.shade50,
-          //       Colors.white,
-          //     ]
-          //     )),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  SizedBox(height: 25),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 800),
-                    child: Container(
-                      height: 380,
-                      child: Image.asset('assets/images/EcoConnect_Logo.png'),
-                      // child: Stack(
-                      //   children: _images.asMap().entries.map((e) {
-                      //     return Positioned.fill(
-                      //       child: AnimatedOpacity(
-                      //         duration: Duration(seconds: 1),
-                      //         opacity: activateIndex == e.key ? 1 : 0,
-                      //         child: Image.asset(
-                      //           e.value,
-                      //           fit: BoxFit.cover, // Auto scales the image
-                      //           //width: double.infinity,
-                      //         ),
-                      //       ),
-                      //     );
-                      //   }).toList(),
-                      // ),
-                    ),
-                  ),
-                  FadeInUp(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Welcome to EcoConnect",
+            backgroundColor: back1,
+            body: Container(
+              color: back1,
+              //width: double.infinity,
+              // decoration: BoxDecoration(
+              //     gradient: LinearGradient(begin: Alignment.topCenter, colors: [
+              //
+              //       Colors.green,
+              //       Colors.green.shade300,
+              //       Colors.green.shade200,
+              //       Colors.green.shade100,
+              //       Colors.green.shade50,
+              //       Colors.white,
+              //     ]
+              //     )),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 25),
+                      FadeInUp(
+                        duration: Duration(milliseconds: 800),
+                        child: Container(
+                          height: 380,
+                          child:
+                              Image.asset('assets/images/EcoConnect_Logo.png'),
+                          // child: Stack(
+                          //   children: _images.asMap().entries.map((e) {
+                          //     return Positioned.fill(
+                          //       child: AnimatedOpacity(
+                          //         duration: Duration(seconds: 1),
+                          //         opacity: activateIndex == e.key ? 1 : 0,
+                          //         child: Image.asset(
+                          //           e.value,
+                          //           fit: BoxFit.cover, // Auto scales the image
+                          //           //width: double.infinity,
+                          //         ),
+                          //       ),
+                          //     );
+                          //   }).toList(),
+                          // ),
+                        ),
+                      ),
+                      FadeInUp(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Welcome to EcoConnect",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: primaryColor_darkGreen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      FadeInUp(
+                        child: Text(
+                          '''Sort smarter. Track your waste.
+Earn rewards for a greener lifestyle.''',
+                          textAlign:
+                              TextAlign.center, // Optional: center the text
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: primaryColor_darkGreen,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  FadeInUp(
-                    child: Text(
-                      '''Sort smarter. Track your waste.
-Earn rewards for a greener lifestyle.''',
-                      textAlign: TextAlign.center, // Optional: center the text
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: primaryColor_darkGreen,
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  FadeInUp(
-                    delay: Duration(milliseconds: 800),
-                    duration: Duration(milliseconds: 1500),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/1');
-                            //Get.to(AdminNavigate());
-                          },
-                          child: Text(
-                            "Login as User",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            backgroundColor: button,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      FadeInUp(
+                        delay: Duration(milliseconds: 800),
+                        duration: Duration(milliseconds: 1500),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/1');
+                                //Get.to(AdminNavigate());
+                              },
+                              child: Text(
+                                "Login as User",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                backgroundColor: button,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-                  FadeInUp(
-                    delay: Duration(milliseconds: 800),
-                    duration: Duration(milliseconds: 1500),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.to(AdminLoginPage());
-                          },
-                          child: Text(
-                            "Login as Company",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            backgroundColor: button,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      FadeInUp(
+                        delay: Duration(milliseconds: 800),
+                        duration: Duration(milliseconds: 1500),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Get.to(AdminLoginPage());
+                              },
+                              child: Text(
+                                "Login as Company",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                backgroundColor: button,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        )));
+            )));
   }
 }
