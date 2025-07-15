@@ -2,13 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:navigate/color.dart';
+import 'package:navigate/user/delivery/add_delivery_request.dart';
 import 'package:navigate/user/delivery/delivery_container.dart';
 import 'package:navigate/user/delivery/delivery_container_detail.dart';
-import 'package:navigate/user/delivery/delivery_info.dart';
-import 'package:navigate/user/delivery/page_delivery.dart';
-
-import '../../color.dart';
-import 'add_delivery_request.dart';
 
 class DeliveryRequest extends StatelessWidget {
   const DeliveryRequest({super.key});
@@ -16,7 +13,7 @@ class DeliveryRequest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Two tabs: Current & Past
+      length: 2,
       child: SafeArea(
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 235, 228, 205),
@@ -44,12 +41,10 @@ class DeliveryRequest extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
-              // Current Deliveries Tab
               _DeliveryList(
                 filterStatuses: ['Pending', 'Accepted'],
                 emptyMessage: "No current delivery requests.",
               ),
-              // Past Deliveries Tab
               _DeliveryList(
                 filterStatuses: ['Completed', 'Rejected'],
                 emptyMessage: "No past delivery requests.",
@@ -71,9 +66,32 @@ class _DeliveryList extends StatelessWidget {
     required this.emptyMessage,
   });
 
+  Future<Map<String, String>> _fetchAllUsernames(
+      List<QueryDocumentSnapshot> docs) async {
+    final userIds = docs.map((doc) => doc['userId'] as String).toSet();
+
+    final futures = userIds.map((uid) async {
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      String username = 'Unknown';
+
+      if (userDoc.exists) {
+        final data = userDoc.data();
+        if (data != null && data.containsKey('username')) {
+          username = data['username'] ?? 'Unknown';
+        }
+      }
+
+      return MapEntry(uid, username);
+    });
+
+    return Map.fromEntries(await Future.wait(futures));
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
       child: StreamBuilder<QuerySnapshot>(
@@ -96,32 +114,45 @@ class _DeliveryList extends StatelessWidget {
             return Center(child: Text(emptyMessage));
           }
 
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final doc = docs[index];
-              final docId = doc.id;
-              final data = doc.data() as Map<String, dynamic>;
+          return FutureBuilder<Map<String, String>>(
+            future: _fetchAllUsernames(docs),
+            builder: (context, userSnapshot) {
+              if (!userSnapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-              return RequestContainerWidget(
-                username: data['username'] ?? 'Unknown',
-                location: data['address'] ?? '-',
-                materials: List<String>.from(data['materials'] ?? []),
-                bagSize: data['bagSize'] ?? '-',
-                status: data['status'] ?? 'Pending',
-                rejectReason: data['rejectReason'] ?? '-',
-                date: data['date'] ?? 'Unknown date',
-                time: data['time'] ?? '',
-                pointAwarded: data['pointAwarded'] ?? 0,
-                remarks: data['remark'] ?? '-',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DeliveryDetailPage(documentId: docId),
-                    ),
+              final usernameMap = userSnapshot.data!;
+
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  final doc = docs[index];
+                  final docId = doc.id;
+                  final data = doc.data() as Map<String, dynamic>;
+                  final userId = data['userId'];
+                  final username = usernameMap[userId] ?? 'Unknown';
+
+                  return RequestContainerWidget(
+                    username: username,
+                    location: data['address'] ?? '-',
+                    materials: List<String>.from(data['materials'] ?? []),
+                    bagSize: data['bagSize'] ?? '-',
+                    status: data['status'] ?? 'Pending',
+                    rejectReason: data['rejectReason'] ?? '-',
+                    date: data['date'] ?? 'Unknown date',
+                    time: data['time'] ?? '',
+                    pointAwarded: data['pointAwarded'] ?? 0,
+                    remarks: data['remark'] ?? '-',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DeliveryDetailPage(documentId: docId),
+                        ),
+                      );
+                    },
                   );
                 },
               );
