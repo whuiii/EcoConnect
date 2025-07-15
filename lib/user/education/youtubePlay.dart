@@ -80,7 +80,7 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.flag),
+                leading: const Icon(Icons.report),
                 title: const Text('Inappropriate Content'),
                 onTap: () {
                   Navigator.pop(context);
@@ -123,10 +123,9 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Header stays fixed
             Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -150,133 +149,138 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
               ),
             ),
 
-            // YouTube Player with rounded corners
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: YoutubePlayer(
-                  controller: _youtubeController,
-                  showVideoProgressIndicator: true,
-                  progressIndicatorColor: Colors.deepPurple,
-                  progressColors: const ProgressBarColors(
-                    playedColor: Colors.deepPurple,
-                    handleColor: Colors.deepPurpleAccent,
-                  ),
+            // Everything below header is now scrollable
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // YouTube Player with rounded corners
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: YoutubePlayer(
+                          controller: _youtubeController,
+                          showVideoProgressIndicator: true,
+                          progressIndicatorColor: Colors.deepPurple,
+                          progressColors: const ProgressBarColors(
+                            playedColor: Colors.deepPurple,
+                            handleColor: Colors.deepPurpleAccent,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Title, likes, author
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "Author: ${widget.author}",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  _isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: _isLiked ? Colors.redAccent : Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isLiked = !_isLiked;
+                                    if (_isLiked) {
+                                      _likesCount++;
+                                    } else {
+                                      _likesCount--;
+                                    }
+                                  });
+                                },
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "${_likesCount ~/ 1000}.${_likesCount % 1000 ~/ 100}k",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Progress + controls + description
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildProgressBar(),
+                          const SizedBox(height: 8),
+                          _buildControlButtons(),
+                          const SizedBox(height: 20),
+                          const Divider(
+                            color: Colors.black12,
+                            thickness: 1,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Description",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                              border:
+                              Border.all(color: Colors.deepPurple.shade50),
+                            ),
+                            child: Text(
+                              widget.description,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-
-            // Title and Subtext
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "Author: ${widget.author}",
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: _isLiked ? Colors.redAccent : Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isLiked = !_isLiked;
-                            if (_isLiked) {
-                              _likesCount++;
-                            } else {
-                              _likesCount--;
-                            }
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "${_likesCount ~/ 1000}.${_likesCount % 1000 ~/ 100}k",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Progress bar + description
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProgressBar(),
-
-                  const SizedBox(height: 8),
-                  _buildControlButtons(),
-                  // Inside the Padding -> Column (after _buildControlButtons)
-                  const SizedBox(height: 20),
-
-                  const Divider(
-                    color: Colors.black12,
-                    thickness: 1,
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Text(
-                    "Description",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.deepPurple.shade50),
-                    ),
-                    child: Text(
-                      widget.description,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-
-                ],
-              ),
-            ),
-
-            const Spacer(),
           ],
         ),
       ),
+
     );
   }
 

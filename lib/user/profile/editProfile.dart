@@ -127,7 +127,7 @@ class _EditProfileState extends State<EditProfile> {
 
       final updatedData = {
         'username': _usernameController.text.trim(),
-        'email': _emailController.text.trim(),
+        //'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'profileImage': imageUrl,
       };
@@ -164,79 +164,139 @@ class _EditProfileState extends State<EditProfile> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Change Password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-                controller: currentPassCtrl,
-                obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Current Password')),
-            TextField(
-                controller: newPassCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'New Password')),
-            TextField(
-                controller: confirmPassCtrl,
-                obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Confirm New Password')),
-          ],
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () async {
-              final current = currentPassCtrl.text.trim();
-              final newPass = newPassCtrl.text.trim();
-              final confirm = confirmPassCtrl.text.trim();
+      builder: (_) {
+        bool _currentObscure = true;
+        bool _newObscure = true;
+        bool _confirmObscure = true;
 
-              if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-                QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    text: "All fields required.");
-                return;
-              }
-              if (newPass != confirm) {
-                QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    text: "Passwords do not match.");
-                return;
-              }
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Change Password'),
+            content: SizedBox(
+              width: 400, // ✅ makes the dialog wider!
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: currentPassCtrl,
+                      obscureText: _currentObscure,
+                      decoration: InputDecoration(
+                        labelText: 'Current Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _currentObscure
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _currentObscure = !_currentObscure;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: newPassCtrl,
+                      obscureText: _newObscure,
+                      decoration: InputDecoration(
+                        labelText: 'New Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _newObscure
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _newObscure = !_newObscure;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: confirmPassCtrl,
+                      obscureText: _confirmObscure,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm New Password',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _confirmObscure
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _confirmObscure = !_confirmObscure;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel')),
+              ElevatedButton(
+                onPressed: () async {
+                  final current = currentPassCtrl.text.trim();
+                  final newPass = newPassCtrl.text.trim();
+                  final confirm = confirmPassCtrl.text.trim();
 
-              try {
-                final user = FirebaseAuth.instance.currentUser;
-                final cred = EmailAuthProvider.credential(
-                    email: user!.email!, password: current);
-                await user.reauthenticateWithCredential(cred);
-                await user.updatePassword(newPass);
-                if (mounted) {
-                  Navigator.pop(context);
-                  QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.success,
-                      text: "Password updated!");
-                }
-              } catch (e) {
-                if (!mounted) return;
-                QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    text: "Failed: ${e.toString()}");
-              }
-            },
-            child: const Text('Save'),
+                  if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.error,
+                        text: "All fields required.");
+                    return;
+                  }
+                  if (newPass != confirm) {
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.error,
+                        text: "Passwords do not match.");
+                    return;
+                  }
+
+                  try {
+                    final user = FirebaseAuth.instance.currentUser;
+                    final cred = EmailAuthProvider.credential(
+                        email: user!.email!, password: current);
+                    await user.reauthenticateWithCredential(cred);
+                    await user.updatePassword(newPass);
+                    if (mounted) {
+                      Navigator.pop(context);
+                      QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.success,
+                          text: "Password updated!");
+                    }
+                  } catch (e) {
+                    if (!mounted) return;
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.error,
+                        text: "Failed: ${e.toString()}");
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
+
 
   @override
   void dispose() {
@@ -318,8 +378,25 @@ class _EditProfileState extends State<EditProfile> {
               const Divider(height: 40),
               _buildTextField(
                   _usernameController, "Username", "Username", Iconsax.user),
-              const SizedBox(height: 15),
-              _buildTextField(_emailController, "Email", "Email", Iconsax.sms),
+              //const SizedBox(height: 15),
+              //_buildTextField(_emailController, "Email", "Email", Iconsax.sms),
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       const Text(
+              //         "Email",
+              //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              //       ),
+              //       const SizedBox(height: 4),
+              //       Text(
+              //         _emailController.text,
+              //         style: const TextStyle(fontSize: 14, color: Colors.black87),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(height: 15),
               _buildTextField(_phoneController, "Phone Number", "Phone Number",
                   Iconsax.call),
