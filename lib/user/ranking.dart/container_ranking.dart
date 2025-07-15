@@ -34,6 +34,7 @@ class RankingContainer extends StatelessWidget {
                   index: (index + 1).toString(),
                   taskName: item['name'] ?? '',
                   value: item['value'].toString(),
+                  imageUrl: item['image'] ?? '',
                 );
               },
             );

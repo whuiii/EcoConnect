@@ -20,6 +20,7 @@ class RankingCubit extends Cubit<Map<String, List<Map<String, dynamic>>>> {
           .map((user) => {
                 'name': user['username'] ?? 'Unknown',
                 'value': user['point'] ?? 0,
+                'image': user['profileImage'] ?? '',
               })
           .toList();
 
@@ -31,6 +32,7 @@ class RankingCubit extends Cubit<Map<String, List<Map<String, dynamic>>>> {
           .map((user) => {
                 'name': user['username'] ?? 'Unknown',
                 'value': user['weight'] ?? 0,
+                'image': user['profileImage'] ?? '',
               })
           .toList();
 
@@ -42,6 +44,7 @@ class RankingCubit extends Cubit<Map<String, List<Map<String, dynamic>>>> {
           .map((user) => {
                 'name': user['username'] ?? 'Unknown',
                 'value': user['frequency'] ?? 0,
+                'image': user['profileImage'] ?? '',
               })
           .toList();
 

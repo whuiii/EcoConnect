@@ -206,6 +206,7 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                 ),
 
+                //Top 3 Ranking
                 const SizedBox(height: 20),
                 Container(
                   color: back1,
@@ -250,6 +251,7 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                 ),
 
+                //All the ranking record 
                 Expanded(
                   child: RankingContainer(
                     category: getSelectedCategoryName(),

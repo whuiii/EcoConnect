@@ -8,13 +8,14 @@ class RankingList extends StatefulWidget {
   final String taskName;
   final String value;
   final String category;
+  final String imageUrl;
 
   const RankingList(
       {super.key,
       required this.taskName,
       required this.value,
       required this.index,
-      required this.category});
+      required this.category, required this.imageUrl});
 
   @override
   State<RankingList> createState() => _RankingListState();
@@ -55,8 +56,11 @@ class _RankingListState extends State<RankingList> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(70),
                     image: DecorationImage(
-                        image: AssetImage("assets/images/ava.jpg"),
-                        fit: BoxFit.cover)),
+  image: widget.imageUrl.isNotEmpty
+      ? NetworkImage(widget.imageUrl)
+      : const AssetImage("assets/images/ava.jpg") as ImageProvider,
+  fit: BoxFit.cover,
+),),
                 width: 40,
                 height: 40,
               ),

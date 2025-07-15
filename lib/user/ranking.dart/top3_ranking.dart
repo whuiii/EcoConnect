@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Top3Ranking extends StatelessWidget {
   final double size;
   final int rank;
-  final String imagePath;
+  final Widget imageWidget;
   final String name;
   final Color colored;
 
@@ -11,9 +11,8 @@ class Top3Ranking extends StatelessWidget {
     Key? key,
     required this.size,
     required this.rank,
-    required this.imagePath,
     required this.colored,
-    required this.name,
+    required this.name, required this.imageWidget,
   }) : super(key: key);
 
   @override
@@ -24,22 +23,24 @@ class Top3Ranking extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          margin:
-              const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: colored,
-              width: 5,
-            ),
-            image: DecorationImage(
-              image: AssetImage(imagePath),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+  margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 50),
+  width: size,
+  height: size,
+  decoration: BoxDecoration(
+    shape: BoxShape.circle,
+    border: Border.all(
+      color: colored,
+      width: 5,
+    ),
+  ),
+  child: ClipOval(
+    child: SizedBox(
+      width: size,
+      height: size,
+      child: imageWidget,
+    ),
+  ),
+),
 
         // Crown if rank == 1
         if (rank == 1)

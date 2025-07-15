@@ -23,21 +23,42 @@ class Top3RankingSection extends StatelessWidget {
             Top3Ranking(
               size: 70,
               rank: 2,
-              imagePath: "assets/images/ava.jpg",
+              imageWidget: Image.network(
+                second?['image'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/images/ava.jpg',
+                      fit: BoxFit.cover);
+                },
+              ),
               name: second?['name'] ?? 'N/A',
               colored: const Color.fromARGB(255, 246, 235, 235),
             ),
             Top3Ranking(
               size: 100,
               rank: 1,
-              imagePath: "assets/images/ava.jpg",
+              imageWidget: Image.network(
+                first?['image'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/images/ava.jpg',
+                      fit: BoxFit.cover);
+                },
+              ),
               name: first?['name'] ?? 'N/A',
               colored: Colors.yellow,
             ),
             Top3Ranking(
               size: 70,
               rank: 3,
-              imagePath: "assets/images/ava.jpg",
+              imageWidget: Image.network(
+                third?['image'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/images/ava.jpg',
+                      fit: BoxFit.cover);
+                },
+              ),
               name: third?['name'] ?? 'N/A',
               colored: Colors.orangeAccent,
             ),
