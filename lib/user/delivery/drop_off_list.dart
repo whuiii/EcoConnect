@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart' as geo;
@@ -5,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:navigate/color.dart';
+import 'package:navigate/user/delivery/deliveryQR.dart';
 
 class DropOffCenters extends StatefulWidget {
   const DropOffCenters({super.key});
@@ -14,6 +16,10 @@ class DropOffCenters extends StatefulWidget {
 }
 
 class _DropOffCentersState extends State<DropOffCenters> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
   final TextEditingController _searchController = TextEditingController();
   LatLng myCurrentLocation = LatLng(3.1319, 101.6841);
   Set<Marker> marker = {};
@@ -24,10 +30,33 @@ class _DropOffCentersState extends State<DropOffCenters> {
   int currentStep = 0;
 
   String? selectedCompanyId;
+  bool _loadingUser = true;
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    if (userDoc.exists) {
+      final data = userDoc.data()!;
+      setState(() {
+        emailController.text = data['email'] ?? '';
+        usernameController.text = data['username'] ?? '';
+        phoneController.text = data['phone'] ?? '';
+        _loadingUser = false;
+      });
+    } else {
+      setState(() {
+        _loadingUser = false;
+      });
+    }
   }
 
   Future<void> _getUserLocation() async {
@@ -127,7 +156,9 @@ class _DropOffCentersState extends State<DropOffCenters> {
 
             await _searchAndNavigate(_searchController.text);
             await _loadCompanies();
-            setState(() => currentStep += 1);
+            if (currentStep < 1) {
+              setState(() => currentStep += 1);
+            }
           } else if (currentStep == 1) {
             if (selectedCompanyId == null) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -142,14 +173,20 @@ class _DropOffCentersState extends State<DropOffCenters> {
               orElse: () => {},
             );
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    "You selected: ${selectedCompany['companyName'] ?? 'Unknown'}"),
+            final userId = FirebaseAuth.instance.currentUser!.uid;
+            // Step 1: Navigate to QR screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DeliveryQRCodeScreen(deliveryInfo: {
+                  'userId': userId,
+                  'username': usernameController.text,
+                  'email': emailController.text,
+                  'phoneNumber': phoneController.text,
+                  'status': 'Pending',
+                }),
               ),
             );
-
-            // You can navigate to another screen or perform an action here if needed
           }
         },
         controlsBuilder: (BuildContext context, ControlsDetails details) {

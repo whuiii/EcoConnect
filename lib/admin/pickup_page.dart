@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:navigate/admin/admin_qr_scan.dart';
 import 'package:navigate/admin/admin_request_detail.dart';
 import '../../color.dart';
 import '../../user/delivery/delivery_container.dart'; // reuse the same widget
@@ -16,18 +17,31 @@ class AdminDeliveryRequest extends StatelessWidget {
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 235, 228, 205),
           appBar: AppBar(
-            title: const Text("Delivery Requests"),
-            foregroundColor: green1,
-            bottom: const TabBar(
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: green1,
-              tabs: [
-                Tab(text: "Current"),
-                Tab(text: "Past"),
-              ],
-            ),
+  title: const Text("Delivery Requests"),
+  foregroundColor: green1,
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.qr_code_scanner_rounded),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const QRScanPage(),
           ),
+        );
+      },
+    ),
+  ],
+  bottom: const TabBar(
+    indicatorColor: Colors.white,
+    labelColor: Colors.white,
+    unselectedLabelColor: green1,
+    tabs: [
+      Tab(text: "Current"),
+      Tab(text: "Past"),
+    ],
+  ),
+),
           body: const TabBarView(
             children: [
               _AdminDeliveryList(

@@ -462,11 +462,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 32,
+                                reservedSize: 40,
                                 interval: interval,
                                 getTitlesWidget: (value, _) {
                                   return value % interval == 0
-                                      ? Text('${value.toInt()}')
+                                      ? Text(
+                                          '${value.toInt()}',
+                                          style: const TextStyle(fontSize: 14),
+                                        )
                                       : const SizedBox();
                                 },
                               ),
